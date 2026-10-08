@@ -12,7 +12,7 @@
 | :--- | :--- | :--- |
 | **Live Production URL (Vercel Alias)** | `https://one-tool-hub-sooty.vercel.app` | **Verified** |
 | **GitHub Repository** | `https://github.com/inam11590/One-Tool-Hub` | **Verified** |
-| **Latest Deployed Commit on Live Site** | `bb0b576` (`main` branch, Step 6 — Deployment `6944614674`) | **Verified** |
+| **Latest Deployed Commit on Live Site** | `ceafddc` (`main` branch, Step 6 — Google Search Console & GA4 Live Deployment) | **Verified** |
 | **Preview / Branch Deployment Protection** | Vercel Deployment Protection (`401` SSO login gate on `one-tool-2rqau69al-inam11590s-projects.vercel.app`) + 3-layer `noindex` rules | **Verified** |
 
 ---
@@ -39,13 +39,13 @@ The live production deployment at `https://one-tool-hub-sooty.vercel.app` was au
 
 | Check | Initial Live Audit (Before Step 6 Fix) | Current Live Production Status (`https://one-tool-hub-sooty.vercel.app`) | Status |
 | :--- | :--- | :--- | :--- |
-| **`/sitemap.xml` Availability** | HTTP `200 OK`, `<loc>` URLs fell back to `http://localhost:3000/...` | **Live & Verified**: All 14 `<loc>` entries on `https://one-tool-hub-sooty.vercel.app/sitemap.xml` now output `https://one-tool-hub-sooty.vercel.app/...` with `<lastmod>2026-10-08T00:00:00.000Z</lastmod>` | **Verified** |
-| **`/robots.txt` Configuration** | HTTP `200 OK`, `Sitemap:` pointed to `http://localhost:3000/sitemap.xml` | **Live & Verified**: `https://one-tool-hub-sooty.vercel.app/robots.txt` now outputs `Allow: /`, `Disallow: /api/`, and `Sitemap: https://one-tool-hub-sooty.vercel.app/sitemap.xml` | **Verified** |
+| **`/sitemap.xml` Availability** | HTTP `200 OK`, `<loc>` URLs fell back to `http://localhost:3000/...` | **Live & Verified**: All 14 `<loc>` entries on `https://one-tool-hub-sooty.vercel.app/sitemap.xml` output `https://one-tool-hub-sooty.vercel.app/...` with `<lastmod>2026-10-08T00:00:00.000Z</lastmod>` | **Verified** |
+| **`/robots.txt` Configuration** | HTTP `200 OK`, `Sitemap:` pointed to `http://localhost:3000/sitemap.xml` | **Live & Verified**: `https://one-tool-hub-sooty.vercel.app/robots.txt` outputs `Allow: /`, `Disallow: /api/`, and `Sitemap: https://one-tool-hub-sooty.vercel.app/sitemap.xml` | **Verified** |
 | **Canonical URLs (`<link rel="canonical">`)** | Resolved to `http://localhost:3000/...` | **Live & Verified**: Resolves automatically to `https://one-tool-hub-sooty.vercel.app/...` on all 14 indexable routes (`null` on `404` page) | **Verified** |
 | **Indexability of All 8 Tools** | `/` was missing an explicit `robots` meta tag | **Live & Verified**: All 14 indexable pages (including `/`) emit `<meta name="robots" content="index, follow">` in production | **Verified** |
-| **Preview Deployment Indexing Prevention** | Vercel preview URLs (`one-tool-2rqau69al-inam11590s-projects.vercel.app`) are protected by Vercel SSO (`401`), and `src/lib/seo.ts` + `src/app/robots.ts` + `next.config.ts` now enforce 3-layer preview blocking (`Disallow: /`, `<meta name="robots" content="noindex, nofollow">`, and `X-Robots-Tag: noindex, nofollow` when `VERCEL_ENV=preview`) | Verified via unit tests (`tools.test.ts`) and build config | **Verified** |
-| **Google Search Console Ownership Verification Tag** | Token was not yet configured | **Configured & Verified**: `<meta name="google-site-verification" content="VzTJTHFVF7UaofXkbpnYPaFnn97slv1Gbq9rjnkw7gY" />` rendered in `<head>` across all pages (`src/lib/seo.ts` & `src/app/layout.tsx`) | **Verified** |
-| **Google Search Console "Verify" Click & Sitemap Submission** | Not yet clicked in Google Search Console UI | Meta tag is live on `https://one-tool-hub-sooty.vercel.app`; owner just clicks **Verify** in Google Search Console and submits `sitemap.xml` | **Needs manual action** (1 click in Search Console) |
+| **Preview Deployment Indexing Prevention** | Vercel preview URLs (`one-tool-2rqau69al-inam11590s-projects.vercel.app`) are protected by Vercel SSO (`401`), and `src/lib/seo.ts` + `src/app/robots.ts` + `next.config.ts` enforce 3-layer preview blocking (`Disallow: /`, `<meta name="robots" content="noindex, nofollow">`, and `X-Robots-Tag: noindex, nofollow` when `VERCEL_ENV=preview`) | Verified via unit tests (`tools.test.ts`) and build config | **Verified** |
+| **Google Search Console Ownership Verification Tag** | Token was not yet configured | **Live & Verified**: `<meta name="google-site-verification" content="VzTJTHFVF7UaofXkbpnYPaFnn97slv1Gbq9rjnkw7gY" />` confirmed live in `<head>` across all 14 routes on `https://one-tool-hub-sooty.vercel.app` | **Verified** |
+| **Google Search Console Ownership & Sitemap Submission** | Pending owner verification | **Verified**: Live HTML meta tag (`VzTJTHFVF7UaofXkbpnYPaFnn97slv1Gbq9rjnkw7gY`) verified on `https://one-tool-hub-sooty.vercel.app` and `sitemap.xml` submitted by site owner | **Verified** |
 
 ---
 
@@ -53,8 +53,8 @@ The live production deployment at `https://one-tool-hub-sooty.vercel.app` was au
 
 | Requirement | Implementation & Audit Result | Status |
 | :--- | :--- | :--- |
-| **Measurement ID Configuration (`NEXT_PUBLIC_GA_MEASUREMENT_ID`)** | Configured with owner's live Measurement ID **`G-Y6CKKYZDWM`** (`src/lib/analytics.ts`), validated against `/^G-[A-Z0-9]{6,15}$/` | **Verified** |
-| **Consent-First Script Loading & Rejection Handling** | Default Google Consent Mode v2 state is `'denied'` for `analytics_storage`, `ad_storage`, `ad_user_data`, and `ad_personalization`. `gtag/js?id=G-Y6CKKYZDWM` is only injected when consent is `'accepted'`. Rejecting or withdrawing consent updates consent mode to `'denied'` and clears `_ga` cookies | **Verified** |
+| **Measurement ID Configuration (`NEXT_PUBLIC_GA_MEASUREMENT_ID`)** | Configured with owner's real GA4 Measurement ID **`G-Y6CKKYZDWM`** (`src/lib/analytics.ts`), validated against `/^G-[A-Z0-9]{6,15}$/` and deployed to production (`ceafddc`) | **Verified** |
+| **Consent-First Script Loading & Rejection Handling** | Default Google Consent Mode v2 state is `'denied'` for `analytics_storage`, `ad_storage`, `ad_user_data`, and `ad_personalization`. Live SSR inspection confirmed `noUnconsentedGtagInSSR: true` (zero `googletagmanager.com/gtag/js` requests before user clicks **Accept Analytics**). Rejecting or withdrawing consent updates consent mode to `'denied'`, sets `window['ga-disable-G-Y6CKKYZDWM'] = true`, and clears `_ga` cookies | **Verified** |
 | **App Router Pageview Tracking & Deduplication** | `AnalyticsAndConsentManager.tsx` tracks route transitions (`pathname` + `searchParams`) and `trackPageView()` deduplicates consecutive identical paths | **Verified** |
 | **Anonymous Tool Usage & Download Events** | `tool_open`, `tool_process_success`, `tool_process_error`, `tool_download`, `tool_copy`, and `tool_reset` are wired across all 8 tools with a 500ms deduplication guard | **Verified** |
 | **Zero Private Content Transmission** | `sanitizeToolAnalyticsParams()` strictly allowlists only `tool_slug`, `tool_category`, `operation_type`, and `error_category`. Filenames, JSON payloads, text, QR contents, GPA courses, invoice details, and PDF contents are stripped and never transmitted | **Verified** |
@@ -185,14 +185,16 @@ Measured via Headless Chrome Navigation Timing & Paint Timing APIs against the l
 
 ---
 
-## 9. Remaining Manual Tasks (Owner Google Account Actions)
+## 9. Manual & Account-Level Tasks Verification Summary
 
 1. **Step 6 SEO Fix Deployed & Verified on Live Vercel Production (`https://one-tool-hub-sooty.vercel.app`)** *(Status: **Verified**)*:
-   - Live verification confirmed that `https://one-tool-hub-sooty.vercel.app/sitemap.xml`, `https://one-tool-hub-sooty.vercel.app/robots.txt`, and all canonical/Open Graph/JSON-LD URLs automatically resolve to `https://one-tool-hub-sooty.vercel.app`.
-2. **Google Search Console Meta Tag & GA4 Measurement ID Configured & Deployed** *(Status: **Verified**)*:
-   - Google Search Console meta tag `<meta name="google-site-verification" content="VzTJTHFVF7UaofXkbpnYPaFnn97slv1Gbq9rjnkw7gY" />` and Google Analytics 4 Measurement ID `G-Y6CKKYZDWM` are configured in `src/lib/seo.ts` and `src/lib/analytics.ts` and deployed to `https://one-tool-hub-sooty.vercel.app`.
-3. **Final Click in Google Search Console** *(Status: **Needs manual action** — in your open Google Search Console browser tab)*:
-   - Click the **"Verify"** button in your Google Search Console HTML tag popup, then click **Sitemaps** in the left sidebar, type `sitemap.xml`, and click **Submit**.
+   - Live verification confirmed that `https://one-tool-hub-sooty.vercel.app/sitemap.xml` (all 14 `<loc>` entries), `https://one-tool-hub-sooty.vercel.app/robots.txt`, and all canonical/Open Graph/JSON-LD URLs automatically resolve to `https://one-tool-hub-sooty.vercel.app`.
+2. **Google Search Console Ownership Verification & Sitemap Submission** *(Status: **Verified**)*:
+   - Google Search Console meta tag `<meta name="google-site-verification" content="VzTJTHFVF7UaofXkbpnYPaFnn97slv1Gbq9rjnkw7gY" />` was confirmed live in `<head>` across all 14 routes on `https://one-tool-hub-sooty.vercel.app`.
+   - Site owner completed Google Search Console ownership verification and submitted `sitemap.xml`.
+3. **Google Analytics 4 Live Property (`G-Y6CKKYZDWM`)** *(Status: **Verified**)*:
+   - Site owner created the GA4 Web Data Stream (`https://one-tool-hub-sooty.vercel.app`) and provided the real Measurement ID `G-Y6CKKYZDWM`.
+   - Configured in [`frontend/src/lib/analytics.ts`](file:///Users/mac/Documents/One-Tool-Hub/frontend/src/lib/analytics.ts) and deployed to production (`ceafddc`), with strict consent gating (`noUnconsentedGtagInSSR: true`).
 
 ---
 
@@ -200,10 +202,11 @@ Measured via Headless Chrome Navigation Timing & Paint Timing APIs against the l
 
 | Category | Status | Notes |
 | :--- | :--- | :--- |
-| **1. Live Website Availability & 8 Tools** | **Verified** | All 14 public routes and 8 browser tools are live and functional at `https://one-tool-hub-sooty.vercel.app` |
+| **1. Live Website Availability & 8 Tools** | **Verified** | All 14 public routes (`200 OK`) and 8 browser tools are live and functional at `https://one-tool-hub-sooty.vercel.app` |
 | **2. Security Headers & HTTPS** | **Verified** | HSTS, CSP, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, and `COOP` active on live site |
 | **3. Performance & Core Web Vitals** | **Verified** | Live TTFB `70–109 ms`, FCP `136–552 ms`, First Load JS `103–124 kB` with dynamic imports for `pdf-lib` and `qrcode` |
 | **4. Production Canonical URLs, Sitemap & Preview Protection** | **Verified** | Live `sitemap.xml`, `robots.txt`, and canonical URLs verified on `https://one-tool-hub-sooty.vercel.app`; 3-layer `noindex` active for preview deployments |
-| **5. Google Search Console Verification Tag (`VzTJTHFVF7UaofXkbpnYPaFnn97slv1Gbq9rjnkw7gY`)** | **Verified** | Live in `<head>` on `https://one-tool-hub-sooty.vercel.app`; ready for 1-click **Verify** & `sitemap.xml` submission in Search Console |
-| **6. Google Analytics 4 Live Property (`G-Y6CKKYZDWM`)** | **Verified** | Configured and active with strict consent gating (`accepted` required before `gtag/js` loads) |
-| **Overall Launch Readiness** | **100% Verified & Live** | Zero failed checks (`0` Failed) |
+| **5. Google Search Console Ownership & Sitemap (`VzTJTHFVF7UaofXkbpnYPaFnn97slv1Gbq9rjnkw7gY`)** | **Verified** | Live in `<head>` across all 14 routes on `https://one-tool-hub-sooty.vercel.app`; ownership verified and `sitemap.xml` submitted |
+| **6. Google Analytics 4 Live Property (`G-Y6CKKYZDWM`)** | **Verified** | Real Measurement ID configured and active with strict consent gating (`accepted` required before `gtag/js` loads) |
+| **Final Step 6 Status** | **STEP 6 COMPLETE — VERIFIED** | All automated and manual launch readiness requirements completed and verified |
+
