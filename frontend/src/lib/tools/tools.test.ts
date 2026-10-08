@@ -22,6 +22,7 @@ import {
   buildWebsiteJsonLd,
   getGoogleSiteVerificationToken,
   getSiteUrlConfig,
+  isPreviewDeployment,
 } from "../seo.ts";
 import {
   canSendAnalyticsEvents,
@@ -1008,5 +1009,68 @@ test("Error Monitoring & Search Console Verification: classifies generic error c
     "abcDEF123_-validTokenValue987"
   );
 });
+
+// ============================================================================
+// STEP 6: Production Vercel URL Resolution & Preview Deployment NoIndex Protection
+// ============================================================================
+test("Step 6 Production SEO: resolves https://one-tool-hub-sooty.vercel.app on Vercel Production and enforces noindex on Preview deployments", () => {
+  const savedSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const savedVercelEnv = process.env.VERCEL_ENV;
+  const savedNextPublicVercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV;
+  const savedVercelProdUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const savedVercel = process.env.VERCEL;
+
+  try {
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+    delete process.env.NEXT_PUBLIC_VERCEL_ENV;
+    process.env.VERCEL = "1";
+    process.env.VERCEL_ENV = "production";
+    process.env.VERCEL_PROJECT_PRODUCTION_URL = "one-tool-hub-sooty.vercel.app";
+
+    const vercelProdCfg = getSiteUrlConfig();
+    assert.equal(vercelProdCfg.origin, "https://one-tool-hub-sooty.vercel.app");
+    assert.equal(vercelProdCfg.isProductionDomainConfigured, true);
+    assert.equal(vercelProdCfg.isPreview, false);
+    assert.equal(isPreviewDeployment(), false);
+
+    const prodPageMeta = buildPageMetadata({
+      title: "GPA Calculator",
+      description: "Calculate semester and cumulative GPA.",
+      path: "/tools/gpa-calculator",
+    });
+    assert.deepEqual(prodPageMeta.robots, { index: true, follow: true });
+
+    // Switch to Vercel Preview environment
+    process.env.VERCEL_ENV = "preview";
+    const vercelPreviewCfg = getSiteUrlConfig();
+    assert.equal(vercelPreviewCfg.isPreview, true);
+    assert.equal(isPreviewDeployment(), true);
+
+    const previewPageMeta = buildPageMetadata({
+      title: "GPA Calculator",
+      description: "Calculate semester and cumulative GPA.",
+      path: "/tools/gpa-calculator",
+    });
+    assert.deepEqual(previewPageMeta.robots, { index: false, follow: false });
+  } finally {
+    if (savedSiteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+    else process.env.NEXT_PUBLIC_SITE_URL = savedSiteUrl;
+
+    if (savedVercelEnv === undefined) delete process.env.VERCEL_ENV;
+    else process.env.VERCEL_ENV = savedVercelEnv;
+
+    if (savedNextPublicVercelEnv === undefined)
+      delete process.env.NEXT_PUBLIC_VERCEL_ENV;
+    else process.env.NEXT_PUBLIC_VERCEL_ENV = savedNextPublicVercelEnv;
+
+    if (savedVercelProdUrl === undefined)
+      delete process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    else process.env.VERCEL_PROJECT_PRODUCTION_URL = savedVercelProdUrl;
+
+    if (savedVercel === undefined) delete process.env.VERCEL;
+    else process.env.VERCEL = savedVercel;
+  }
+});
+
 
 

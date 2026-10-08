@@ -9,7 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ).map((tool) => tool.href!);
 
   const allRoutes = [...staticRoutes, ...availableToolRoutes];
-  const lastModified = new Date("2025-03-01T00:00:00.000Z");
+  const lastModified = new Date("2026-10-08T00:00:00.000Z");
 
   return allRoutes.map((route) => ({
     url: getAbsoluteUrl(route),

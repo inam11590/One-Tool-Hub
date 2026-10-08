@@ -2,64 +2,105 @@ import type { Metadata } from "next";
 import type { ToolItem } from "@/types/tools";
 
 const LOCAL_FALLBACK_ORIGIN = "http://localhost:3000";
+const VERCEL_PRODUCTION_FALLBACK_ORIGIN = "https://one-tool-hub-sooty.vercel.app";
 
 export interface SiteUrlConfig {
   /** Validated origin without trailing slash */
   origin: string;
-  /** True only when NEXT_PUBLIC_SITE_URL is explicitly configured to a non-localhost, non-preview HTTPS origin */
+  /** True when the resolved origin is a production HTTPS domain (custom domain or Vercel production alias) */
   isProductionDomainConfigured: boolean;
-  /** True when the current environment is a staging, preview, or localhost origin */
+  /** True when the current environment is a preview, staging, or localhost origin */
   isStagingOrLocal: boolean;
+  /** True specifically when running in a Vercel preview or staging environment that must not be indexed */
+  isPreview: boolean;
+}
+
+function normalizeCandidateOrigin(rawInput: string): string {
+  const trimmed = rawInput.trim();
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
 }
 
 /**
- * Validates and normalizes `process.env.NEXT_PUBLIC_SITE_URL`.
- * Never hardcodes an invented production domain.
+ * Validates and normalizes `process.env.NEXT_PUBLIC_SITE_URL`, falling back to
+ * Vercel's production domain (`VERCEL_PROJECT_PRODUCTION_URL` or `https://one-tool-hub-sooty.vercel.app`)
+ * when running in a Vercel production environment without an explicit custom domain override,
+ * and `http://localhost:3000` in local development.
  */
 export function getSiteUrlConfig(): SiteUrlConfig {
   const rawEnvUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  const vercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV?.trim();
+  const vercelEnv = (
+    process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.VERCEL_ENV ?? ""
+  )
+    .trim()
+    .toLowerCase();
+  const vercelProdUrl = (
+    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ??
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
+    ""
+  ).trim();
+  const isOnVercel =
+    process.env.VERCEL === "1" ||
+    vercelEnv === "production" ||
+    vercelEnv === "preview";
 
-  if (!rawEnvUrl) {
+  const candidateUrl =
+    rawEnvUrl ||
+    (vercelProdUrl ? normalizeCandidateOrigin(vercelProdUrl) : "") ||
+    (isOnVercel ? VERCEL_PRODUCTION_FALLBACK_ORIGIN : "");
+
+  if (!candidateUrl) {
     return {
       origin: LOCAL_FALLBACK_ORIGIN,
       isProductionDomainConfigured: false,
       isStagingOrLocal: true,
+      isPreview: false,
     };
   }
 
   try {
-    const parsed = new URL(rawEnvUrl);
+    const parsed = new URL(candidateUrl);
     const hostname = parsed.hostname.toLowerCase();
     const isLocalHost =
       hostname === "localhost" ||
       hostname === "127.0.0.1" ||
       hostname === "0.0.0.0" ||
       hostname.endsWith(".local");
-    const isPreviewOrStaging =
-      vercelEnv === "preview" ||
-       vercelEnv === "development" ||
-      hostname.endsWith(".vercel.app") ||
+    const isExplicitStagingHost =
       hostname.startsWith("staging.") ||
       hostname.startsWith("dev.") ||
+      hostname.startsWith("preview.") ||
       hostname === "example.com";
+    const isPreviewEnv =
+      vercelEnv === "preview" ||
+      isExplicitStagingHost ||
+      (hostname.endsWith(".vercel.app") &&
+        vercelEnv === "development");
 
     const cleanOrigin = parsed.origin.replace(/\/+$/, "");
     const isProdHttps =
-      parsed.protocol === "https:" && !isLocalHost && !isPreviewOrStaging;
+      parsed.protocol === "https:" && !isLocalHost && !isPreviewEnv;
 
     return {
       origin: cleanOrigin,
       isProductionDomainConfigured: isProdHttps,
-      isStagingOrLocal: isLocalHost || isPreviewOrStaging,
+      isStagingOrLocal: isLocalHost || isPreviewEnv,
+      isPreview: isPreviewEnv,
     };
   } catch {
     return {
       origin: LOCAL_FALLBACK_ORIGIN,
       isProductionDomainConfigured: false,
       isStagingOrLocal: true,
+      isPreview: false,
     };
   }
+}
+
+export function isPreviewDeployment(): boolean {
+  return getSiteUrlConfig().isPreview;
 }
 
 export function getSiteOrigin(): string {
@@ -117,6 +158,7 @@ export function buildPageMetadata({
 }: PageMetadataOptions): Metadata {
   const rawPath = pathname ?? path ?? "/";
   const canonicalPath = rawPath === "/" ? "/" : rawPath.replace(/\/+$/, "");
+  const shouldNoIndex = noIndex || isPreviewDeployment();
 
   return {
     title,
@@ -140,7 +182,7 @@ export function buildPageMetadata({
       title: `${title} | OneToolHub`,
       description,
     },
-    robots: noIndex
+    robots: shouldNoIndex
       ? {
           index: false,
           follow: false,

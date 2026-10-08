@@ -23,6 +23,11 @@ const contentSecurityPolicy = [
   "frame-ancestors 'none'",
 ].join("; ");
 
+const isVercelPreview =
+  (process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.VERCEL_ENV ?? "")
+    .trim()
+    .toLowerCase() === "preview";
+
 const securityHeaders = [
   {
     key: "Content-Security-Policy",
@@ -49,11 +54,22 @@ const securityHeaders = [
     key: "Cross-Origin-Opener-Policy",
     value: "same-origin",
   },
+  ...(isVercelPreview
+    ? [
+        {
+          key: "X-Robots-Tag",
+          value: "noindex, nofollow",
+        },
+      ]
+    : []),
 ];
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
   async headers() {
     return [
       {

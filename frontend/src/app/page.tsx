@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { buildWebsiteJsonLd } from "@/lib/seo";
+import { buildWebsiteJsonLd, isPreviewDeployment } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/tools";
 import { HomeClient } from "@/components/home/HomeClient";
+
+const previewNoIndex = isPreviewDeployment();
 
 export const metadata: Metadata = {
   title: {
@@ -24,6 +26,15 @@ export const metadata: Metadata = {
     title: `${SITE_CONFIG.name} — ${SITE_CONFIG.tagline}`,
     description: SITE_CONFIG.description,
   },
+  robots: previewNoIndex
+    ? {
+        index: false,
+        follow: false,
+      }
+    : {
+        index: true,
+        follow: true,
+      },
 };
 
 export default function HomePage() {
