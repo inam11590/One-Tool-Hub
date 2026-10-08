@@ -30,9 +30,9 @@ export function Footer() {
 
           {/* Categories links */}
           <div className="md:col-span-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
               Tool Categories
-            </h3>
+            </h2>
             <ul className="mt-3 space-y-2.5">
               {TOOL_CATEGORIES.map((category) => (
                 <li key={category.id}>
@@ -49,9 +49,9 @@ export function Footer() {
 
           {/* Platform & Legal links */}
           <div className="md:col-span-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-900">
               Platform
-            </h3>
+            </h2>
             <ul className="mt-3 space-y-2.5">
               {FOOTER_NAV_ITEMS.map((item) => (
                 <li key={item.href}>

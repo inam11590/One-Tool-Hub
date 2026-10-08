@@ -1,5 +1,3 @@
-import QRCode from "qrcode";
-
 export const MAX_QR_INPUT_LENGTH = 2000;
 export const MIN_QR_SIZE_PX = 128;
 export const MAX_QR_SIZE_PX = 1024;
@@ -139,6 +137,8 @@ export async function generateQrCodeAssets(
   }
 
   try {
+    const qrModule = await import("qrcode");
+    const QRCode = qrModule.default ?? qrModule;
     const qrParams = {
       width: options.size,
       margin: DEFAULT_QR_MARGIN,
@@ -163,13 +163,10 @@ export async function generateQrCodeAssets(
       svgString,
       contrastWarning: validation.contrastWarning,
     };
-  } catch (err) {
+  } catch {
     return {
       valid: false,
-      error:
-        err instanceof Error
-          ? err.message
-          : "Failed to generate QR code for the given input.",
+      error: "Unable to generate a QR code for the provided input.",
     };
   }
 }

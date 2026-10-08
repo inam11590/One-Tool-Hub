@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MessageSquare, Wrench } from "lucide-react";
+import { AlertCircle, MessageSquare, Wrench } from "lucide-react";
+import { buildPageMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 
-export const metadata: Metadata = {
-  title: "Contact",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Contact & Feedback — Report Issues or Suggest Tools",
   description:
-    "Contact information and feedback status for the OneToolHub platform.",
-};
+    "Contact information, bug reporting guidelines, and tool feedback details for the OneToolHub online utility platform.",
+  pathname: "/contact",
+});
 
 export default function ContactPage() {
   return (
@@ -20,8 +22,9 @@ export default function ContactPage() {
             Contact &amp; Feedback
           </h1>
           <p className="mt-4 text-base leading-relaxed text-slate-600 sm:text-lg">
-            We welcome tool suggestions, usability feedback, and bug reports as
-            OneToolHub grows.
+            We welcome tool suggestions, usability feedback, accessibility
+            reports, and bug reports for OneToolHub&apos;s eight browser-based
+            utilities.
           </p>
 
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -30,13 +33,13 @@ export default function ContactPage() {
                 <MessageSquare className="h-5 w-5" aria-hidden="true" />
               </span>
               <h2 className="mt-4 text-base font-bold text-slate-900">
-                Tool Requests &amp; Ideas
+                Tool Suggestions &amp; Bug Reports
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                Have a specific calculator, converter, or formatter that would
-                help your study, freelance, creator, or developer workflow?
-                Feedback channels are being prepared for the upcoming public
-                release.
+                Found a formatting edge case or have a suggestion for an
+                existing calculator, formatter, or PDF utility? When reporting
+                an issue, please include your browser version, device type, and
+                steps to reproduce (without sharing sensitive personal files).
               </p>
             </div>
 
@@ -45,34 +48,57 @@ export default function ContactPage() {
                 <Wrench className="h-5 w-5" aria-hidden="true" />
               </span>
               <h2 className="mt-4 text-base font-bold text-slate-900">
-                Current Contact Availability
+                No Server-Side Contact Form Collection
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                During Step 1 of platform setup, interactive contact forms and
-                automated support ticketing are not yet connected to a backend
-                service. No form inputs are collected or stored on this page.
+                OneToolHub currently operates without a backend database or
+                server-side form submission endpoint. No personal messages or
+                contact form entries are collected or stored on this page.
               </p>
             </div>
           </div>
 
-          <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-sm leading-relaxed text-slate-600">
-            <h3 className="font-semibold text-slate-900">
-              Note on Project Setup
-            </h3>
-            <p className="mt-1.5">
-              This page provides transparent starter content without placeholder
-              phone numbers, invented physical office addresses, or unmonitored
-              email inboxes. Official contact endpoints will be configured when
-              backend services are enabled.
+          <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50/70 p-6 text-sm leading-relaxed text-amber-950">
+            <div className="flex items-center gap-2 font-bold text-amber-900">
+              <AlertCircle
+                className="h-4 w-4 shrink-0 text-amber-700"
+                aria-hidden="true"
+              />
+              <h2>Owner Configuration Required Before Public Launch</h2>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed sm:text-sm">
+              To avoid publishing invented company names, fake office addresses,
+              or unmonitored email addresses, the site owner should replace the
+              placeholders below prior to production deployment:
             </p>
+            <ul className="mt-3 list-inside list-disc space-y-1.5 font-mono text-xs text-amber-900">
+              <li>
+                Support / Feedback Email:{" "}
+                <span>[OWNER PLACEHOLDER: Insert monitored support email]</span>
+              </li>
+              <li>
+                Operator / Organization Name:{" "}
+                <span>[OWNER PLACEHOLDER: Insert site operator or entity name]</span>
+              </li>
+              <li>
+                Mailing / Notice Address (if applicable):{" "}
+                <span>[OWNER PLACEHOLDER: Insert official mailing address]</span>
+              </li>
+            </ul>
           </div>
 
-          <div className="mt-8">
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/"
               className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Return to Homepage
+            </Link>
+            <Link
+              href="/tools"
+              className="inline-flex items-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Browse All 8 Tools
             </Link>
           </div>
         </div>

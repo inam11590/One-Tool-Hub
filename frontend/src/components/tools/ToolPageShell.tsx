@@ -1,18 +1,37 @@
 import Link from "next/link";
-import { ChevronRight, HelpCircle, BookOpen, ShieldCheck } from "lucide-react";
+import {
+  BookOpen,
+  CheckCircle2,
+  ChevronRight,
+  HelpCircle,
+  Info,
+  Lightbulb,
+  ShieldCheck,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import type { ToolFaqItem, ToolItem } from "@/types/tools";
+import { buildToolPageJsonLd } from "@/lib/seo";
 import { getRelatedTools } from "@/lib/tools";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { ToolCard } from "@/components/ui/ToolCard";
 import { ToolIcon } from "@/components/ui/ToolIcon";
 
+export interface ToolPracticalExample {
+  title: string;
+  scenario?: string;
+  description?: string;
+  sample?: string;
+}
+
 interface ToolPageShellProps {
   tool: ToolItem;
   title: string;
   description: string;
   privacyNote: string;
+  overview?: string | readonly string[];
+  features?: readonly string[];
+  examples?: readonly ToolPracticalExample[];
   instructions: readonly {
     stepTitle: string;
     stepDescription: string;
@@ -26,18 +45,28 @@ export function ToolPageShell({
   title,
   description,
   privacyNote,
+  overview,
+  features,
+  examples,
   instructions,
   faqs,
   children,
 }: ToolPageShellProps) {
   const relatedTools = getRelatedTools(tool.slug, 4);
+  const jsonLdItems = buildToolPageJsonLd(tool, title, description);
 
   return (
     <div className="py-10 sm:py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLdItems),
+        }}
+      />
       <Container>
         {/* 1. Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="mb-6">
-          <ol className="flex flex-wrap items-center gap-1.5 text-xs font-medium text-slate-500 sm:text-sm">
+          <ol className="flex flex-wrap items-center gap-1.5 text-xs font-medium text-slate-600 sm:text-sm">
             <li>
               <Link
                 href="/"
@@ -66,7 +95,7 @@ export function ToolPageShell({
           </ol>
         </nav>
 
-        {/* 2. Clear H1 Title & Short Explanation */}
+        {/* 2. Clear H1 Title & Short Introduction */}
         <div className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-8 lg:flex-row lg:items-end">
           <div className="max-w-3xl">
             <div className="flex flex-wrap items-center gap-2.5">
@@ -91,7 +120,7 @@ export function ToolPageShell({
 
           <div className="flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-xs leading-relaxed text-emerald-950 lg:max-w-xs">
             <ShieldCheck
-              className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600"
+              className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700"
               aria-hidden="true"
             />
             <span>{privacyNote}</span>
@@ -103,7 +132,99 @@ export function ToolPageShell({
           {children}
         </section>
 
-        {/* 4. Instructions & FAQs Grid */}
+        {/* 4. Tool Overview, Supported Features & Practical Examples */}
+        {(overview || features?.length || examples?.length) ? (
+          <div className="mt-16 grid grid-cols-1 gap-8 border-t border-slate-200 pt-14 lg:grid-cols-12">
+            {/* Explanation of What the Tool Does & Supported Features */}
+            <section
+              aria-labelledby="tool-overview-heading"
+              className="space-y-6 lg:col-span-6"
+            >
+              <div>
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-600">
+                  <Info className="h-4 w-4" aria-hidden="true" />
+                  <span>About This Utility</span>
+                </div>
+                <h2
+                  id="tool-overview-heading"
+                  className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl"
+                >
+                  What the {tool.name} Does
+                </h2>
+                {(typeof overview === "string" ? [overview] : overview ?? []).map(
+                  (paragraph, idx) => (
+                    <p
+                      key={idx}
+                      className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base"
+                    >
+                      {paragraph}
+                    </p>
+                  )
+                )}
+              </div>
+
+              {features && features.length > 0 ? (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-5">
+                  <h3 className="text-base font-bold text-slate-900">
+                    Supported Features &amp; Specifications
+                  </h3>
+                  <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                    {features.map((feat) => (
+                      <li key={feat} className="flex items-start gap-2.5">
+                        <CheckCircle2
+                          className="mt-0.5 h-4 w-4 shrink-0 text-indigo-600"
+                          aria-hidden="true"
+                        />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </section>
+
+            {/* Practical Examples */}
+            {examples && examples.length > 0 ? (
+              <section
+                aria-labelledby="tool-examples-heading"
+                className="lg:col-span-6"
+              >
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-600">
+                  <Lightbulb className="h-4 w-4" aria-hidden="true" />
+                  <span>Real-World Workflows</span>
+                </div>
+                <h2
+                  id="tool-examples-heading"
+                  className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl"
+                >
+                  Practical Examples
+                </h2>
+                <div className="mt-4 space-y-4">
+                  {examples.map((ex) => (
+                    <div
+                      key={ex.title}
+                      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs"
+                    >
+                      <h3 className="text-sm font-bold text-slate-900 sm:text-base">
+                        {ex.title}
+                      </h3>
+                      <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+                        {ex.scenario ?? ex.description}
+                      </p>
+                      {ex.sample ? (
+                        <pre className="mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-xs leading-relaxed text-slate-800">
+                          <code>{ex.sample}</code>
+                        </pre>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+          </div>
+        ) : null}
+
+        {/* 5. Instructions & FAQs Grid */}
         <div className="mt-16 grid grid-cols-1 gap-10 border-t border-slate-200 pt-14 lg:grid-cols-12">
           {/* Instructions */}
           <section
@@ -172,7 +293,7 @@ export function ToolPageShell({
           </section>
         </div>
 
-        {/* 5. Related Tools Section */}
+        {/* 6. Related Tools Section */}
         <section
           aria-labelledby="related-tools-heading"
           className="mt-16 border-t border-slate-200 pt-14"

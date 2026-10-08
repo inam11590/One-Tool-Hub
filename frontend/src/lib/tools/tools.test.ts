@@ -14,7 +14,14 @@ import {
   MAX_IMAGE_FILE_SIZE_BYTES,
   validateImageDimensions,
   validateImageFileMetadata,
+  validateImageMagicBytes,
 } from "./image-compressor.ts";
+import {
+  buildPageMetadata,
+  buildToolPageJsonLd,
+  buildWebsiteJsonLd,
+  getSiteUrlConfig,
+} from "../seo.ts";
 import {
   generateQrCodeAssets,
   getContrastRatio,
@@ -602,3 +609,91 @@ test("PDF Merge & Split: rejects invalid page ranges, corrupted PDFs, encrypted 
   );
   assert.equal(encryptedCheck.valid, false);
 });
+
+// ============================================================================
+// STEP 4: Security (Image Magic Bytes) & Technical SEO Tests
+// ============================================================================
+test("Image Compressor Security: validates JPEG, PNG, and WebP magic byte headers and rejects spoofed files", () => {
+  const jpegBytes = new Uint8Array([
+    0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01,
+  ]);
+  const jpegRes = validateImageMagicBytes(jpegBytes);
+  assert.equal(jpegRes.valid, true);
+  assert.equal(jpegRes.detectedMimeType, "image/jpeg");
+
+  const pngBytes = new Uint8Array([
+    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+  ]);
+  const pngRes = validateImageMagicBytes(pngBytes);
+  assert.equal(pngRes.valid, true);
+  assert.equal(pngRes.detectedMimeType, "image/png");
+
+  const webpBytes = new Uint8Array([
+    0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50,
+  ]);
+  const webpRes = validateImageMagicBytes(webpBytes);
+  assert.equal(webpRes.valid, true);
+  assert.equal(webpRes.detectedMimeType, "image/webp");
+
+  const spoofedExe = new TextEncoder().encode("MZ\x90\x00\x03\x00\x00\x00\x04\x00\x00\x00\xff\xff");
+  const spoofedRes = validateImageMagicBytes(spoofedExe);
+  assert.equal(spoofedRes.valid, false);
+  assert.ok(spoofedRes.error?.includes("File signature does not match"));
+});
+
+test("Technical SEO: validates NEXT_PUBLIC_SITE_URL, relative canonicals, staging protection, and accurate JSON-LD", () => {
+  const originalEnv = process.env.NEXT_PUBLIC_SITE_URL;
+
+  try {
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+    const defaultCfg = getSiteUrlConfig();
+    assert.equal(defaultCfg.origin, "http://localhost:3000");
+    assert.equal(defaultCfg.isProductionDomainConfigured, false);
+    assert.equal(defaultCfg.isStagingOrLocal, true);
+
+    process.env.NEXT_PUBLIC_SITE_URL = "https://tools.example.org/";
+    const prodCfg = getSiteUrlConfig();
+    assert.equal(prodCfg.origin, "https://tools.example.org");
+    assert.equal(prodCfg.isProductionDomainConfigured, true);
+    assert.equal(prodCfg.isStagingOrLocal, false);
+
+    const pageMeta = buildPageMetadata({
+      title: "JSON Formatter & Validator",
+      description: "Format and validate JSON in your browser.",
+      path: "/tools/json-formatter",
+    });
+    assert.equal(pageMeta.alternates?.canonical, "/tools/json-formatter");
+
+    const siteLd = buildWebsiteJsonLd("OneToolHub", "Online utility platform.");
+    assert.equal(siteLd["@type"], "WebSite");
+    assert.equal(siteLd.url, "https://tools.example.org");
+
+    const toolLd = buildToolPageJsonLd(
+      {
+        id: "json-formatter",
+        name: "JSON Formatter",
+        slug: "json-formatter",
+        shortDescription: "Format JSON.",
+        categoryId: "developer",
+        categoryLabel: "Developer Tools",
+        icon: "Braces",
+        status: "available",
+        featured: true,
+        keywords: ["json"],
+      },
+      "JSON Formatter & Validator",
+      "Format JSON locally."
+    );
+    assert.equal(toolLd.length, 2);
+    assert.equal(toolLd[0]?.["@type"], "BreadcrumbList");
+    assert.equal(toolLd[1]?.["@type"], "SoftwareApplication");
+    assert.equal("aggregateRating" in (toolLd[1] ?? {}), false);
+  } finally {
+    if (originalEnv === undefined) {
+      delete process.env.NEXT_PUBLIC_SITE_URL;
+    } else {
+      process.env.NEXT_PUBLIC_SITE_URL = originalEnv;
+    }
+  }
+});
+

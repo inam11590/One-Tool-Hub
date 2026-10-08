@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { buildPageMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 
-export const metadata: Metadata = {
-  title: "Privacy Notice",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Privacy Policy — Local Browser Processing & Data Handling",
   description:
-    "Transparent starter privacy notice explaining how OneToolHub currently operates.",
-};
+    "Read how OneToolHub processes tool inputs locally in your browser, handles optional localStorage invoice drafts, and manages standard web hosting logs.",
+  pathname: "/privacy",
+});
 
 export default function PrivacyPage() {
   return (
@@ -16,12 +18,13 @@ export default function PrivacyPage() {
         <div className="mx-auto max-w-3xl">
           <Badge variant="primary">Transparency &amp; Data Handling</Badge>
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-            Privacy Notice (Starter)
+            Privacy Policy
           </h1>
           <p className="mt-4 text-base leading-relaxed text-slate-600">
-            This notice explains accurately how OneToolHub handles information
-            in its current foundational version, without making false legal
-            claims or unverifiable guarantees.
+            This Privacy Policy describes how OneToolHub handles information in
+            its current release. This document is provided for operational
+            transparency and does not constitute formal legal advice or claim
+            regulatory certification without review by qualified counsel.
           </p>
 
           <div className="mt-10 space-y-8 border-t border-slate-200 pt-10 text-sm leading-relaxed text-slate-600 sm:text-base">
@@ -30,19 +33,36 @@ export default function PrivacyPage() {
                 id="current-data-heading"
                 className="text-lg font-bold text-slate-900"
               >
-                1. Local Browser Processing (All 8 MVP Tools)
+                1. Local Browser Processing Across All 8 Tools
               </h2>
               <p className="mt-2">
-                All 8 tools on OneToolHub (JSON Formatter, Image Compressor, QR
-                Code Generator, Word Counter, YouTube Timestamp Formatter, GPA
-                Calculator, Invoice Generator, and PDF Merge &amp; Split)
-                execute locally in your web browser. Your JSON text, images, QR
-                inputs, essays, timestamps, grades, invoices, and PDF documents
-                are processed in browser memory and are not uploaded to or
-                stored on OneToolHub servers. In the Invoice Generator, saving a
-                draft to your browser&apos;s <code>localStorage</code> is
-                strictly optional and only occurs if you explicitly enable the
-                consent checkbox.
+                All eight tools currently available on OneToolHub (JSON
+                Formatter &amp; Validator, Image Compressor, QR Code Generator,
+                Word Counter, YouTube Timestamp Formatter, GPA Calculator,
+                Professional Invoice Generator, and PDF Merge &amp; Split)
+                process your inputs locally inside your web browser. Your JSON
+                payloads, uploaded images, QR text, essays, chapter timestamps,
+                course grades, invoice details, and PDF files are processed in
+                browser memory and are not uploaded to OneToolHub application
+                servers.
+              </p>
+            </section>
+
+            <section aria-labelledby="local-storage-heading">
+              <h2
+                id="local-storage-heading"
+                className="text-lg font-bold text-slate-900"
+              >
+                2. Optional Local Browser Storage (Invoice Generator)
+              </h2>
+              <p className="mt-2">
+                By default, OneToolHub does not persist your tool inputs after
+                you close or refresh a browser tab. In the Professional Invoice
+                Generator, you may optionally check the explicit consent box to
+                save your draft invoice in your own browser&apos;s{" "}
+                <code>localStorage</code>. That data remains on your device and
+                is immediately deleted from <code>localStorage</code> if you
+                uncheck the consent option.
               </p>
             </section>
 
@@ -51,31 +71,59 @@ export default function PrivacyPage() {
                 id="hosting-logs-heading"
                 className="text-lg font-bold text-slate-900"
               >
-                2. Standard Web Server &amp; Hosting Logs
+                3. Standard Web Server &amp; Hosting Logs
               </h2>
               <p className="mt-2">
-                When you access any website, the hosting provider or web server
-                typically processes standard technical request metadata—such as
-                IP address, browser user-agent, requested page path, and
-                timestamp—to deliver web pages and maintain service reliability.
+                When you visit any web page on OneToolHub, the underlying web
+                hosting infrastructure automatically receives standard HTTP
+                request metadata—such as your IP address, browser user-agent,
+                requested URL path, referrer header, and timestamp—necessary to
+                deliver static assets and maintain network security.
               </p>
             </section>
 
-            <section aria-labelledby="future-tools-heading">
+            <section aria-labelledby="third-parties-heading">
               <h2
-                id="future-tools-heading"
+                id="third-parties-heading"
                 className="text-lg font-bold text-slate-900"
               >
-                3. Future Interactive Tools &amp; Backend Services
+                4. Accounts, Payments, and Third-Party Analytics
               </h2>
               <p className="mt-2">
-                As individual tools and optional backend features (such as
-                FastAPI document processing or PostgreSQL account storage) are
-                introduced in future phases, this Privacy Notice will be updated
-                before launch to specify clearly which tools execute entirely in
-                the browser and which tools transmit data to a server for
-                processing.
+                OneToolHub does not currently include user account registration,
+                payment processing, advertising networks, or third-party
+                behavioral tracking scripts. If optional backend services or
+                analytics are introduced in a future version, this Privacy
+                Policy must be updated prior to enabling those features.
               </p>
+            </section>
+
+            <section aria-labelledby="operator-placeholder-heading">
+              <h2
+                id="operator-placeholder-heading"
+                className="text-lg font-bold text-slate-900"
+              >
+                5. Data Controller &amp; Privacy Contact Placeholders
+              </h2>
+              <div className="mt-2 rounded-xl border border-amber-200 bg-amber-50/70 p-4 text-xs leading-relaxed text-amber-950 sm:text-sm">
+                <p className="font-semibold text-amber-900">
+                  Owner Action Required Before Public Launch:
+                </p>
+                <ul className="mt-2 list-inside list-disc space-y-1 font-mono text-xs">
+                  <li>
+                    Site Operator / Data Controller:{" "}
+                    <span>[OWNER PLACEHOLDER: Insert legal name or entity]</span>
+                  </li>
+                  <li>
+                    Privacy Contact Email:{" "}
+                    <span>[OWNER PLACEHOLDER: Insert privacy contact email]</span>
+                  </li>
+                  <li>
+                    Effective Date:{" "}
+                    <span>[OWNER PLACEHOLDER: Insert production launch date]</span>
+                  </li>
+                </ul>
+              </div>
             </section>
           </div>
 

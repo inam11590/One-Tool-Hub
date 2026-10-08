@@ -1,26 +1,45 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getToolBySlug, SITE_CONFIG } from "@/lib/tools";
+import { getToolBySlug } from "@/lib/tools";
+import { buildPageMetadata } from "@/lib/seo";
 import { ToolPageShell } from "@/components/tools/ToolPageShell";
 import { QrCodeGeneratorTool } from "@/components/tools/QrCodeGeneratorTool";
 
 const TOOL_SLUG = "qr-code-generator";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "QR Code Generator — Create Custom PNG & SVG QR Codes Online",
   description:
     "Generate scannable QR codes from any URL or text instantly in your browser. Customize size and colors, check contrast, and download high-resolution PNG or SVG files.",
-  alternates: {
-    canonical: `${SITE_CONFIG.url}/tools/${TOOL_SLUG}`,
-  },
-  openGraph: {
-    title: `QR Code Generator | ${SITE_CONFIG.name}`,
+  path: `/tools/${TOOL_SLUG}`,
+});
+
+const OVERVIEW =
+  "The OneToolHub QR Code Generator creates static, non-expiring QR codes from website URLs, plain text, Wi-Fi notes, or contact details directly in your browser. Unlike redirect-based QR services, the generated pattern encodes your data directly into the matrix and includes a real-time WCAG luminance contrast checker so your codes remain scannable across smartphone cameras.";
+
+const FEATURES = [
+  "Instant live QR preview for URLs and text strings up to 2,000 characters.",
+  "Customizable output dimensions from 128 px to 1024 px with a standard 4-module quiet zone.",
+  "Custom foreground and background hex color pickers.",
+  "Built-in contrast and color-inversion detector to warn against low-scannability color pairs.",
+  "High-resolution raster PNG and scalable vector SVG download options.",
+  "Static encoding with zero tracking redirects or expiration limits.",
+] as const;
+
+const EXAMPLES = [
+  {
+    title: "Website or Portfolio Link for Print Cards",
     description:
-      "Generate scannable QR codes from any URL or text instantly in your browser with PNG and SVG export.",
-    url: `${SITE_CONFIG.url}/tools/${TOOL_SLUG}`,
-    type: "website",
+      "Enter your portfolio URL, choose a dark navy foreground (#1e1b4b) on a white background (#ffffff), and export an SVG for crisp vector printing.",
+    sample: "https://example.com/portfolio",
   },
-};
+  {
+    title: "Event Check-In or Conference Slide QR",
+    description:
+      "Generate a 512 px PNG QR code pointing to a registration form or slide deck so attendees can scan from across the room.",
+    sample: "https://example.com/slides-2026",
+  },
+] as const;
 
 const INSTRUCTIONS = [
   {
@@ -80,6 +99,9 @@ export default function QrCodeGeneratorPage() {
       title="QR Code Generator"
       description="Create customizable, high-contrast QR codes for links and text with instant live preview and PNG or SVG downloads."
       privacyNote="QR codes are generated locally in your browser with no tracking redirects."
+      overview={OVERVIEW}
+      features={FEATURES}
+      examples={EXAMPLES}
       instructions={INSTRUCTIONS}
       faqs={FAQS}
     >

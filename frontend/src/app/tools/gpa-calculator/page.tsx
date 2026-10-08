@@ -1,26 +1,44 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getToolBySlug, SITE_CONFIG } from "@/lib/tools";
+import { getToolBySlug } from "@/lib/tools";
+import { buildPageMetadata } from "@/lib/seo";
 import { ToolPageShell } from "@/components/tools/ToolPageShell";
 import { GpaCalculatorTool } from "@/components/tools/GpaCalculatorTool";
 
 const TOOL_SLUG = "gpa-calculator";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "GPA Calculator — Semester & Cumulative GPA (4.0 & 5.0 Scales)",
   description:
     "Calculate your weighted semester and cumulative GPA online. Supports configurable 4.0 and 5.0 grading scales, editable letter-grade mappings, multiple semesters, and worked examples.",
-  alternates: {
-    canonical: `${SITE_CONFIG.url}/tools/${TOOL_SLUG}`,
-  },
-  openGraph: {
-    title: `GPA Calculator | ${SITE_CONFIG.name}`,
+  path: `/tools/${TOOL_SLUG}`,
+});
+
+const OVERVIEW =
+  "The OneToolHub GPA Calculator is designed for university, college, and high school students worldwide who need an accurate weighted Grade Point Average calculation. Because grading policies vary between institutions, this tool lets you switch between 4.0 and 5.0 scales, customize the exact point value of every letter grade (A+ through F), and track multiple semesters for cumulative GPA.";
+
+const FEATURES = [
+  "Dynamic course list with course name, credit hours, and letter grade inputs.",
+  "Configurable 4.0 and 5.0 grading scale presets with fully editable grade-to-point mappings.",
+  "Multi-semester support to compute both individual term GPAs and overall cumulative GPA.",
+  "Automatic weighted calculation: Sum of (Grade Points × Credit Hours) ÷ Total Credit Hours.",
+  "Real-time validation for missing grades, negative or zero credit hours, and zero total credits.",
+  "Worked step-by-step calculation breakdown showing quality points per course.",
+] as const;
+
+const EXAMPLES = [
+  {
+    title: "Single Semester Weighted GPA (4.0 Scale)",
     description:
-      "Calculate semester and cumulative GPA with configurable 4.0 and 5.0 scales, editable grade mappings, and credit hour weighting.",
-    url: `${SITE_CONFIG.url}/tools/${TOOL_SLUG}`,
-    type: "website",
+      "A student taking Data Structures (4 credits, A = 4.0), Linear Algebra (3 credits, B+ = 3.3), and Technical Writing (3 credits, A- = 3.7) earns 37.00 grade points across 10 credits.",
+    sample: "(16.00 + 9.90 + 11.10) ÷ 10 credits = 3.70 GPA",
   },
-};
+  {
+    title: "Custom University Grade Mapping",
+    description:
+      "If your institution defines A- as 3.67 instead of 3.70, open the Grade-to-Point Mapping panel and adjust A- to 3.67 for an exact match.",
+  },
+] as const;
 
 const INSTRUCTIONS = [
   {
@@ -64,7 +82,7 @@ const FAQS = [
   {
     question: "Are my course names or grades uploaded anywhere?",
     answer:
-      "No. All GPA calculations happen 100% locally in your browser tab without any server requests or account registration.",
+      "No. All GPA calculations happen locally in your browser tab without any server requests or account registration.",
   },
 ] as const;
 
@@ -79,7 +97,10 @@ export default function GpaCalculatorPage() {
       tool={tool}
       title="GPA Calculator"
       description="Calculate weighted semester and cumulative GPA with configurable 4.0 and 5.0 scales, editable grade-to-point mappings, and credit hour validation."
-      privacyNote="100% client-side calculation. Your academic grades never leave your browser."
+      privacyNote="Calculated locally in your browser. Your course list and grades never leave your device."
+      overview={OVERVIEW}
+      features={FEATURES}
+      examples={EXAMPLES}
       instructions={INSTRUCTIONS}
       faqs={FAQS}
     >

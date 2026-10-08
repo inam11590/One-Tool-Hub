@@ -1,26 +1,44 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getToolBySlug, SITE_CONFIG } from "@/lib/tools";
+import { getToolBySlug } from "@/lib/tools";
+import { buildPageMetadata } from "@/lib/seo";
 import { ToolPageShell } from "@/components/tools/ToolPageShell";
 import { PdfMergeSplitTool } from "@/components/tools/PdfMergeSplitTool";
 
 const TOOL_SLUG = "pdf-merge-split";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "PDF Merge & Split — Combine PDFs or Extract Pages in Browser",
   description:
     "Merge multiple PDF documents into one file or split and extract custom page ranges (e.g., 1-3, 5, 7-10) locally in your browser without uploading files to a server.",
-  alternates: {
-    canonical: `${SITE_CONFIG.url}/tools/${TOOL_SLUG}`,
-  },
-  openGraph: {
-    title: `PDF Merge & Split | ${SITE_CONFIG.name}`,
+  path: `/tools/${TOOL_SLUG}`,
+});
+
+const OVERVIEW =
+  "The OneToolHub PDF Merge & Split utility allows students, freelancers, and office teams to combine multiple PDF files or extract specific pages locally inside their web browser. Because all PDF parsing and page assembly happen in client-side memory buffers, sensitive contracts, academic papers, and financial statements stay on your device.";
+
+const FEATURES = [
+  "Merge Mode: Combine up to 25 PDF files (up to 100 MB total and 500 pages) in any custom order.",
+  "Split & Extract Mode: Extract custom page ranges such as '1-3, 5, 7-10' or toggle individual pages interactively.",
+  "Flexible split output: Download extracted pages as one combined PDF or as separate PDF files per range.",
+  "Automatic detection of encrypted/password-protected or corrupted PDF files with clear guidance.",
+  "Built-in sample PDF generator so you can test merging and splitting immediately without uploading personal files.",
+  "Automatic release of memory buffers when resetting or switching modes.",
+] as const;
+
+const EXAMPLES = [
+  {
+    title: "Combining Signed Contract Pages & Appendices",
     description:
-      "Combine multiple PDF files in custom order or extract page ranges into single or separate PDFs directly in your browser.",
-    url: `${SITE_CONFIG.url}/tools/${TOOL_SLUG}`,
-    type: "website",
+      "Upload a cover letter PDF, a main agreement PDF, and an appendix PDF in Merge Mode, reorder them with the Up/Down buttons, and download a single consolidated packet.",
   },
-};
+  {
+    title: "Extracting Specific Chapters from a Lecture Packet",
+    description:
+      "Switch to Split Mode, upload a 20-page PDF, and enter '1-3, 8, 12-15' to extract only the required reading pages into a new file.",
+    sample: "Page Range Input: 1-3, 8, 12-15",
+  },
+] as const;
 
 const INSTRUCTIONS = [
   {
@@ -49,7 +67,7 @@ const FAQS = [
   {
     question: "Are my PDF documents uploaded to any cloud server?",
     answer:
-      "No. All PDF inspection, page copying, merging, and splitting run locally inside your browser using WebAssembly/JavaScript memory buffers. Your documents never leave your device.",
+      "No. All PDF inspection, page copying, merging, and splitting run locally inside your browser using JavaScript memory buffers. Your documents never leave your device.",
   },
   {
     question: "Can I merge or split password-protected (encrypted) PDF files?",
@@ -78,8 +96,11 @@ export default function PdfMergeSplitPage() {
     <ToolPageShell
       tool={tool}
       title="PDF Merge & Split"
-      description="Combine multiple PDF files in any order or extract specific page ranges into single or separate PDF documents—100% locally in your browser."
-      privacyNote="100% local browser processing. Your PDFs are never uploaded to any external server."
+      description="Combine multiple PDF files in any order or extract specific page ranges into single or separate PDF documents—directly in your browser."
+      privacyNote="Processed locally in your browser. Your PDFs are not uploaded to any external server."
+      overview={OVERVIEW}
+      features={FEATURES}
+      examples={EXAMPLES}
       instructions={INSTRUCTIONS}
       faqs={FAQS}
     >

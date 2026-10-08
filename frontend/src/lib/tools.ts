@@ -5,13 +5,14 @@ import type {
   ToolCategoryId,
   ToolItem,
 } from "@/types/tools";
+import { getSiteOrigin } from "@/lib/seo";
 
 export const SITE_CONFIG = {
   name: "OneToolHub",
   tagline: "Every Tool You Need. One Powerful Platform.",
   description:
-    "Free, fast, and easy online tools for students, freelancers, creators, and developers.",
-  url: "https://onetoolhub.com",
+    "Free, fast, and easy online tools for students, freelancers, creators, and developers. Process JSON, images, QR codes, text, timestamps, GPA, invoices, and PDFs directly in your browser.",
+  url: getSiteOrigin(),
 } as const;
 
 export const MAIN_NAV_ITEMS: readonly NavItem[] = [

@@ -1,5 +1,3 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-
 export const MAX_PDF_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB per file
 export const MAX_TOTAL_MERGE_SIZE_BYTES = 100 * 1024 * 1024; // 100 MB combined
 export const MAX_MERGE_FILES_COUNT = 25;
@@ -87,8 +85,8 @@ export function hasPdfMagicHeader(bytes: Uint8Array): boolean {
 }
 
 /**
- * Inspects a PDF byte array using pdf-lib, detecting corrupted files,
- * password-protected/encrypted PDFs, and excessive page counts.
+ * Inspects a PDF byte array using pdf-lib (loaded dynamically on demand),
+ * detecting corrupted files, password-protected/encrypted PDFs, and excessive page counts.
  */
 export async function inspectPdfBytes(
   bytes: Uint8Array,
@@ -119,6 +117,7 @@ export async function inspectPdfBytes(
   }
 
   try {
+    const { PDFDocument } = await import("pdf-lib");
     const doc = await PDFDocument.load(bytes, {
       updateMetadata: false,
     });
@@ -237,6 +236,7 @@ export async function mergePdfDocuments(
   }
 
   try {
+    const { PDFDocument } = await import("pdf-lib");
     const mergedPdf = await PDFDocument.create();
     mergedPdf.setCreator("OneToolHub PDF Merge & Split");
 
@@ -277,11 +277,11 @@ export async function mergePdfDocuments(
       mergedBytes,
       totalPages: runningPageCount,
     };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+  } catch {
     return {
       valid: false,
-      error: `Failed to merge PDF files: ${message}`,
+      error:
+        "Unable to merge the selected PDF files. One or more files may contain unsupported or damaged page objects.",
     };
   }
 }
@@ -466,6 +466,7 @@ export async function splitPdfDocument(
   const baseName = sanitizeBaseFileName(sourceFileName);
 
   try {
+    const { PDFDocument } = await import("pdf-lib");
     const sourceDoc = await PDFDocument.load(sourceBytes, {
       updateMetadata: false,
     });
@@ -522,12 +523,12 @@ export async function splitPdfDocument(
       valid: true,
       outputs,
     };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+  } catch {
     return {
       valid: false,
       outputs: [],
-      error: `Failed to extract PDF pages: ${message}`,
+      error:
+        "Unable to extract pages from the PDF document. The file may contain unsupported page resources.",
     };
   }
 }
@@ -539,6 +540,7 @@ export async function createSamplePdfBytes(
   documentTitle: string,
   pageCount: number
 ): Promise<Uint8Array> {
+  const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
   const doc = await PDFDocument.create();
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
   const fontRegular = await doc.embedFont(StandardFonts.Helvetica);

@@ -575,7 +575,7 @@ export function PdfMergeSplitTool() {
                     e.target.value = "";
                   }
                 }}
-                className="sr-only"
+                className="peer sr-only"
               />
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
                 <UploadCloud className="h-6 w-6" aria-hidden="true" />
@@ -583,14 +583,14 @@ export function PdfMergeSplitTool() {
               <h2 className="mt-3 text-base font-bold text-slate-900">
                 Drop PDF files here to combine, or browse from your device
               </h2>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-600">
                 Supports up to {MAX_MERGE_FILES_COUNT} unencrypted PDFs &bull;
                 Max 50 MB per file &bull; Max {MAX_PDF_PAGE_COUNT} total pages
               </p>
-              <div className="mt-4 flex flex-wrap justify-center gap-3">
+              <div className="mt-4 flex flex-wrap justify-center gap-3 peer-focus-within:ring-2">
                 <label
                   htmlFor={`${baseId}-merge-upload`}
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-colors hover:bg-indigo-700"
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-colors hover:bg-indigo-700 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600"
                 >
                   <FilePlus2 className="h-4 w-4" aria-hidden="true" />
                   <span>Select PDF Files</span>
@@ -827,7 +827,7 @@ export function PdfMergeSplitTool() {
                     e.target.value = "";
                   }
                 }}
-                className="sr-only"
+                className="peer sr-only"
               />
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
                 <Scissors className="h-6 w-6" aria-hidden="true" />
@@ -835,10 +835,10 @@ export function PdfMergeSplitTool() {
               <h2 className="mt-3 text-base font-bold text-slate-900">
                 Upload a PDF to split or extract specific page ranges
               </h2>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-600">
                 Unencrypted PDF up to 50 MB and {MAX_PDF_PAGE_COUNT} pages
               </p>
-              <div className="mt-4 flex flex-wrap justify-center gap-3">
+              <div className="mt-4 flex flex-wrap justify-center gap-3 peer-focus-within:ring-2">
                 <label
                   htmlFor={`${baseId}-split-upload`}
                   className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-colors hover:bg-indigo-700"

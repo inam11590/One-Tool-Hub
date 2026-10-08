@@ -14,12 +14,77 @@ export const MAX_IMAGE_TOTAL_PIXELS = 40_000_000; // 40 MP memory cap
 export interface ImageValidationResult {
   valid: boolean;
   error?: string;
+  detectedMimeType?: SupportedImageMimeType;
 }
 
 export function isSupportedImageMimeType(
   mimeType: string
 ): mimeType is SupportedImageMimeType {
   return (SUPPORTED_IMAGE_MIME_TYPES as readonly string[]).includes(mimeType);
+}
+
+/**
+ * Inspects the first 12 bytes of a binary file buffer to verify genuine
+ * JPEG (FF D8 FF), PNG (89 50 4E 47 0D 0A 1A 0A), or WebP (RIFF....WEBP) magic headers.
+ */
+export function validateImageMagicBytes(
+  bytes: Uint8Array
+): ImageValidationResult {
+  if (!bytes || bytes.byteLength < 12) {
+    return {
+      valid: false,
+      error:
+        "The uploaded file is too small or truncated to be a valid JPEG, PNG, or WebP image.",
+    };
+  }
+
+  // Check JPEG signature: FF D8 FF
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
+    return {
+      valid: true,
+      detectedMimeType: "image/jpeg",
+    };
+  }
+
+  // Check PNG signature: 89 50 4E 47 0D 0A 1A 0A
+  if (
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4e &&
+    bytes[3] === 0x47 &&
+    bytes[4] === 0x0d &&
+    bytes[5] === 0x0a &&
+    bytes[6] === 0x1a &&
+    bytes[7] === 0x0a
+  ) {
+    return {
+      valid: true,
+      detectedMimeType: "image/png",
+    };
+  }
+
+  // Check WebP signature: "RIFF" (52 49 46 46) at 0..3 and "WEBP" (57 45 42 50) at 8..11
+  if (
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
+  ) {
+    return {
+      valid: true,
+      detectedMimeType: "image/webp",
+    };
+  }
+
+  return {
+    valid: false,
+    error:
+      "File signature does not match a valid JPEG, PNG, or WebP image. The file may be corrupted or renamed from another format.",
+  };
 }
 
 export function validateImageFileMetadata(file: {

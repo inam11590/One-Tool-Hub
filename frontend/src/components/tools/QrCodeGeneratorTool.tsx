@@ -18,7 +18,7 @@ import {
   type QrGenerationResult,
 } from "@/lib/tools/qr-code-generator";
 
-const DEFAULT_QR_TEXT = "https://onetoolhub.com";
+const DEFAULT_QR_TEXT = "https://example.com";
 const DEFAULT_FG_COLOR = "#0F172A";
 const DEFAULT_BG_COLOR = "#FFFFFF";
 

@@ -16,6 +16,7 @@ import {
   type SupportedImageMimeType,
   validateImageDimensions,
   validateImageFileMetadata,
+  validateImageMagicBytes,
 } from "@/lib/tools/image-compressor";
 
 interface ProcessedImageState {
@@ -171,11 +172,23 @@ export function ImageCompressorTool() {
     }
   };
 
-  const handleSelectFile = (file: File | undefined) => {
+  const handleSelectFile = async (file: File | undefined) => {
     if (!file) return;
     const check = validateImageFileMetadata(file);
     if (!check.valid) {
       setError(check.error ?? "Invalid image file.");
+      return;
+    }
+
+    try {
+      const headerBuffer = await file.slice(0, 16).arrayBuffer();
+      const magicCheck = validateImageMagicBytes(new Uint8Array(headerBuffer));
+      if (!magicCheck.valid) {
+        setError(magicCheck.error ?? "Invalid image file signature.");
+        return;
+      }
+    } catch {
+      setError("Could not read the selected image file.");
       return;
     }
 
@@ -352,28 +365,21 @@ export function ImageCompressorTool() {
             Drag &amp; drop an image here, or choose a file
           </h2>
           <p className="mt-1 text-xs text-slate-600 sm:text-sm">
-            Supports JPEG, PNG, and WebP up to 25 MB (processed 100% locally in
-            your browser).
+            Supports JPEG, PNG, and WebP up to 25 MB (processed locally in your
+            browser).
           </p>
 
           <input
             ref={fileInputRef}
             type="file"
             accept="image/jpeg,image/png,image/webp"
-            onChange={(e) => handleSelectFile(e.target.files?.[0])}
-            className="sr-only"
+            onChange={(e) => void handleSelectFile(e.target.files?.[0])}
+            className="peer sr-only"
             id="image-compressor-file-input"
           />
           <label
             htmlFor="image-compressor-file-input"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                fileInputRef.current?.click();
-              }
-            }}
-            className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:text-sm"
+            className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-indigo-700 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-indigo-600 sm:text-sm"
           >
             <ImageIcon className="h-4 w-4" aria-hidden="true" />
             <span>Select Image File</span>

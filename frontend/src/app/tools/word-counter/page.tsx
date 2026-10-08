@@ -1,26 +1,43 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getToolBySlug, SITE_CONFIG } from "@/lib/tools";
+import { getToolBySlug } from "@/lib/tools";
+import { buildPageMetadata } from "@/lib/seo";
 import { ToolPageShell } from "@/components/tools/ToolPageShell";
 import { WordCounterTool } from "@/components/tools/WordCounterTool";
 
 const TOOL_SLUG = "word-counter";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Word Counter — Count Words, Characters, Sentences & Reading Time",
   description:
     "Free real-time online word and character counter for students, writers, and creators. Count words, characters with and without spaces, sentences, paragraphs, and reading time.",
-  alternates: {
-    canonical: `${SITE_CONFIG.url}/tools/${TOOL_SLUG}`,
-  },
-  openGraph: {
-    title: `Word Counter | ${SITE_CONFIG.name}`,
+  path: `/tools/${TOOL_SLUG}`,
+});
+
+const OVERVIEW =
+  "The OneToolHub Word Counter gives students, journalists, copywriters, and video scriptwriters real-time text statistics as they type or paste drafts. It measures total words, characters with and without spaces, sentences, paragraphs, and estimated reading time using modern Unicode segmentation right in the browser.";
+
+const FEATURES = [
+  "Real-time counting of words, total characters, and characters excluding whitespace.",
+  "Sentence and paragraph detection for essay, article, and script structure analysis.",
+  "Estimated silent reading time based on 200 words per minute (with second-level precision for short scripts).",
+  "Unicode-aware word and sentence segmentation via ECMAScript Intl.Segmenter where supported.",
+  "One-click clipboard copy and plain-text (.txt) file export.",
+  "Instant sample loading and reset controls for rapid drafting.",
+] as const;
+
+const EXAMPLES = [
+  {
+    title: "Checking University Essay & Abstract Limits",
     description:
-      "Count words, characters, sentences, paragraphs, and estimated reading time instantly in your browser.",
-    url: `${SITE_CONFIG.url}/tools/${TOOL_SLUG}`,
-    type: "website",
+      "Paste your academic abstract or admissions essay to verify it stays within a strict 250-word or 500-word submission cap.",
   },
-};
+  {
+    title: "Timing a YouTube Intro or Social Post",
+    description:
+      "Check both character count (for meta descriptions or social posts) and estimated reading time for spoken or silent scripts.",
+  },
+] as const;
 
 const INSTRUCTIONS = [
   {
@@ -79,7 +96,10 @@ export default function WordCounterPage() {
       tool={tool}
       title="Word Counter"
       description="Count words, characters (with and without spaces), sentences, paragraphs, and estimated reading time in real time."
-      privacyNote="Your writing is analyzed locally in your browser with zero network calls."
+      privacyNote="Your writing is analyzed locally in your browser with no network requests."
+      overview={OVERVIEW}
+      features={FEATURES}
+      examples={EXAMPLES}
       instructions={INSTRUCTIONS}
       faqs={FAQS}
     >

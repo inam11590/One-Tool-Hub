@@ -1,26 +1,45 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getToolBySlug, SITE_CONFIG } from "@/lib/tools";
+import { getToolBySlug } from "@/lib/tools";
+import { buildPageMetadata } from "@/lib/seo";
 import { ToolPageShell } from "@/components/tools/ToolPageShell";
 import { JsonFormatterTool } from "@/components/tools/JsonFormatterTool";
 
 const TOOL_SLUG = "json-formatter";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "JSON Formatter & Validator — Prettify & Minify JSON Online",
   description:
     "Format, validate, and minify JSON documents directly in your browser. Choose 2-space or 4-space indentation, inspect syntax errors, upload .json files, and download clean JSON.",
-  alternates: {
-    canonical: `${SITE_CONFIG.url}/tools/${TOOL_SLUG}`,
-  },
-  openGraph: {
-    title: `JSON Formatter & Validator | ${SITE_CONFIG.name}`,
+  path: `/tools/${TOOL_SLUG}`,
+});
+
+const OVERVIEW =
+  "The OneToolHub JSON Formatter & Validator helps software engineers, API developers, and data analysts inspect, prettify, and compact JSON payloads without sending sensitive configuration or API response data to an external server. Whether you are debugging a minified REST webhook, checking syntax before committing a configuration file, or preparing compact JSON for production headers, the tool parses and formats your data directly in browser memory.";
+
+const FEATURES = [
+  "2-space and 4-space indentation formatting for readable nested objects and arrays.",
+  "One-click JSON minification to strip unnecessary whitespace and reduce payload byte size.",
+  "Syntax validation powered by standard ECMAScript JSON.parse() with line and column error diagnostics.",
+  "Local .json file upload (up to 2 MB) and one-click formatted .json file download.",
+  "Live UTF-8 byte size measurement for both input and formatted output.",
+  "Safe data handling that never executes scripts or evaluates arbitrary code.",
+] as const;
+
+const EXAMPLES = [
+  {
+    title: "Prettifying a Minified API Response",
     description:
-      "Format, validate, and minify JSON documents directly in your browser with 2-space or 4-space indentation and syntax error reporting.",
-    url: `${SITE_CONFIG.url}/tools/${TOOL_SLUG}`,
-    type: "website",
+      "Paste a single-line REST or GraphQL response and select 'Format (2 Spaces)' to inspect nested keys, arrays, and boolean flags.",
+    sample: '{"status":200,"data":{"userId":42,"roles":["editor","admin"]}}',
   },
-};
+  {
+    title: "Compacting Configuration Payloads",
+    description:
+      "Convert a multi-line JSON document into a single-line string using 'Minify' before embedding it in environment variables or HTTP test scripts.",
+    sample: '{\n  "region": "eu-west-1",\n  "retries": 3\n}  →  {"region":"eu-west-1","retries":3}',
+  },
+] as const;
 
 const INSTRUCTIONS = [
   {
@@ -79,7 +98,10 @@ export default function JsonFormatterPage() {
       tool={tool}
       title="JSON Formatter & Validator"
       description="Prettify, validate, and minify JSON payloads with 2-space or 4-space indentation, byte size inspection, and syntax error reporting."
-      privacyNote="100% client-side processing. Your JSON never leaves your browser."
+      privacyNote="Processed locally in your browser. Your JSON payload is not uploaded to any server."
+      overview={OVERVIEW}
+      features={FEATURES}
+      examples={EXAMPLES}
       instructions={INSTRUCTIONS}
       faqs={FAQS}
     >

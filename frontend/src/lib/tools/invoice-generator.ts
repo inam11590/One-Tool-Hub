@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import type { PDFFont, PDFPage } from "pdf-lib";
 
 export type InvoiceTemplateId = "modern-indigo" | "classic-slate";
 export type InvoiceDiscountType = "percentage" | "fixed";
@@ -452,6 +452,7 @@ function wrapTextLines(
 export async function generateInvoicePdfBytes(
   data: InvoiceFormData
 ): Promise<Uint8Array> {
+  const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
   const calculation = calculateInvoiceTotals(data);
   const pdfDoc = await PDFDocument.create();
   pdfDoc.setTitle(`Invoice ${sanitizePdfText(data.invoiceNumber || "Draft")}`);
