@@ -10,12 +10,15 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { ToolFaqItem, ToolItem } from "@/types/tools";
+import type { ValidToolSlug } from "@/lib/analytics";
 import { buildToolPageJsonLd } from "@/lib/seo";
 import { getRelatedTools } from "@/lib/tools";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { ToolCard } from "@/components/ui/ToolCard";
 import { ToolIcon } from "@/components/ui/ToolIcon";
+import { ToolOpenTracker } from "@/components/analytics/ToolOpenTracker";
+import { ToolFeedbackCard } from "@/components/tools/ToolFeedbackCard";
 
 export interface ToolPracticalExample {
   title: string;
@@ -129,8 +132,18 @@ export function ToolPageShell({
 
         {/* 3. Interactive Tool Workspace */}
         <section aria-label={`${tool.name} Workspace`} className="mt-8">
+          <ToolOpenTracker
+            toolSlug={tool.slug as ValidToolSlug}
+            toolCategory={tool.categoryId}
+          />
           {children}
         </section>
+
+        {/* 3b. Lightweight User Feedback Card */}
+        <ToolFeedbackCard
+          toolSlug={tool.slug as ValidToolSlug}
+          toolName={tool.name}
+        />
 
         {/* 4. Tool Overview, Supported Features & Practical Examples */}
         {(overview || features?.length || examples?.length) ? (

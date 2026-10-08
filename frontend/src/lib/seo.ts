@@ -72,6 +72,28 @@ export function getAbsoluteUrl(pathname: string): string {
   return normalizedPath === "/" ? origin : `${origin}${normalizedPath}`;
 }
 
+const GOOGLE_SITE_VERIFICATION_REGEX = /^[A-Za-z0-9_-]{10,128}$/;
+
+/**
+ * Validates and returns the optional Google Search Console verification token
+ * configured via NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION.
+ */
+export function getGoogleSiteVerificationToken(
+  rawEnv: string | undefined = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+): string | null {
+  if (!rawEnv || typeof rawEnv !== "string") {
+    return null;
+  }
+  const cleaned = rawEnv
+    .trim()
+    .replace(/^google-site-verification=/i, "")
+    .trim();
+  if (!GOOGLE_SITE_VERIFICATION_REGEX.test(cleaned)) {
+    return null;
+  }
+  return cleaned;
+}
+
 export interface PageMetadataOptions {
   title: string;
   description: string;

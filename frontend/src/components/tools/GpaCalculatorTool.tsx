@@ -25,6 +25,10 @@ import {
   type GpaSemesterInput,
   type GradeMappingEntry,
 } from "@/lib/tools/gpa-calculator";
+import { trackToolEvent } from "@/lib/analytics";
+
+const TOOL_SLUG = "gpa-calculator";
+const TOOL_CATEGORY = "student";
 
 export function GpaCalculatorTool() {
   const baseId = useId();
@@ -45,6 +49,11 @@ export function GpaCalculatorTool() {
   const handleScaleChange = (newScale: GpaScalePreset) => {
     setScalePreset(newScale);
     setGradeMappings(getDefaultGradeMappings(newScale));
+    trackToolEvent("tool_process_success", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: `scale_${newScale}`,
+    });
   };
 
   const handleMappingPointChange = (index: number, rawValue: string) => {
@@ -84,6 +93,11 @@ export function GpaCalculatorTool() {
         ],
       },
     ]);
+    trackToolEvent("tool_process_success", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "add_semester",
+    });
   };
 
   const handleRemoveSemester = (semesterId: string) => {
@@ -171,6 +185,11 @@ export function GpaCalculatorTool() {
         ],
       },
     ]);
+    trackToolEvent("tool_reset", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "reset_all",
+    });
   };
 
   const handleLoadSampleSingle = () => {

@@ -31,6 +31,11 @@ import {
   validatePdfFileMetadata,
   type PdfSplitOutputMode,
 } from "@/lib/tools/pdf-merge-split";
+import { trackToolEvent } from "@/lib/analytics";
+import { reportToolProcessingError } from "@/lib/error-monitoring";
+
+const TOOL_SLUG = "pdf-merge-split";
+const TOOL_CATEGORY = "freelancer";
 
 type ActivePdfMode = "merge" | "split";
 
@@ -141,8 +146,14 @@ export function PdfMergeSplitTool() {
     if (incoming.length === 0) return;
 
     if (mergeFiles.length + incoming.length > MAX_MERGE_FILES_COUNT) {
-      setMergeError(
-        `You can queue at most ${MAX_MERGE_FILES_COUNT} PDF files for a single merge operation.`
+      const errMsg = `You can queue at most ${MAX_MERGE_FILES_COUNT} PDF files for a single merge operation.`;
+      setMergeError(errMsg);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "upload_merge_pdf",
+        errMsg,
+        "range_error"
       );
       return;
     }
@@ -157,7 +168,14 @@ export function PdfMergeSplitTool() {
       });
 
       if (!metaCheck.valid) {
-        setMergeError(metaCheck.error ?? "Invalid PDF file.");
+        const errMsg = metaCheck.error ?? "Invalid PDF file.";
+        setMergeError(errMsg);
+        reportToolProcessingError(
+          TOOL_SLUG,
+          TOOL_CATEGORY,
+          "upload_merge_pdf",
+          errMsg
+        );
         return;
       }
 
@@ -166,7 +184,14 @@ export function PdfMergeSplitTool() {
       const inspection = await inspectPdfBytes(bytes, file.name);
 
       if (!inspection.valid) {
+        const errMsg = inspection.error ?? "Could not read PDF file.";
         setMergeError(inspection.error ?? `Could not read "${file.name}".`);
+        reportToolProcessingError(
+          TOOL_SLUG,
+          TOOL_CATEGORY,
+          "upload_merge_pdf",
+          errMsg
+        );
         return;
       }
 
@@ -247,6 +272,11 @@ export function PdfMergeSplitTool() {
     if (mergeFileInputRef.current) {
       mergeFileInputRef.current.value = "";
     }
+    trackToolEvent("tool_reset", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "reset_merge",
+    });
   };
 
   const handleExecuteMerge = async () => {
@@ -257,7 +287,15 @@ export function PdfMergeSplitTool() {
     }
 
     if (mergeFiles.length < 2) {
-      setMergeError("Please upload at least 2 PDF files to merge.");
+      const errMsg = "Please upload at least 2 PDF files to merge.";
+      setMergeError(errMsg);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "merge_pdf",
+        errMsg,
+        "invalid_input"
+      );
       return;
     }
 
@@ -268,7 +306,9 @@ export function PdfMergeSplitTool() {
       );
 
       if (!response.valid || !response.mergedBytes) {
-        setMergeError(response.error ?? "Failed to merge PDF files.");
+        const errMsg = response.error ?? "Failed to merge PDF files.";
+        setMergeError(errMsg);
+        reportToolProcessingError(TOOL_SLUG, TOOL_CATEGORY, "merge_pdf", errMsg);
         return;
       }
 
@@ -284,6 +324,11 @@ export function PdfMergeSplitTool() {
         sizeBytes: response.mergedBytes.byteLength,
         rangeLabel: `Combined from ${mergeFiles.length} PDF files`,
         objectUrl,
+      });
+      trackToolEvent("tool_process_success", {
+        tool_slug: TOOL_SLUG,
+        tool_category: TOOL_CATEGORY,
+        operation_type: "merge_pdf",
       });
     } finally {
       setIsMerging(false);
@@ -304,7 +349,14 @@ export function PdfMergeSplitTool() {
       size: file.size,
     });
     if (!metaCheck.valid) {
-      setSplitError(metaCheck.error ?? "Invalid PDF file.");
+      const errMsg = metaCheck.error ?? "Invalid PDF file.";
+      setSplitError(errMsg);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "upload_split_pdf",
+        errMsg
+      );
       return;
     }
 
@@ -313,7 +365,14 @@ export function PdfMergeSplitTool() {
     const inspection = await inspectPdfBytes(bytes, file.name);
 
     if (!inspection.valid) {
+      const errMsg = inspection.error ?? "Could not read PDF file.";
       setSplitError(inspection.error ?? `Could not read "${file.name}".`);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "upload_split_pdf",
+        errMsg
+      );
       return;
     }
 
@@ -399,7 +458,15 @@ export function PdfMergeSplitTool() {
     setSplitResults([]);
 
     if (!splitFile) {
-      setSplitError("Please upload a PDF file first.");
+      const errMsg = "Please upload a PDF file first.";
+      setSplitError(errMsg);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "split_pdf",
+        errMsg,
+        "invalid_input"
+      );
       return;
     }
 
@@ -413,7 +480,9 @@ export function PdfMergeSplitTool() {
       );
 
       if (!response.valid || response.outputs.length === 0) {
-        setSplitError(response.error ?? "Failed to split PDF pages.");
+        const errMsg = response.error ?? "Failed to split PDF pages.";
+        setSplitError(errMsg);
+        reportToolProcessingError(TOOL_SLUG, TOOL_CATEGORY, "split_pdf", errMsg);
         return;
       }
 
@@ -429,6 +498,11 @@ export function PdfMergeSplitTool() {
       );
 
       setSplitResults(downloadable);
+      trackToolEvent("tool_process_success", {
+        tool_slug: TOOL_SLUG,
+        tool_category: TOOL_CATEGORY,
+        operation_type: `split_${splitOutputMode}`,
+      });
     } finally {
       setIsSplitting(false);
     }
@@ -443,6 +517,11 @@ export function PdfMergeSplitTool() {
     if (splitFileInputRef.current) {
       splitFileInputRef.current.value = "";
     }
+    trackToolEvent("tool_reset", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "reset_split",
+    });
   };
 
   const totalMergePages = mergeFiles.reduce((acc, f) => acc + f.pageCount, 0);
@@ -761,6 +840,13 @@ export function PdfMergeSplitTool() {
                   <a
                     href={mergeResult.objectUrl}
                     download={mergeResult.fileName}
+                    onClick={() =>
+                      trackToolEvent("tool_download", {
+                        tool_slug: TOOL_SLUG,
+                        tool_category: TOOL_CATEGORY,
+                        operation_type: "download_merged_pdf",
+                      })
+                    }
                     className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-colors hover:bg-emerald-700"
                   >
                     <Download className="h-4 w-4" aria-hidden="true" />
@@ -1081,6 +1167,13 @@ export function PdfMergeSplitTool() {
                       <a
                         href={res.objectUrl}
                         download={res.fileName}
+                        onClick={() =>
+                          trackToolEvent("tool_download", {
+                            tool_slug: TOOL_SLUG,
+                            tool_category: TOOL_CATEGORY,
+                            operation_type: `download_split_${splitOutputMode}`,
+                          })
+                        }
                         className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-emerald-700"
                       >
                         <Download className="h-3.5 w-3.5" aria-hidden="true" />

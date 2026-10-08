@@ -2,12 +2,13 @@ import Link from "next/link";
 import { Layers } from "lucide-react";
 import { FOOTER_NAV_ITEMS, SITE_CONFIG, TOOL_CATEGORIES } from "@/lib/tools";
 import { Container } from "@/components/ui/Container";
+import { CookieSettingsButton } from "@/components/analytics/CookieSettingsButton";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-slate-200 bg-slate-50">
+    <footer className="border-t border-slate-200 bg-slate-50 print:hidden">
       <Container className="py-12 sm:py-14">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
           {/* Brand summary */}
@@ -63,6 +64,9 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <CookieSettingsButton className="text-sm text-slate-600 transition-colors hover:text-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" />
+              </li>
             </ul>
           </div>
         </div>
@@ -81,6 +85,7 @@ export function Footer() {
                 {item.label}
               </Link>
             ))}
+            <CookieSettingsButton />
           </div>
         </div>
       </Container>

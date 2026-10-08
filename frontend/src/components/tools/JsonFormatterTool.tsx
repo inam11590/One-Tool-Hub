@@ -21,6 +21,11 @@ import {
   validateAndFormatJson,
   type JsonErrorDetails,
 } from "@/lib/tools/json-formatter";
+import { trackToolEvent } from "@/lib/analytics";
+import { reportToolProcessingError } from "@/lib/error-monitoring";
+
+const TOOL_SLUG = "json-formatter";
+const TOOL_CATEGORY = "developer";
 
 export function JsonFormatterTool() {
   const [input, setInput] = useState<string>(SAMPLE_JSON_DOCUMENT);
@@ -37,15 +42,24 @@ export function JsonFormatterTool() {
   const outputBytes = getUtf8ByteSize(output);
 
   const handleProcess = (targetIndent: 2 | 4 | 0, sourceText = input) => {
+    const operationType =
+      targetIndent === 0 ? "minify" : `format_${targetIndent}`;
     const result = validateAndFormatJson(sourceText, targetIndent);
     if (!result.valid) {
-      setError(result.error ?? { message: "Invalid JSON syntax." });
+      const errMsg = result.error?.message ?? "Invalid JSON syntax.";
+      setError(result.error ?? { message: errMsg });
       setStatusMessage(null);
+      reportToolProcessingError(TOOL_SLUG, TOOL_CATEGORY, operationType, errMsg);
       return;
     }
 
     setError(null);
     setOutput(result.output ?? "");
+    trackToolEvent("tool_process_success", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: operationType,
+    });
     if (targetIndent === 0) {
       setStatusMessage("JSON validated and minified successfully.");
     } else {
@@ -59,12 +73,19 @@ export function JsonFormatterTool() {
   const handleValidateOnly = () => {
     const result = validateAndFormatJson(input, indent);
     if (!result.valid) {
-      setError(result.error ?? { message: "Invalid JSON syntax." });
+      const errMsg = result.error?.message ?? "Invalid JSON syntax.";
+      setError(result.error ?? { message: errMsg });
       setStatusMessage(null);
+      reportToolProcessingError(TOOL_SLUG, TOOL_CATEGORY, "validate", errMsg);
       return;
     }
     setError(null);
     setStatusMessage("Valid JSON syntax confirmed.");
+    trackToolEvent("tool_process_success", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "validate",
+    });
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +101,13 @@ export function JsonFormatterTool() {
         message: "Please select a valid .json file.",
       });
       setStatusMessage(null);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "upload_json",
+        "unsupported format",
+        "unsupported_format"
+      );
       event.target.value = "";
       return;
     }
@@ -91,6 +119,13 @@ export function JsonFormatterTool() {
         )}) exceeds the 2 MB browser limit.`,
       });
       setStatusMessage(null);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "upload_json",
+        "file exceeds limit",
+        "file_too_large"
+      );
       event.target.value = "";
       return;
     }
@@ -104,15 +139,35 @@ export function JsonFormatterTool() {
         setError(null);
         setOutput(res.output ?? "");
         setStatusMessage(`Loaded and formatted "${file.name}".`);
+        trackToolEvent("tool_process_success", {
+          tool_slug: TOOL_SLUG,
+          tool_category: TOOL_CATEGORY,
+          operation_type: "upload_json",
+        });
       } else {
         setOutput("");
-        setError(res.error ?? { message: "Invalid JSON in uploaded file." });
+        const errMsg = res.error?.message ?? "Invalid JSON in uploaded file.";
+        setError(res.error ?? { message: errMsg });
         setStatusMessage(null);
+        reportToolProcessingError(
+          TOOL_SLUG,
+          TOOL_CATEGORY,
+          "upload_json",
+          errMsg,
+          "syntax_error"
+        );
       }
     };
     reader.onerror = () => {
       setError({ message: "Failed to read the selected file." });
       setStatusMessage(null);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "upload_json",
+        "file read error",
+        "processing_error"
+      );
     };
     reader.readAsText(file);
     event.target.value = "";
@@ -125,8 +180,20 @@ export function JsonFormatterTool() {
       await navigator.clipboard.writeText(textToCopy);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      trackToolEvent("tool_copy", {
+        tool_slug: TOOL_SLUG,
+        tool_category: TOOL_CATEGORY,
+        operation_type: "copy_json",
+      });
     } catch {
       setError({ message: "Unable to copy to clipboard in this browser." });
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "copy_json",
+        "clipboard write failed",
+        "clipboard_error"
+      );
     }
   };
 
@@ -144,6 +211,11 @@ export function JsonFormatterTool() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    trackToolEvent("tool_download", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "download_json",
+    });
   };
 
   const handleClear = () => {
@@ -152,6 +224,11 @@ export function JsonFormatterTool() {
     setError(null);
     setStatusMessage(null);
     setCopied(false);
+    trackToolEvent("tool_reset", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "clear",
+    });
   };
 
   const handleLoadSample = () => {

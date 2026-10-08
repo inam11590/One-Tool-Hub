@@ -18,6 +18,11 @@ import {
   validateImageFileMetadata,
   validateImageMagicBytes,
 } from "@/lib/tools/image-compressor";
+import { trackToolEvent } from "@/lib/analytics";
+import { reportToolProcessingError } from "@/lib/error-monitoring";
+
+const TOOL_SLUG = "image-compressor";
+const TOOL_CATEGORY = "developer";
 
 interface ProcessedImageState {
   originalFile: File;
@@ -68,6 +73,7 @@ export function ImageCompressorTool() {
     setError(null);
 
     const originalUrl = existingOriginalUrl ?? URL.createObjectURL(file);
+    const mimeFormatLabel = targetMime.replace("image/", "");
 
     try {
       const img = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -86,7 +92,15 @@ export function ImageCompressorTool() {
         if (!existingOriginalUrl) {
           URL.revokeObjectURL(originalUrl);
         }
-        setError(dimCheck.error ?? "Image dimensions exceed safety limits.");
+        const errMsg =
+          dimCheck.error ?? "Image dimensions exceed safety limits.";
+        setError(errMsg);
+        reportToolProcessingError(
+          TOOL_SLUG,
+          TOOL_CATEGORY,
+          `compress_${mimeFormatLabel}`,
+          errMsg
+        );
         setIsProcessing(false);
         return;
       }
@@ -100,7 +114,15 @@ export function ImageCompressorTool() {
         if (!existingOriginalUrl) {
           URL.revokeObjectURL(originalUrl);
         }
-        setError("Canvas 2D context is not available in this browser.");
+        const errMsg = "Canvas 2D context is not available in this browser.";
+        setError(errMsg);
+        reportToolProcessingError(
+          TOOL_SLUG,
+          TOOL_CATEGORY,
+          `compress_${mimeFormatLabel}`,
+          errMsg,
+          "processing_error"
+        );
         setIsProcessing(false);
         return;
       }
@@ -130,7 +152,15 @@ export function ImageCompressorTool() {
         if (!existingOriginalUrl) {
           URL.revokeObjectURL(originalUrl);
         }
-        setError("Browser failed to encode the output image.");
+        const errMsg = "Browser failed to encode the output image.";
+        setError(errMsg);
+        reportToolProcessingError(
+          TOOL_SLUG,
+          TOOL_CATEGORY,
+          `compress_${mimeFormatLabel}`,
+          errMsg,
+          "processing_error"
+        );
         setIsProcessing(false);
         return;
       }
@@ -158,14 +188,26 @@ export function ImageCompressorTool() {
         outputBytes: blob.size,
         outputMime: targetMime,
       });
+
+      trackToolEvent("tool_process_success", {
+        tool_slug: TOOL_SLUG,
+        tool_category: TOOL_CATEGORY,
+        operation_type: `compress_${mimeFormatLabel}`,
+      });
     } catch (err) {
       if (!existingOriginalUrl) {
         URL.revokeObjectURL(originalUrl);
       }
-      setError(
+      const errMsg =
         err instanceof Error
           ? err.message
-          : "Failed to process the selected image."
+          : "Failed to process the selected image.";
+      setError(errMsg);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        `compress_${mimeFormatLabel}`,
+        errMsg
       );
     } finally {
       setIsProcessing(false);
@@ -176,7 +218,9 @@ export function ImageCompressorTool() {
     if (!file) return;
     const check = validateImageFileMetadata(file);
     if (!check.valid) {
-      setError(check.error ?? "Invalid image file.");
+      const errMsg = check.error ?? "Invalid image file.";
+      setError(errMsg);
+      reportToolProcessingError(TOOL_SLUG, TOOL_CATEGORY, "upload_image", errMsg);
       return;
     }
 
@@ -184,11 +228,27 @@ export function ImageCompressorTool() {
       const headerBuffer = await file.slice(0, 16).arrayBuffer();
       const magicCheck = validateImageMagicBytes(new Uint8Array(headerBuffer));
       if (!magicCheck.valid) {
-        setError(magicCheck.error ?? "Invalid image file signature.");
+        const errMsg = magicCheck.error ?? "Invalid image file signature.";
+        setError(errMsg);
+        reportToolProcessingError(
+          TOOL_SLUG,
+          TOOL_CATEGORY,
+          "upload_image",
+          errMsg,
+          "unsupported_format"
+        );
         return;
       }
     } catch {
-      setError("Could not read the selected image file.");
+      const errMsg = "Could not read the selected image file.";
+      setError(errMsg);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "upload_image",
+        errMsg,
+        "corrupted_file"
+      );
       return;
     }
 
@@ -228,6 +288,11 @@ export function ImageCompressorTool() {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    trackToolEvent("tool_reset", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "reset",
+    });
   };
 
   const reduction = imageState
@@ -441,6 +506,13 @@ export function ImageCompressorTool() {
                   imageState.originalFile.name,
                   imageState.outputMime
                 )}
+                onClick={() =>
+                  trackToolEvent("tool_download", {
+                    tool_slug: TOOL_SLUG,
+                    tool_category: TOOL_CATEGORY,
+                    operation_type: `download_${imageState.outputMime.replace("image/", "")}`,
+                  })
+                }
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto sm:text-sm"
               >
                 <Download className="h-4 w-4" aria-hidden="true" />

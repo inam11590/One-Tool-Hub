@@ -1,9 +1,12 @@
+import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SITE_CONFIG } from "@/lib/tools";
+import { getGoogleSiteVerificationToken } from "@/lib/seo";
+import { AnalyticsAndConsentManager } from "@/components/analytics/AnalyticsAndConsentManager";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,6 +19,8 @@ export const viewport: Viewport = {
   themeColor: "#4f46e5",
 };
 
+const googleSiteVerification = getGoogleSiteVerificationToken();
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.url),
   title: {
@@ -23,6 +28,11 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_CONFIG.name}`,
   },
   description: SITE_CONFIG.description,
+  verification: googleSiteVerification
+    ? {
+        google: googleSiteVerification,
+      }
+    : undefined,
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -50,7 +60,7 @@ export default function RootLayout({
       >
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-indigo-600 focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg focus:outline-none"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-indigo-600 focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold text-white shadow-lg focus:outline-none"
         >
           Skip to main content
         </a>
@@ -59,6 +69,9 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <Suspense fallback={null}>
+          <AnalyticsAndConsentManager />
+        </Suspense>
       </body>
     </html>
   );

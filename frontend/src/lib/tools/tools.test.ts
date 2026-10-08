@@ -20,8 +20,30 @@ import {
   buildPageMetadata,
   buildToolPageJsonLd,
   buildWebsiteJsonLd,
+  getGoogleSiteVerificationToken,
   getSiteUrlConfig,
 } from "../seo.ts";
+import {
+  canSendAnalyticsEvents,
+  getConfiguredGaMeasurementId,
+  isAnalyticsEnvironmentEnabled,
+  isValidGaMeasurementId,
+  resetAnalyticsDedupeState,
+  sanitizeToolAnalyticsParams,
+  trackPageView,
+  trackToolEvent,
+} from "../analytics.ts";
+import {
+  classifyErrorCategory,
+  getErrorMonitoringConfig,
+  getFriendlyBoundaryErrorMessage,
+} from "../error-monitoring.ts";
+import {
+  FEEDBACK_COOLDOWN_MS,
+  MAX_FEEDBACK_SUGGESTION_LENGTH,
+  sanitizeFeedbackText,
+  validateToolFeedback,
+} from "../feedback.ts";
 import {
   generateQrCodeAssets,
   getContrastRatio,
@@ -696,4 +718,295 @@ test("Technical SEO: validates NEXT_PUBLIC_SITE_URL, relative canonicals, stagin
     }
   }
 });
+
+// ============================================================================
+// STEP 5: Analytics, Privacy Consent, Feedback, Error Monitoring & Search Console
+// ============================================================================
+test("GA4 Configuration & Consent Gating: validates measurement ID format, dev environment blocking, and explicit consent requirements", () => {
+  // Valid GA4 IDs
+  assert.equal(isValidGaMeasurementId("G-1234567890"), true);
+  assert.equal(isValidGaMeasurementId("G-ABCDEF12"), true);
+  assert.equal(getConfiguredGaMeasurementId(" G-ABC12345 "), "G-ABC12345");
+
+  // Invalid GA4 IDs (including lowercase or malformed)
+  assert.equal(isValidGaMeasurementId(""), false);
+  assert.equal(isValidGaMeasurementId("g-abc12345"), false);
+  assert.equal(isValidGaMeasurementId("UA-123456-1"), false);
+  assert.equal(isValidGaMeasurementId("G-123"), false);
+  assert.equal(isValidGaMeasurementId("G-INVALID_CHARS!"), false);
+  assert.equal(getConfiguredGaMeasurementId("invalid"), null);
+
+  // Blocked in local development unless explicitly enabled
+  assert.equal(
+    isAnalyticsEnvironmentEnabled({
+      measurementId: "G-TEST123456",
+      nodeEnv: "development",
+      enableInDev: "false",
+    }),
+    false
+  );
+  assert.equal(
+    isAnalyticsEnvironmentEnabled({
+      measurementId: "G-TEST123456",
+      nodeEnv: "development",
+      enableInDev: "true",
+    }),
+    true
+  );
+  assert.equal(
+    isAnalyticsEnvironmentEnabled({
+      measurementId: "G-TEST123456",
+      nodeEnv: "production",
+    }),
+    true
+  );
+
+  // Consent gating: undecided or rejected must never allow sending events
+  assert.equal(
+    canSendAnalyticsEvents({
+      consentStatus: "undecided",
+      measurementId: "G-TEST123456",
+      nodeEnv: "production",
+    }),
+    false
+  );
+  assert.equal(
+    canSendAnalyticsEvents({
+      consentStatus: "rejected",
+      measurementId: "G-TEST123456",
+      nodeEnv: "production",
+    }),
+    false
+  );
+  assert.equal(
+    canSendAnalyticsEvents({
+      consentStatus: "accepted",
+      measurementId: "G-TEST123456",
+      nodeEnv: "production",
+    }),
+    true
+  );
+});
+
+test("Analytics Privacy Sanitization & Deduplication: strips sensitive user data and prevents duplicate pageview/tool events", () => {
+  // Attempt to pass sensitive keys alongside allowed keys
+  const rawUnsafePayload = {
+    tool_slug: "json-formatter",
+    tool_category: "developer",
+    operation_type: "format_2",
+    error_category: "syntax_error",
+    filename: "secret-financials.json",
+    json_content: '{"ssn": "123-45-6789"}',
+    invoice_details: "ACME Corp $50,000",
+    qr_text: "https://private-link.internal",
+    user_text: "Confidential essay content",
+  } as unknown as Parameters<typeof sanitizeToolAnalyticsParams>[0];
+
+  const sanitized = sanitizeToolAnalyticsParams(rawUnsafePayload);
+  assert.ok(sanitized !== null);
+  assert.deepEqual(Object.keys(sanitized).sort(), [
+    "error_category",
+    "operation_type",
+    "tool_category",
+    "tool_slug",
+  ]);
+  assert.equal("filename" in sanitized, false);
+  assert.equal("json_content" in sanitized, false);
+  assert.equal("invoice_details" in sanitized, false);
+  assert.equal("qr_text" in sanitized, false);
+  assert.equal("user_text" in sanitized, false);
+
+  // Rejects unknown tool slugs
+  const invalidSlug = sanitizeToolAnalyticsParams({
+    tool_slug: "unknown-tool" as "json-formatter",
+    tool_category: "developer",
+  });
+  assert.equal(invalidSlug, null);
+
+  // Deduplication check for pageviews and tool events
+  resetAnalyticsDedupeState();
+  const capturedCalls: Array<{ args: unknown[] }> = [];
+  const mockGtag = (...args: unknown[]) => {
+    capturedCalls.push({ args });
+  };
+
+  // First pageview succeeds
+  const firstPage = trackPageView("/tools/json-formatter?secret=123#hash", {
+    consentStatus: "accepted",
+    measurementId: "G-TEST123456",
+    nodeEnv: "production",
+    gtagFn: mockGtag,
+  });
+  assert.equal(firstPage, true);
+  assert.equal(capturedCalls.length, 1);
+  assert.deepEqual(capturedCalls[0]?.args, [
+    "event",
+    "page_view",
+    { page_path: "/tools/json-formatter" },
+  ]);
+
+  // Duplicate pageview to the same path is suppressed
+  const duplicatePage = trackPageView("/tools/json-formatter", {
+    consentStatus: "accepted",
+    measurementId: "G-TEST123456",
+    nodeEnv: "production",
+    gtagFn: mockGtag,
+  });
+  assert.equal(duplicatePage, false);
+  assert.equal(capturedCalls.length, 1);
+
+  // Unconsented tool event is blocked
+  const rejectedEvent = trackToolEvent(
+    "tool_open",
+    { tool_slug: "json-formatter", tool_category: "developer" },
+    {
+      consentStatus: "rejected",
+      measurementId: "G-TEST123456",
+      nodeEnv: "production",
+      gtagFn: mockGtag,
+    }
+  );
+  assert.equal(rejectedEvent.sent, false);
+
+  // Consented tool event succeeds and deduplicates rapid repeats
+  const firstToolEvent = trackToolEvent(
+    "tool_open",
+    { tool_slug: "json-formatter", tool_category: "developer" },
+    {
+      consentStatus: "accepted",
+      measurementId: "G-TEST123456",
+      nodeEnv: "production",
+      nowMs: 1_000,
+      dedupeWindowMs: 500,
+      gtagFn: mockGtag,
+    }
+  );
+  assert.equal(firstToolEvent.sent, true);
+
+  const duplicateToolEvent = trackToolEvent(
+    "tool_open",
+    { tool_slug: "json-formatter", tool_category: "developer" },
+    {
+      consentStatus: "accepted",
+      measurementId: "G-TEST123456",
+      nodeEnv: "production",
+      nowMs: 1_200,
+      dedupeWindowMs: 500,
+      gtagFn: mockGtag,
+    }
+  );
+  assert.equal(duplicateToolEvent.sent, false);
+  assert.equal(duplicateToolEvent.reason, "duplicate_suppressed");
+});
+
+test("User Feedback System: validates helpful vote, 500-char limit, honeypot spam protection, and 15-second cooldown", () => {
+  // Valid feedback with suggestion
+  const validRes = validateToolFeedback({
+    toolSlug: "pdf-merge-split",
+    helpful: "yes",
+    suggestion: "  Great local PDF merging speed!  ",
+    honeypot: "",
+    lastSubmittedAtMs: null,
+    nowMs: 100_000,
+  });
+  assert.equal(validRes.valid, true);
+  assert.equal(validRes.sanitized?.toolSlug, "pdf-merge-split");
+  assert.equal(validRes.sanitized?.helpful, "yes");
+  assert.equal(
+    validRes.sanitized?.suggestion,
+    "Great local PDF merging speed!"
+  );
+
+  // Strips control characters
+  assert.equal(sanitizeFeedbackText("Hello\u0000\u0007World"), "HelloWorld");
+
+  // Rejects honeypot bot fill
+  const botRes = validateToolFeedback({
+    toolSlug: "pdf-merge-split",
+    helpful: "yes",
+    suggestion: "Spam link",
+    honeypot: "http://spam.example.com",
+  });
+  assert.equal(botRes.valid, false);
+
+  // Rejects missing helpful selection
+  const missingVote = validateToolFeedback({
+    toolSlug: "word-counter",
+    helpful: "",
+    suggestion: "Nice tool",
+  });
+  assert.equal(missingVote.valid, false);
+  assert.ok(missingVote.error?.includes("Yes or No"));
+
+  // Rejects suggestion exceeding 500 chars
+  const tooLong = validateToolFeedback({
+    toolSlug: "word-counter",
+    helpful: "no",
+    suggestion: "a".repeat(MAX_FEEDBACK_SUGGESTION_LENGTH + 1),
+  });
+  assert.equal(tooLong.valid, false);
+  assert.ok(tooLong.error?.includes("500 characters"));
+
+  // Enforces 15-second cooldown
+  const cooldownBlocked = validateToolFeedback({
+    toolSlug: "word-counter",
+    helpful: "yes",
+    lastSubmittedAtMs: 100_000,
+    nowMs: 100_000 + FEEDBACK_COOLDOWN_MS - 3_000,
+  });
+  assert.equal(cooldownBlocked.valid, false);
+  assert.ok(cooldownBlocked.error?.includes("wait"));
+});
+
+test("Error Monitoring & Search Console Verification: classifies generic error categories without leaking user content", () => {
+  assert.equal(
+    classifyErrorCategory(new Error("Uploaded file exceeds 25 MB limit")),
+    "file_too_large"
+  );
+  assert.equal(
+    classifyErrorCategory("Password-protected or encrypted PDF detected"),
+    "encrypted_file"
+  );
+  assert.equal(
+    classifyErrorCategory("Unexpected token in JSON syntax at line 4"),
+    "syntax_error"
+  );
+  assert.equal(
+    classifyErrorCategory("File signature does not match supported format"),
+    "unsupported_format"
+  );
+  assert.equal(
+    classifyErrorCategory("Corrupted PDF header"),
+    "corrupted_file"
+  );
+  assert.equal(
+    classifyErrorCategory("Page range exceeds document page count"),
+    "range_error"
+  );
+
+  // Friendly boundary message never exposes raw error message or stack trace
+  const friendlyMsg = getFriendlyBoundaryErrorMessage();
+  assert.ok(friendlyMsg.includes("Your local data has not been transmitted"));
+  assert.equal(friendlyMsg.includes("Error:"), false);
+
+  const monCfg = getErrorMonitoringConfig({
+    enabledEnv: "true",
+    dsnEnv: "https://monitor.example.org/ingest",
+  });
+  assert.equal(monCfg.enabled, true);
+  assert.equal(monCfg.dsn, "https://monitor.example.org/ingest");
+
+  // Search Console token validation
+  assert.equal(getGoogleSiteVerificationToken(""), null);
+  assert.equal(getGoogleSiteVerificationToken("   "), null);
+  assert.equal(
+    getGoogleSiteVerificationToken("<script>alert(1)</script>"),
+    null
+  );
+  assert.equal(
+    getGoogleSiteVerificationToken("abcDEF123_-validTokenValue987"),
+    "abcDEF123_-validTokenValue987"
+  );
+});
+
 

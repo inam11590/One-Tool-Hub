@@ -16,6 +16,10 @@ import {
   analyzeAndFormatYouTubeTimestamps,
   SAMPLE_YOUTUBE_TIMESTAMPS,
 } from "@/lib/tools/youtube-timestamp-formatter";
+import { trackToolEvent } from "@/lib/analytics";
+
+const TOOL_SLUG = "youtube-timestamp-formatter";
+const TOOL_CATEGORY = "youtube";
 
 export function YouTubeTimestampTool() {
   const [input, setInput] = useState<string>(SAMPLE_YOUTUBE_TIMESTAMPS);
@@ -36,6 +40,11 @@ export function YouTubeTimestampTool() {
       await navigator.clipboard.writeText(analysis.formattedOutput);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      trackToolEvent("tool_copy", {
+        tool_slug: TOOL_SLUG,
+        tool_category: TOOL_CATEGORY,
+        operation_type: "copy_chapters",
+      });
     } catch {
       // ignore clipboard errors
     }
@@ -54,12 +63,22 @@ export function YouTubeTimestampTool() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    trackToolEvent("tool_download", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "download_chapters_txt",
+    });
   };
 
   const handleReset = () => {
     setInput("");
     setSortChronologically(false);
     setCopied(false);
+    trackToolEvent("tool_reset", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "reset",
+    });
   };
 
   return (

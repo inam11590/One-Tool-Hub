@@ -27,6 +27,11 @@ import {
   type InvoiceFormData,
   type InvoiceTemplateId,
 } from "@/lib/tools/invoice-generator";
+import { trackToolEvent } from "@/lib/analytics";
+import { reportToolProcessingError } from "@/lib/error-monitoring";
+
+const TOOL_SLUG = "invoice-generator";
+const TOOL_CATEGORY = "freelancer";
 
 export function InvoiceGeneratorTool() {
   const baseId = useId();
@@ -163,13 +168,25 @@ export function InvoiceGeneratorTool() {
   const handleResetBlank = () => {
     setFormData(createBlankInvoiceData());
     setPdfError(null);
+    trackToolEvent("tool_reset", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "reset_blank",
+    });
   };
 
   const handleDownloadPdf = async () => {
     setPdfError(null);
     if (!calculation.valid) {
-      setPdfError(
-        "Please fix the validation errors listed above before downloading your PDF invoice."
+      const errMsg =
+        "Please fix the validation errors listed above before downloading your PDF invoice.";
+      setPdfError(errMsg);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "generate_invoice_pdf",
+        errMsg,
+        "invalid_input"
       );
       return;
     }
@@ -192,9 +209,26 @@ export function InvoiceGeneratorTool() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      trackToolEvent("tool_process_success", {
+        tool_slug: TOOL_SLUG,
+        tool_category: TOOL_CATEGORY,
+        operation_type: "generate_invoice_pdf",
+      });
+      trackToolEvent("tool_download", {
+        tool_slug: TOOL_SLUG,
+        tool_category: TOOL_CATEGORY,
+        operation_type: "download_invoice_pdf",
+      });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setPdfError(`Could not generate PDF: ${msg}`);
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "generate_invoice_pdf",
+        msg,
+        "processing_error"
+      );
     } finally {
       if (objectUrl) {
         const urlToRevoke = objectUrl;
@@ -205,6 +239,11 @@ export function InvoiceGeneratorTool() {
   };
 
   const handlePrintInvoice = () => {
+    trackToolEvent("tool_process_success", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "print_invoice",
+    });
     window.print();
   };
 

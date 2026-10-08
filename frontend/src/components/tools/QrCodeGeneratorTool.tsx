@@ -17,6 +17,11 @@ import {
   MIN_QR_SIZE_PX,
   type QrGenerationResult,
 } from "@/lib/tools/qr-code-generator";
+import { trackToolEvent } from "@/lib/analytics";
+import { reportToolProcessingError } from "@/lib/error-monitoring";
+
+const TOOL_SLUG = "qr-code-generator";
+const TOOL_CATEGORY = "freelancer";
 
 const DEFAULT_QR_TEXT = "https://example.com";
 const DEFAULT_FG_COLOR = "#0F172A";
@@ -42,6 +47,14 @@ export function QrCodeGeneratorTool() {
     }).then((res) => {
       if (active) {
         setQrResult(res);
+        if (!res.valid && res.error && text.trim().length > 0) {
+          reportToolProcessingError(
+            TOOL_SLUG,
+            TOOL_CATEGORY,
+            "generate_qr",
+            res.error
+          );
+        }
       }
     });
     return () => {
@@ -55,8 +68,19 @@ export function QrCodeGeneratorTool() {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      trackToolEvent("tool_copy", {
+        tool_slug: TOOL_SLUG,
+        tool_category: TOOL_CATEGORY,
+        operation_type: "copy_qr_input",
+      });
     } catch {
-      // ignore clipboard errors
+      reportToolProcessingError(
+        TOOL_SLUG,
+        TOOL_CATEGORY,
+        "copy_qr_input",
+        "clipboard failed",
+        "clipboard_error"
+      );
     }
   };
 
@@ -68,6 +92,11 @@ export function QrCodeGeneratorTool() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    trackToolEvent("tool_download", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "download_png",
+    });
   };
 
   const handleDownloadSvg = () => {
@@ -83,6 +112,11 @@ export function QrCodeGeneratorTool() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    trackToolEvent("tool_download", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "download_svg",
+    });
   };
 
   const handleReset = () => {
@@ -91,6 +125,11 @@ export function QrCodeGeneratorTool() {
     setForegroundColor(DEFAULT_FG_COLOR);
     setBackgroundColor(DEFAULT_BG_COLOR);
     setCopied(false);
+    trackToolEvent("tool_reset", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "reset",
+    });
   };
 
   return (

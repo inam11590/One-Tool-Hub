@@ -10,6 +10,10 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { analyzeTextMetrics } from "@/lib/tools/word-counter";
+import { trackToolEvent } from "@/lib/analytics";
+
+const TOOL_SLUG = "word-counter";
+const TOOL_CATEGORY = "student";
 
 const SAMPLE_TEXT = `OneToolHub provides fast, browser-based utilities for students, freelancers, creators, and software developers.
 
@@ -27,6 +31,11 @@ export function WordCounterTool() {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      trackToolEvent("tool_copy", {
+        tool_slug: TOOL_SLUG,
+        tool_category: TOOL_CATEGORY,
+        operation_type: "copy_text",
+      });
     } catch {
       // ignore clipboard errors
     }
@@ -43,11 +52,21 @@ export function WordCounterTool() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    trackToolEvent("tool_download", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "download_txt",
+    });
   };
 
   const handleClear = () => {
     setText("");
     setCopied(false);
+    trackToolEvent("tool_reset", {
+      tool_slug: TOOL_SLUG,
+      tool_category: TOOL_CATEGORY,
+      operation_type: "clear",
+    });
   };
 
   return (
