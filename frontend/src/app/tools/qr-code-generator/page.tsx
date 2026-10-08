@@ -8,10 +8,17 @@ import { QrCodeGeneratorTool } from "@/components/tools/QrCodeGeneratorTool";
 const TOOL_SLUG = "qr-code-generator";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "QR Code Generator — Create Custom PNG & SVG QR Codes Online",
+  title: "QR Code Generator — Create Static PNG & SVG QR Codes Online",
   description:
-    "Generate scannable QR codes from any URL or text instantly in your browser. Customize size and colors, check contrast, and download high-resolution PNG or SVG files.",
+    "Generate permanent, non-expiring QR codes from any URL or text in your browser. Customize size and colors, check WCAG contrast, and download high-resolution PNG or vector SVG files.",
   path: `/tools/${TOOL_SLUG}`,
+  keywords: [
+    "free static qr code generator",
+    "create qr code for website url",
+    "download svg png qr code",
+    "qr code contrast checker",
+    "non expiring qr code maker",
+  ],
 });
 
 const OVERVIEW =

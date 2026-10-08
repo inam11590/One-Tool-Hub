@@ -12,6 +12,13 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Format, normalize, and validate YouTube chapter timestamps online. Check for 00:00 start, minimum 3 chapters, 10-second duration, duplicates, and chronological order.",
   path: `/tools/${TOOL_SLUG}`,
+  keywords: [
+    "youtube timestamp formatter",
+    "youtube chapter validator",
+    "format youtube video chapters",
+    "youtube 00:00 10 second chapter rule",
+    "sort youtube timestamps chronologically",
+  ],
 });
 
 const OVERVIEW =

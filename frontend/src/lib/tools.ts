@@ -19,10 +19,13 @@ export const MAIN_NAV_ITEMS: readonly NavItem[] = [
   { label: "Home", href: "/" },
   { label: "All Tools", href: "/tools" },
   { label: "Categories", href: "/#categories" },
+  { label: "Learning Center", href: "/learn" },
   { label: "About", href: "/about" },
 ] as const;
 
 export const FOOTER_NAV_ITEMS: readonly NavItem[] = [
+  { label: "All Tools", href: "/tools" },
+  { label: "Learning Center", href: "/learn" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
   { label: "Privacy", href: "/privacy" },
@@ -289,15 +292,78 @@ export function getToolBySlug(slug: string): ToolItem | undefined {
   return TOOLS_REGISTRY.find((tool) => tool.slug === slug);
 }
 
+const CURATED_RELATED_TOOL_SLUGS: Record<string, readonly string[]> = {
+  "json-formatter": [
+    "qr-code-generator",
+    "word-counter",
+    "image-compressor",
+    "youtube-timestamp-formatter",
+  ],
+  "image-compressor": [
+    "youtube-timestamp-formatter",
+    "pdf-merge-split",
+    "qr-code-generator",
+    "invoice-generator",
+  ],
+  "qr-code-generator": [
+    "json-formatter",
+    "invoice-generator",
+    "image-compressor",
+    "pdf-merge-split",
+  ],
+  "word-counter": [
+    "gpa-calculator",
+    "youtube-timestamp-formatter",
+    "pdf-merge-split",
+    "invoice-generator",
+  ],
+  "youtube-timestamp-formatter": [
+    "image-compressor",
+    "word-counter",
+    "qr-code-generator",
+    "json-formatter",
+  ],
+  "gpa-calculator": [
+    "word-counter",
+    "pdf-merge-split",
+    "image-compressor",
+    "qr-code-generator",
+  ],
+  "invoice-generator": [
+    "pdf-merge-split",
+    "qr-code-generator",
+    "word-counter",
+    "image-compressor",
+  ],
+  "pdf-merge-split": [
+    "invoice-generator",
+    "gpa-calculator",
+    "image-compressor",
+    "word-counter",
+  ],
+};
+
 export function getRelatedTools(
   currentSlug: string,
   limit = 4
 ): ToolItem[] {
+  const curatedSlugs = CURATED_RELATED_TOOL_SLUGS[currentSlug];
+  if (curatedSlugs) {
+    const curatedTools = curatedSlugs
+      .map((slug) => getToolBySlug(slug))
+      .filter((item): item is ToolItem => Boolean(item));
+    const remaining = TOOLS_REGISTRY.filter(
+      (tool) =>
+        tool.slug !== currentSlug &&
+        !curatedTools.some((c) => c.slug === tool.slug)
+    );
+    return [...curatedTools, ...remaining].slice(0, limit);
+  }
+
   const currentTool = getToolBySlug(currentSlug);
   const others = TOOLS_REGISTRY.filter((tool) => tool.slug !== currentSlug);
 
   const sorted = [...others].sort((a, b) => {
-    // Prefer available tools first, then same category
     if (a.status !== b.status) {
       return a.status === "available" ? -1 : 1;
     }

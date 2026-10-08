@@ -12,11 +12,16 @@ import type { ReactNode } from "react";
 import type { ToolFaqItem, ToolItem } from "@/types/tools";
 import type { ValidToolSlug } from "@/lib/analytics";
 import { buildToolPageJsonLd } from "@/lib/seo";
+import {
+  getArticleForTool,
+  getRelatedArticlesForTool,
+} from "@/lib/learn";
 import { getRelatedTools } from "@/lib/tools";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { ToolCard } from "@/components/ui/ToolCard";
 import { ToolIcon } from "@/components/ui/ToolIcon";
+import { ArticleCard } from "@/components/learn/ArticleCard";
 import { ToolOpenTracker } from "@/components/analytics/ToolOpenTracker";
 import { ToolFeedbackCard } from "@/components/tools/ToolFeedbackCard";
 
@@ -56,6 +61,8 @@ export function ToolPageShell({
   children,
 }: ToolPageShellProps) {
   const relatedTools = getRelatedTools(tool.slug, 4);
+  const companionArticle = getArticleForTool(tool.slug);
+  const relatedArticles = getRelatedArticlesForTool(tool.slug, 3);
   const jsonLdItems = buildToolPageJsonLd(tool, title, description);
 
   return (
@@ -119,6 +126,21 @@ export function ToolPageShell({
             <p className="mt-3 text-base leading-relaxed text-slate-600 sm:text-lg">
               {description}
             </p>
+            {companionArticle ? (
+              <p className="mt-3 inline-flex flex-wrap items-center gap-1.5 text-xs font-medium text-slate-600 sm:text-sm">
+                <BookOpen
+                  className="h-4 w-4 shrink-0 text-indigo-600"
+                  aria-hidden="true"
+                />
+                <span>Step-by-step tutorial:</span>
+                <Link
+                  href={`/learn/${companionArticle.slug}`}
+                  className="font-semibold text-indigo-600 underline decoration-indigo-300 underline-offset-4 transition-colors hover:text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                  {companionArticle.title}
+                </Link>
+              </p>
+            ) : null}
           </div>
 
           <div className="flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-xs leading-relaxed text-emerald-950 lg:max-w-xs">
@@ -306,7 +328,41 @@ export function ToolPageShell({
           </section>
         </div>
 
-        {/* 6. Related Tools Section */}
+        {/* 6. Related Learning Center Guides Section */}
+        {relatedArticles.length > 0 ? (
+          <section
+            aria-labelledby="related-guides-heading"
+            className="mt-16 border-t border-slate-200 pt-14"
+          >
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-indigo-600">
+                  Learning Center Tutorials
+                </p>
+                <h2
+                  id="related-guides-heading"
+                  className="mt-1 text-xl font-bold text-slate-900 sm:text-2xl"
+                >
+                  Related Guides &amp; Walkthroughs
+                </h2>
+              </div>
+              <Link
+                href="/learn"
+                className="text-sm font-semibold text-indigo-600 transition-colors hover:text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Explore All Tutorials in Learning Center &rarr;
+              </Link>
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+              {relatedArticles.map((article) => (
+                <ArticleCard key={article.slug} article={article} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {/* 7. Related Tools Section */}
         <section
           aria-labelledby="related-tools-heading"
           className="mt-16 border-t border-slate-200 pt-14"

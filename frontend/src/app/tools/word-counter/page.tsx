@@ -12,6 +12,13 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Free real-time online word and character counter for students, writers, and creators. Count words, characters with and without spaces, sentences, paragraphs, and reading time.",
   path: `/tools/${TOOL_SLUG}`,
+  keywords: [
+    "word and character counter online",
+    "count characters with and without spaces",
+    "reading time calculator 200 wpm",
+    "essay word count checker",
+    "sentence and paragraph counter",
+  ],
 });
 
 const OVERVIEW =
@@ -31,11 +38,13 @@ const EXAMPLES = [
     title: "Checking University Essay & Abstract Limits",
     description:
       "Paste your academic abstract or admissions essay to verify it stays within a strict 250-word or 500-word submission cap.",
+    sample: "Words: 248 / 250 | Characters (with spaces): 1,640 | Paragraphs: 2",
   },
   {
     title: "Timing a YouTube Intro or Social Post",
     description:
       "Check both character count (for meta descriptions or social posts) and estimated reading time for spoken or silent scripts.",
+    sample: "Words: 155 | Characters (with spaces): 920 | Reading Time: 47 sec",
   },
 ] as const;
 

@@ -6,7 +6,6 @@ import type { ToolCategoryId } from "@/types/tools";
 import { Hero } from "@/components/home/Hero";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { FeaturedTools } from "@/components/home/FeaturedTools";
-import { Benefits } from "@/components/home/Benefits";
 
 export function HomeClient() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,7 +42,6 @@ export function HomeClient() {
         onSelectCategory={setSelectedCategory}
         onResetFilters={handleResetFilters}
       />
-      <Benefits />
     </>
   );
 }

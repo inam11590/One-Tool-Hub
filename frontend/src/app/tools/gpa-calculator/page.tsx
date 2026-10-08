@@ -10,8 +10,15 @@ const TOOL_SLUG = "gpa-calculator";
 export const metadata: Metadata = buildPageMetadata({
   title: "GPA Calculator — Semester & Cumulative GPA (4.0 & 5.0 Scales)",
   description:
-    "Calculate your weighted semester and cumulative GPA online. Supports configurable 4.0 and 5.0 grading scales, editable letter-grade mappings, multiple semesters, and worked examples.",
+    "Calculate your weighted semester and cumulative college GPA using credit hours. Supports configurable 4.0 and 5.0 grading scales, editable letter-grade mappings, and multi-semester tracking.",
   path: `/tools/${TOOL_SLUG}`,
+  keywords: [
+    "weighted college gpa calculator credit hours",
+    "semester and cumulative gpa calculator",
+    "4.0 and 5.0 scale gpa calculator",
+    "editable grade scale gpa calculator",
+    "university grade point average formula",
+  ],
 });
 
 const OVERVIEW =
@@ -37,6 +44,7 @@ const EXAMPLES = [
     title: "Custom University Grade Mapping",
     description:
       "If your institution defines A- as 3.67 instead of 3.70, open the Grade-to-Point Mapping panel and adjust A- to 3.67 for an exact match.",
+    sample: "A = 4.00 | A- = 3.67 | B+ = 3.33 | B = 3.00 | B- = 2.67",
   },
 ] as const;
 

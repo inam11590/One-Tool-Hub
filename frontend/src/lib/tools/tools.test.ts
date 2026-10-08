@@ -17,6 +17,8 @@ import {
   validateImageMagicBytes,
 } from "./image-compressor.ts";
 import {
+  buildArticleJsonLd,
+  buildLearnDirectoryJsonLd,
   buildPageMetadata,
   buildToolPageJsonLd,
   buildWebsiteJsonLd,
@@ -24,6 +26,15 @@ import {
   getSiteUrlConfig,
   isPreviewDeployment,
 } from "../seo.ts";
+import {
+  filterArticles,
+  getArticleBySlug,
+  getArticleForTool,
+  getRelatedArticles,
+  getRelatedArticlesForTool,
+  LEARN_ARTICLES,
+  LEARN_CATEGORIES,
+} from "../learn.ts";
 import {
   canSendAnalyticsEvents,
   getConfiguredGaMeasurementId,
@@ -1076,6 +1087,166 @@ test("Step 6 Production SEO: resolves https://one-tool-hub-sooty.vercel.app on V
     else process.env.VERCEL = savedVercel;
   }
 });
+
+// ============================================================================
+// STEP 7: Learning Center Architecture, 8 Tutorials, Internal Linking & Article JSON-LD
+// ============================================================================
+test("Step 7 Learning Center Content Integrity: verifies 8 complete tutorials, unique metadata, and 1-to-1 tool coverage", () => {
+  assert.equal(LEARN_CATEGORIES.length, 5);
+  assert.equal(LEARN_ARTICLES.length, 8);
+
+  const slugs = new Set<string>();
+  const titles = new Set<string>();
+  const seoTitles = new Set<string>();
+  const metaDescriptions = new Set<string>();
+  const primaryToolsCovered = new Set<string>();
+
+  for (const article of LEARN_ARTICLES) {
+    assert.ok(article.slug.length > 5);
+    assert.equal(slugs.has(article.slug), false, `Duplicate slug: ${article.slug}`);
+    slugs.add(article.slug);
+
+    assert.equal(titles.has(article.title), false, `Duplicate title: ${article.title}`);
+    titles.add(article.title);
+
+    assert.equal(
+      seoTitles.has(article.seoTitle),
+      false,
+      `Duplicate seoTitle: ${article.seoTitle}`
+    );
+    seoTitles.add(article.seoTitle);
+
+    assert.equal(
+      metaDescriptions.has(article.metaDescription),
+      false,
+      `Duplicate metaDescription on: ${article.slug}`
+    );
+    metaDescriptions.add(article.metaDescription);
+
+    assert.equal(
+      primaryToolsCovered.has(article.primaryToolSlug),
+      false,
+      `Duplicate primaryToolSlug: ${article.primaryToolSlug}`
+    );
+    primaryToolsCovered.add(article.primaryToolSlug);
+
+    // Every required tutorial section must be populated
+    assert.ok(article.readingTimeMinutes >= 3 && article.readingTimeMinutes <= 15);
+    assert.ok(article.introduction.length >= 2);
+    assert.ok(article.problemSolved.heading.length > 10);
+    assert.ok(article.problemSolved.paragraphs.length >= 2);
+    assert.ok(article.problemSolved.keyTakeaways.length >= 3);
+    assert.ok(article.steps.length >= 4);
+    assert.ok(article.practicalExample.title.length > 5);
+    assert.ok(article.practicalExample.explanation.length > 20);
+    assert.ok(article.commonMistakes.length >= 2);
+    assert.ok(article.troubleshooting.length >= 2);
+    assert.ok(article.faqs.length >= 3);
+    assert.ok(article.conclusion.heading.length > 5);
+    assert.ok(article.conclusion.ctaLabel.length > 5);
+    assert.ok(article.relatedToolSlugs.length >= 2);
+    assert.ok(article.relatedArticleSlugs.length >= 2);
+  }
+
+  // All 8 tools have a dedicated companion tutorial
+  assert.equal(primaryToolsCovered.size, 8);
+});
+
+test("Step 7 Search, Category Filtering, Internal Linking & Article JSON-LD: validates directory filters and structured data", () => {
+  // Search and category filtering
+  const allResults = filterArticles(LEARN_ARTICLES, "", "all");
+  assert.equal(allResults.length, 8);
+
+  const devCategoryResults = filterArticles(
+    LEARN_ARTICLES,
+    "",
+    "developer-tutorials"
+  );
+  assert.equal(devCategoryResults.length, 2);
+
+  const gpaSearchResults = filterArticles(LEARN_ARTICLES, "credit hours", "all");
+  assert.ok(
+    gpaSearchResults.some(
+      (a) => a.slug === "how-to-calculate-college-gpa-credit-hours"
+    )
+  );
+
+  const emptySearchResults = filterArticles(
+    LEARN_ARTICLES,
+    "nonexistent-xyz-999-query",
+    "all"
+  );
+  assert.equal(emptySearchResults.length, 0);
+
+  // Lookup & internal linking helpers
+  const jsonArticle = getArticleBySlug("how-to-format-and-validate-json");
+  assert.ok(jsonArticle);
+  assert.equal(jsonArticle.primaryToolSlug, "json-formatter");
+
+  const youtubeCompanion = getArticleForTool("youtube-timestamp-formatter");
+  assert.ok(youtubeCompanion);
+  assert.equal(
+    youtubeCompanion.slug,
+    "how-to-format-youtube-timestamps-and-chapters"
+  );
+
+  const relatedToJsonArticle = getRelatedArticles(
+    "how-to-format-and-validate-json",
+    3
+  );
+  assert.equal(relatedToJsonArticle.length, 3);
+  assert.ok(
+    relatedToJsonArticle.every(
+      (a) => a.slug !== "how-to-format-and-validate-json"
+    )
+  );
+
+  const relatedForInvoiceTool = getRelatedArticlesForTool(
+    "invoice-generator",
+    3
+  );
+  assert.equal(relatedForInvoiceTool.length, 3);
+  assert.equal(
+    relatedForInvoiceTool[0]?.slug,
+    "how-to-create-professional-freelance-invoice"
+  );
+
+  // Structured data validation (BreadcrumbList + Article)
+  const savedVercel = process.env.VERCEL;
+  const savedVercelEnv = process.env.VERCEL_ENV;
+  try {
+    process.env.VERCEL = "1";
+    process.env.VERCEL_ENV = "production";
+
+    const dirLd = buildLearnDirectoryJsonLd();
+    assert.equal(dirLd["@type"], "BreadcrumbList");
+    assert.equal(dirLd.itemListElement.length, 2);
+    assert.equal(
+      dirLd.itemListElement[1]?.item,
+      "https://one-tool-hub-sooty.vercel.app/learn"
+    );
+
+    const articleLd = buildArticleJsonLd(jsonArticle);
+    assert.equal(articleLd.length, 2);
+    assert.equal(articleLd[0]?.["@type"], "BreadcrumbList");
+    assert.equal(articleLd[1]?.["@type"], "Article");
+    assert.equal(
+      articleLd[1]?.headline,
+      "How to Format and Validate JSON Correctly"
+    );
+    assert.equal(
+      articleLd[1]?.url,
+      "https://one-tool-hub-sooty.vercel.app/learn/how-to-format-and-validate-json"
+    );
+    assert.equal("aggregateRating" in (articleLd[1] ?? {}), false);
+  } finally {
+    if (savedVercel === undefined) delete process.env.VERCEL;
+    else process.env.VERCEL = savedVercel;
+    if (savedVercelEnv === undefined) delete process.env.VERCEL_ENV;
+    else process.env.VERCEL_ENV = savedVercelEnv;
+  }
+});
+
 
 
 

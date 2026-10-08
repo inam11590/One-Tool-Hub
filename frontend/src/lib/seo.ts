@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { LearnArticle } from "@/types/learn";
 import type { ToolItem } from "@/types/tools";
 
 const LOCAL_FALLBACK_ORIGIN = "http://localhost:3000";
@@ -263,3 +264,94 @@ export function buildToolPageJsonLd(
 
   return [breadcrumbList, softwareApplication];
 }
+
+/**
+ * Generates accurate BreadcrumbList JSON-LD for the Learning Center directory (/learn).
+ */
+export function buildLearnDirectoryJsonLd() {
+  const origin = getSiteOrigin();
+  const learnUrl = getAbsoluteUrl("/learn");
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: origin,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Learning Center",
+        item: learnUrl,
+      },
+    ],
+  };
+}
+
+/**
+ * Generates accurate BreadcrumbList and Article JSON-LD for a tutorial page (/learn/[slug]).
+ * Uses only factual, visible page metadata and the verified production origin.
+ */
+export function buildArticleJsonLd(article: LearnArticle) {
+  const origin = getSiteOrigin();
+  const articleUrl = getAbsoluteUrl(`/learn/${article.slug}`);
+
+  const breadcrumbList = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: origin,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Learning Center",
+        item: getAbsoluteUrl("/learn"),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: article.title,
+        item: articleUrl,
+      },
+    ],
+  };
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.metaDescription,
+    url: articleUrl,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": articleUrl,
+    },
+    datePublished: `${article.publishedAt}T00:00:00.000Z`,
+    dateModified: `${article.updatedAt}T00:00:00.000Z`,
+    articleSection: article.categoryLabel,
+    inLanguage: "en",
+    isAccessibleForFree: true,
+    author: {
+      "@type": "Organization",
+      name: "OneToolHub",
+      url: origin,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "OneToolHub",
+      url: origin,
+    },
+  };
+
+  return [breadcrumbList, articleSchema] as const;
+}
+

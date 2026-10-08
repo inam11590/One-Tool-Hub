@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Search, RotateCcw, X } from "lucide-react";
+import { BookOpen, Search, RotateCcw, X } from "lucide-react";
 import { filterTools, TOOL_CATEGORIES, TOOLS_REGISTRY } from "@/lib/tools";
 import type { ToolCategoryId } from "@/types/tools";
 import { Container } from "@/components/ui/Container";
@@ -204,6 +205,30 @@ export function ToolsDirectoryClient() {
             </button>
           </div>
         )}
+
+        {/* Learning Center Cross-Link Banner */}
+        <div className="mt-14 flex flex-col justify-between gap-4 rounded-2xl border border-indigo-200/80 bg-indigo-50/50 p-6 sm:flex-row sm:items-center">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-700">
+              <BookOpen className="h-4 w-4" aria-hidden="true" />
+              <span>OneToolHub Learning Center</span>
+            </div>
+            <h2 className="mt-1 text-lg font-bold text-slate-900">
+              Need step-by-step instructions or troubleshooting advice?
+            </h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Read our 8 practical tutorials covering JSON validation, image
+              compression, QR codes, word counts, YouTube chapters, GPA formulas,
+              freelance invoices, and PDF workflows.
+            </p>
+          </div>
+          <Link
+            href="/learn"
+            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:text-sm"
+          >
+            Explore Learning Center &rarr;
+          </Link>
+        </div>
       </Container>
     </div>
   );

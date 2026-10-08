@@ -12,6 +12,13 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Format, validate, and minify JSON documents directly in your browser. Choose 2-space or 4-space indentation, inspect syntax errors, upload .json files, and download clean JSON.",
   path: `/tools/${TOOL_SLUG}`,
+  keywords: [
+    "json formatter and validator online",
+    "prettify json 2 spaces 4 spaces",
+    "minify json payload online",
+    "validate json syntax in browser",
+    "client side json viewer",
+  ],
 });
 
 const OVERVIEW =

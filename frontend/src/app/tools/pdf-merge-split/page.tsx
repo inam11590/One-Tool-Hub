@@ -12,6 +12,13 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Merge multiple PDF documents into one file or split and extract custom page ranges (e.g., 1-3, 5, 7-10) locally in your browser without uploading files to a server.",
   path: `/tools/${TOOL_SLUG}`,
+  keywords: [
+    "merge and split pdf in browser without uploading",
+    "combine pdf files online free",
+    "extract specific page ranges from pdf",
+    "client side pdf merger",
+    "private local pdf splitter",
+  ],
 });
 
 const OVERVIEW =
@@ -31,12 +38,13 @@ const EXAMPLES = [
     title: "Combining Signed Contract Pages & Appendices",
     description:
       "Upload a cover letter PDF, a main agreement PDF, and an appendix PDF in Merge Mode, reorder them with the Up/Down buttons, and download a single consolidated packet.",
+    sample: "cover-letter.pdf (1p) + agreement.pdf (4p) + appendix.pdf (2p) → merged-packet.pdf (7p)",
   },
   {
     title: "Extracting Specific Chapters from a Lecture Packet",
     description:
       "Switch to Split Mode, upload a 20-page PDF, and enter '1-3, 8, 12-15' to extract only the required reading pages into a new file.",
-    sample: "Page Range Input: 1-3, 8, 12-15",
+    sample: "Page Range Input: 1-3, 8, 12-15 → 8 extracted pages",
   },
 ] as const;
 

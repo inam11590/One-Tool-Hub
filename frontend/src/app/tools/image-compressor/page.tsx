@@ -10,8 +10,15 @@ const TOOL_SLUG = "image-compressor";
 export const metadata: Metadata = buildPageMetadata({
   title: "Image Compressor — Compress JPEG, PNG & WebP in Your Browser",
   description:
-    "Compress and convert JPEG, PNG, and WebP images locally in your browser. Adjust quality, compare original and output file sizes, and download optimized images.",
+    "Compress and convert JPEG, PNG, and WebP images locally in your browser. Adjust quality, shrink YouTube thumbnails under 2 MB, compare file sizes, and download optimized images.",
   path: `/tools/${TOOL_SLUG}`,
+  keywords: [
+    "compress image online in browser",
+    "jpeg png webp image compressor",
+    "compress youtube thumbnail under 2mb",
+    "convert png to webp online",
+    "reduce image file size without quality loss",
+  ],
 });
 
 const OVERVIEW =
@@ -30,12 +37,14 @@ const EXAMPLES = [
   {
     title: "Optimizing a Blog Hero Photo or YouTube Thumbnail",
     description:
-      "Upload a high-resolution JPEG or PNG thumbnail, select WebP output at 80% quality, and reduce byte size significantly for faster page loading.",
+      "Upload a high-resolution JPEG or PNG thumbnail, select WebP or JPEG output at 80% quality, and reduce byte size significantly for faster page loading.",
+    sample: "1280×720 PNG (3.4 MB) → 80% WebP/JPEG (~215 KB, −93% reduction)",
   },
   {
     title: "Converting Transparent Graphics to JPEG",
     description:
       "Select a transparent PNG logo and export it as JPEG at 85% quality; transparent areas are cleanly filled with solid white.",
+    sample: "logo-transparent.png → logo-transparent-compressed.jpg (white background)",
   },
 ] as const;
 

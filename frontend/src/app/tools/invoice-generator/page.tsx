@@ -10,8 +10,15 @@ const TOOL_SLUG = "invoice-generator";
 export const metadata: Metadata = buildPageMetadata({
   title: "Professional Invoice Generator — Free PDF & Print Invoices",
   description:
-    "Create clean, print-ready client invoices online for free. Includes ISO currency support, safe decimal tax and discount math, two templates, and instant readable PDF download.",
+    "Create clean, print-ready client invoices online for free. Includes 10 ISO currencies, safe decimal tax and discount math, two templates, and instant readable PDF download.",
   path: `/tools/${TOOL_SLUG}`,
+  keywords: [
+    "free freelance invoice generator pdf",
+    "online invoice maker no signup",
+    "multi currency invoice generator",
+    "client invoice with discount and tax",
+    "browser pdf invoice generator",
+  ],
 });
 
 const OVERVIEW =

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { buildWebsiteJsonLd, isPreviewDeployment } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/tools";
 import { HomeClient } from "@/components/home/HomeClient";
+import { FeaturedGuides } from "@/components/home/FeaturedGuides";
+import { Benefits } from "@/components/home/Benefits";
 
 const previewNoIndex = isPreviewDeployment();
 
@@ -52,6 +54,8 @@ export default function HomePage() {
         }}
       />
       <HomeClient />
+      <FeaturedGuides />
+      <Benefits />
     </>
   );
 }
