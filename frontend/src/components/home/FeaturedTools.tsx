@@ -35,7 +35,7 @@ export function FeaturedTools({
           <SectionHeading
             eyebrow="Featured Tool Catalog"
             title="Core Utilities Directory"
-            description="Launch 5 live browser-based utilities immediately, or preview upcoming tools currently in development."
+            description="Launch all 8 live browser-based utilities immediately—no account registration required."
           />
 
           {/* Category Filter Pills */}

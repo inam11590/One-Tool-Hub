@@ -6,20 +6,22 @@ OneToolHub is a modern online utility platform built for students, freelancers, 
 
 ---
 
-## Step 2 Status (5 Live Browser Tools)
+## Step 3 Status (8-Tool MVP Complete)
 
-This repository includes **Step 1 + Step 2** of the OneToolHub architecture:
+This repository includes **Step 1 + Step 2 + Step 3** of the OneToolHub architecture:
 - Production-quality Next.js App Router + TypeScript (strict mode) + Tailwind CSS foundation
 - Responsive sticky header, desktop navigation, and accessible mobile menu
 - **All Tools Directory** (`/tools`) and **Homepage** (`/`) with client-side search, category filtering, and availability filtering
-- **5 Live Client-Side Tools** (processed 100% locally in the browser without registration):
+- **8 Live Client-Side Tools** (processed 100% locally in the browser without registration):
   1. **JSON Formatter & Validator** (`/tools/json-formatter`)
   2. **Image Compressor** (`/tools/image-compressor`)
   3. **QR Code Generator** (`/tools/qr-code-generator`)
   4. **Word Counter** (`/tools/word-counter`)
   5. **YouTube Timestamp Formatter** (`/tools/youtube-timestamp-formatter`)
-- **3 Coming Soon Tools** clearly marked in the catalog (*GPA Calculator, Invoice Generator, PDF Merge & Split*)
-- Automated unit test suite (`npm test`), strict TypeScript checks (`npm run typecheck`), ESLint (`npm run lint`), and static production build (`npm run build`)
+  6. **GPA Calculator** (`/tools/gpa-calculator`)
+  7. **Professional Invoice Generator** (`/tools/invoice-generator`)
+  8. **PDF Merge & Split** (`/tools/pdf-merge-split`)
+- Automated unit test suite (`npm test` with 19 tests across all 8 tools), strict TypeScript checks (`npm run typecheck`), ESLint (`npm run lint`), and static production build (`npm run build`)
 
 ---
 

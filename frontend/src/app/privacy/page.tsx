@@ -30,16 +30,19 @@ export default function PrivacyPage() {
                 id="current-data-heading"
                 className="text-lg font-bold text-slate-900"
               >
-                1. Local Browser Processing (Current Tools)
+                1. Local Browser Processing (All 8 MVP Tools)
               </h2>
               <p className="mt-2">
-                All currently available tools on OneToolHub (JSON Formatter,
-                Image Compressor, QR Code Generator, Word Counter, and YouTube
-                Timestamp Formatter) execute locally in your web browser. Your
-                JSON text, uploaded images, QR inputs, essays, and timestamps
+                All 8 tools on OneToolHub (JSON Formatter, Image Compressor, QR
+                Code Generator, Word Counter, YouTube Timestamp Formatter, GPA
+                Calculator, Invoice Generator, and PDF Merge &amp; Split)
+                execute locally in your web browser. Your JSON text, images, QR
+                inputs, essays, timestamps, grades, invoices, and PDF documents
                 are processed in browser memory and are not uploaded to or
-                stored on OneToolHub servers. User accounts, payment processing,
-                and database storage are not yet active.
+                stored on OneToolHub servers. In the Invoice Generator, saving a
+                draft to your browser&apos;s <code>localStorage</code> is
+                strictly optional and only occurs if you explicitly enable the
+                consent checkbox.
               </p>
             </section>
 

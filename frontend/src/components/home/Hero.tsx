@@ -33,7 +33,7 @@ export function Hero({
         <div className="mx-auto max-w-3xl text-center">
           <Badge variant="primary" className="mb-5 px-3 py-1">
             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>5 Live Browser Tools &bull; No Signup Required</span>
+            <span>8 Live Browser Tools &bull; No Signup Required</span>
           </Badge>
 
           <h1

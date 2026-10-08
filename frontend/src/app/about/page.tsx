@@ -75,7 +75,7 @@ export default function AboutPage() {
                 id="status-heading"
                 className="text-xl font-bold text-slate-900"
               >
-                Current Development Stage (Step 2 Release)
+                Current Development Stage (Step 3 — 8-Tool MVP Complete)
               </h2>
               <div className="mt-3 rounded-xl border border-indigo-200 bg-indigo-50/50 p-5 text-sm leading-relaxed text-slate-700">
                 <div className="flex items-center gap-2 font-semibold text-indigo-900">
@@ -83,13 +83,12 @@ export default function AboutPage() {
                   <span>Transparent Roadmap Status</span>
                 </div>
                 <p className="mt-2">
-                  OneToolHub now features <strong>5 live browser-based tools</strong>{" "}
-                  (JSON Formatter &amp; Validator, Image Compressor, QR Code
-                  Generator, Word Counter, and YouTube Timestamp Formatter) out
-                  of our initial catalog of {TOOLS_REGISTRY.length} utilities.
-                  The remaining 3 tools (GPA Calculator, Invoice Generator, and
-                  PDF Merge &amp; Split) are clearly marked as{" "}
-                  <strong>Coming Soon</strong> for the next release phase.
+                  OneToolHub now features all <strong>{TOOLS_REGISTRY.length} live browser-based tools</strong>{" "}
+                  in our initial MVP catalog: JSON Formatter &amp; Validator,
+                  Image Compressor, QR Code Generator, Word Counter, YouTube
+                  Timestamp Formatter, GPA Calculator, Professional Invoice
+                  Generator, and PDF Merge &amp; Split. Every utility runs
+                  directly in your browser without requiring signup.
                 </p>
               </div>
             </section>

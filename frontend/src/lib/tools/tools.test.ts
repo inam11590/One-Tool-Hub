@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { PDFDocument } from "pdf-lib";
 
 import {
   formatByteSize,
@@ -26,6 +27,27 @@ import {
   formatSecondsToTimestamp,
   parseTimestampToken,
 } from "./youtube-timestamp-formatter.ts";
+import {
+  calculateGpa,
+  getDefaultGradeMappings,
+  type GpaSemesterInput,
+} from "./gpa-calculator.ts";
+import {
+  calculateInvoiceTotals,
+  createSampleInvoiceData,
+  generateInvoicePdfBytes,
+  type InvoiceFormData,
+} from "./invoice-generator.ts";
+import {
+  createSamplePdfBytes,
+  inspectPdfBytes,
+  MAX_PDF_FILE_SIZE_BYTES,
+  mergePdfDocuments,
+  parsePageRanges,
+  reorderArrayItems,
+  splitPdfDocument,
+  validatePdfFileMetadata,
+} from "./pdf-merge-split.ts";
 
 // ============================================================================
 // TOOL 1: JSON Formatter & Validator Tests
@@ -230,7 +252,6 @@ test("YouTube Timestamp Formatter: parses valid MM:SS, HH:MM:SS, and trailing ti
   assert.equal(res.isChronological, true);
   assert.equal(res.allChaptersAtLeastTenSeconds, true);
   assert.equal(res.readyForYouTube, true);
-  // Because 1:02:15 is >= 1 hour, all timestamps normalize to HH:MM:SS
   assert.equal(
     res.formattedOutput,
     [
@@ -264,7 +285,320 @@ test("YouTube Timestamp Formatter: detects invalid, duplicate, out-of-order, and
   assert.equal(res.shortChapters[0]?.durationSeconds, 5);
   assert.equal(res.readyForYouTube, false);
 
-  // Also test parseTimestampToken directly
   assert.equal(parseTimestampToken("05:60").valid, false);
   assert.equal(formatSecondsToTimestamp(3661), "01:01:01");
+});
+
+// ============================================================================
+// TOOL 6: GPA Calculator Tests
+// ============================================================================
+test("GPA Calculator: calculates single course and multiple courses accurately on 4.0 scale", () => {
+  const mappings4 = getDefaultGradeMappings("4.0");
+
+  // Single course
+  const singleRes = calculateGpa(
+    [
+      {
+        id: "sem-1",
+        name: "Semester 1",
+        courses: [{ id: "c-1", name: "Physics I", credits: "4", grade: "A-" }],
+      },
+    ],
+    mappings4,
+    "4.0"
+  );
+  assert.equal(singleRes.valid, true);
+  assert.equal(singleRes.totalCredits, 4);
+  assert.equal(singleRes.totalQualityPoints, 14.8);
+  assert.equal(singleRes.cumulativeGpaFormatted, "3.70");
+
+  // Multiple courses (worked example: 4cr A=16.0, 4cr B+=13.2, 3cr A-=11.1 => 40.3 / 11 = 3.66)
+  const multiCourseRes = calculateGpa(
+    [
+      {
+        id: "sem-1",
+        name: "Semester 1",
+        courses: [
+          { id: "c-1", name: "CS I", credits: "4", grade: "A" },
+          { id: "c-2", name: "Calc I", credits: "4", grade: "B+" },
+          { id: "c-3", name: "Writing", credits: "3", grade: "A-" },
+        ],
+      },
+    ],
+    mappings4,
+    "4.0"
+  );
+  assert.equal(multiCourseRes.valid, true);
+  assert.equal(multiCourseRes.totalCredits, 11);
+  assert.equal(multiCourseRes.totalQualityPoints, 40.3);
+  assert.equal(multiCourseRes.cumulativeGpaFormatted, "3.66");
+});
+
+test("GPA Calculator: calculates multiple semesters and supports 5.0 scale & custom mappings", () => {
+  const semesters: GpaSemesterInput[] = [
+    {
+      id: "s1",
+      name: "Fall",
+      courses: [
+        { id: "c1", name: "Biology", credits: "3", grade: "A" },
+        { id: "c2", name: "Chemistry", credits: "3", grade: "B" },
+      ],
+    },
+    {
+      id: "s2",
+      name: "Spring",
+      courses: [{ id: "c3", name: "Honors Organic Chem", credits: "4", grade: "A" }],
+    },
+  ];
+
+  // 4.0 scale: (3*4 + 3*3 + 4*4) / 10 = (12 + 9 + 16)/10 = 37/10 = 3.70
+  const res4 = calculateGpa(semesters, getDefaultGradeMappings("4.0"), "4.0");
+  assert.equal(res4.valid, true);
+  assert.equal(res4.semesterSummaries.length, 2);
+  assert.equal(res4.semesterSummaries[0]?.gpaFormatted, "3.50");
+  assert.equal(res4.semesterSummaries[1]?.gpaFormatted, "4.00");
+  assert.equal(res4.cumulativeGpaFormatted, "3.70");
+
+  // 5.0 scale: (3*5 + 3*4 + 4*5) / 10 = (15 + 12 + 20)/10 = 47/10 = 4.70
+  const res5 = calculateGpa(semesters, getDefaultGradeMappings("5.0"), "5.0");
+  assert.equal(res5.valid, true);
+  assert.equal(res5.cumulativeGpaFormatted, "4.70");
+});
+
+test("GPA Calculator: rejects zero credit hours, negative/invalid credit hours, and missing grades", () => {
+  const mappings4 = getDefaultGradeMappings("4.0");
+
+  const zeroCredits = calculateGpa(
+    [
+      {
+        id: "s1",
+        name: "Fall",
+        courses: [{ id: "c1", name: "Zero Course", credits: "0", grade: "A" }],
+      },
+    ],
+    mappings4,
+    "4.0"
+  );
+  assert.equal(zeroCredits.valid, false);
+  assert.ok(zeroCredits.errorMessage?.includes("positive number"));
+
+  const negativeCredits = calculateGpa(
+    [
+      {
+        id: "s1",
+        name: "Fall",
+        courses: [{ id: "c1", name: "Bad Course", credits: "-3", grade: "A" }],
+      },
+    ],
+    mappings4,
+    "4.0"
+  );
+  assert.equal(negativeCredits.valid, false);
+  assert.equal(negativeCredits.validationIssues.length, 1);
+
+  const missingGrade = calculateGpa(
+    [
+      {
+        id: "s1",
+        name: "Fall",
+        courses: [{ id: "c1", name: "No Grade", credits: "3", grade: "" }],
+      },
+    ],
+    mappings4,
+    "4.0"
+  );
+  assert.equal(missingGrade.valid, false);
+  assert.ok(missingGrade.errorMessage?.includes("select a letter grade"));
+});
+
+// ============================================================================
+// TOOL 7: Invoice Generator Tests
+// ============================================================================
+test("Invoice Generator: computes single item, multiple items, tax, and percentage/fixed discounts with floating-point safety", () => {
+  const baseData: InvoiceFormData = {
+    ...createSampleInvoiceData(),
+    items: [
+      { id: "1", description: "Item A (0.1 + 0.2 test)", quantity: "1", unitPrice: "0.10" },
+      { id: "2", description: "Item B", quantity: "1", unitPrice: "0.20" },
+      { id: "3", description: "Subscription", quantity: "3", unitPrice: "19.99" },
+    ],
+    discountType: "percentage",
+    discountValue: "10",
+    taxRatePercent: "8.25",
+  };
+
+  // Subtotal: 0.10 + 0.20 + 59.97 = 60.27 (exact, no 0.30000000000000004!)
+  const pctRes = calculateInvoiceTotals(baseData);
+  assert.equal(pctRes.valid, true);
+  assert.equal(pctRes.subtotal, 60.27);
+  // 10% of 60.27 = 6.03
+  assert.equal(pctRes.discountAmount, 6.03);
+  // Taxable: 60.27 - 6.03 = 54.24
+  assert.equal(pctRes.taxableSubtotal, 54.24);
+  // Tax 8.25% of 54.24 = 4.4748 -> 4.47
+  assert.equal(pctRes.taxAmount, 4.47);
+  // Grand total: 54.24 + 4.47 = 58.71
+  assert.equal(pctRes.grandTotal, 58.71);
+
+  // Fixed discount calculation
+  const fixedRes = calculateInvoiceTotals({
+    ...baseData,
+    discountType: "fixed",
+    discountValue: "10.27",
+    taxRatePercent: "10",
+  });
+  assert.equal(fixedRes.valid, true);
+  assert.equal(fixedRes.discountAmount, 10.27);
+  assert.equal(fixedRes.taxableSubtotal, 50.0);
+  assert.equal(fixedRes.taxAmount, 5.0);
+  assert.equal(fixedRes.grandTotal, 55.0);
+});
+
+test("Invoice Generator: rejects negative values, invalid dates, and generates readable multi-page PDF bytes", async () => {
+  const invalidData: InvoiceFormData = {
+    ...createSampleInvoiceData(),
+    issueDate: "2025-05-10",
+    dueDate: "2025-05-01", // due before issue
+    items: [
+      { id: "1", description: "Bad Item", quantity: "-2", unitPrice: "-50" },
+    ],
+  };
+
+  const invalidRes = calculateInvoiceTotals(invalidData);
+  assert.equal(invalidRes.valid, false);
+  assert.ok(
+    invalidRes.validationErrors.some((e) =>
+      e.includes("cannot be earlier than the invoice issue date")
+    )
+  );
+  assert.ok(
+    invalidRes.validationErrors.some((e) =>
+      e.includes("Quantity must be a positive number")
+    )
+  );
+  assert.ok(
+    invalidRes.validationErrors.some((e) =>
+      e.includes("Unit price must be zero or a positive number")
+    )
+  );
+
+  // Generate multi-page invoice PDF with 45 line items
+  const multiPageData: InvoiceFormData = {
+    ...createSampleInvoiceData(),
+    items: Array.from({ length: 45 }, (_, idx) => ({
+      id: `item-${idx + 1}`,
+      description: `Milestone Deliverable #${idx + 1} — Full-stack engineering & architecture consultation`,
+      quantity: "2",
+      unitPrice: "150.00",
+    })),
+  };
+
+  const pdfBytes = await generateInvoicePdfBytes(multiPageData);
+  assert.ok(pdfBytes.byteLength > 1000);
+  const loadedDoc = await PDFDocument.load(pdfBytes);
+  assert.ok(loadedDoc.getPageCount() >= 2);
+});
+
+// ============================================================================
+// TOOL 8: PDF Merge & Split Tests
+// ============================================================================
+test("PDF Merge & Split: merges two or multiple PDFs, reorders files, and splits page ranges", async () => {
+  const pdfA = await createSamplePdfBytes("Doc A", 2);
+  const pdfB = await createSamplePdfBytes("Doc B", 3);
+  const pdfC = await createSamplePdfBytes("Doc C", 4);
+
+  // Merge two PDFs
+  const merge2 = await mergePdfDocuments([
+    { name: "a.pdf", bytes: pdfA },
+    { name: "b.pdf", bytes: pdfB },
+  ]);
+  assert.equal(merge2.valid, true);
+  assert.equal(merge2.totalPages, 5);
+
+  // Reorder and merge three PDFs
+  const list = [
+    { name: "a.pdf", bytes: pdfA },
+    { name: "b.pdf", bytes: pdfB },
+    { name: "c.pdf", bytes: pdfC },
+  ];
+  const reordered = reorderArrayItems(list, 2, 0); // move c.pdf to first
+  assert.equal(reordered[0]?.name, "c.pdf");
+
+  const merge3 = await mergePdfDocuments(reordered);
+  assert.equal(merge3.valid, true);
+  assert.equal(merge3.totalPages, 9);
+
+  // Split selected page ranges into a single combined PDF ("1-2, 5, 7-8" -> 5 pages)
+  const mergedBytes = merge3.mergedBytes!;
+  const splitCombined = await splitPdfDocument(
+    mergedBytes,
+    "combined-report.pdf",
+    "1-2, 5, 7-8",
+    "single-combined"
+  );
+  assert.equal(splitCombined.valid, true);
+  assert.equal(splitCombined.outputs.length, 1);
+  assert.equal(splitCombined.outputs[0]?.pageCount, 5);
+
+  // Split into separate files per range ("1-2, 5, 7-8" -> 3 separate PDF files)
+  const splitSeparate = await splitPdfDocument(
+    mergedBytes,
+    "combined-report.pdf",
+    "1-2, 5, 7-8",
+    "separate-files"
+  );
+  assert.equal(splitSeparate.valid, true);
+  assert.equal(splitSeparate.outputs.length, 3);
+  assert.equal(splitSeparate.outputs[0]?.pageCount, 2);
+  assert.equal(splitSeparate.outputs[1]?.pageCount, 1);
+  assert.equal(splitSeparate.outputs[2]?.pageCount, 2);
+});
+
+test("PDF Merge & Split: rejects invalid page ranges, corrupted PDFs, encrypted PDFs, and oversized files", async () => {
+  // Invalid page range checks
+  assert.equal(parsePageRanges("1-12", 5).valid, false);
+  assert.equal(parsePageRanges("4-2", 5).valid, false);
+  assert.equal(parsePageRanges("0-2", 5).valid, false);
+  assert.equal(parsePageRanges("abc", 5).valid, false);
+
+  // File size & type limit validation
+  const oversizedMeta = validatePdfFileMetadata({
+    name: "huge.pdf",
+    type: "application/pdf",
+    size: MAX_PDF_FILE_SIZE_BYTES + 100,
+  });
+  assert.equal(oversizedMeta.valid, false);
+  assert.ok(oversizedMeta.error?.includes("exceeds the 50 MB"));
+
+  const wrongTypeMeta = validatePdfFileMetadata({
+    name: "malware.exe",
+    type: "application/x-msdownload",
+    size: 1024,
+  });
+  assert.equal(wrongTypeMeta.valid, false);
+
+  // Corrupted PDF handling
+  const corruptedBytes = new TextEncoder().encode("not a valid pdf file at all");
+  const corruptedCheck = await inspectPdfBytes(corruptedBytes, "broken.pdf");
+  assert.equal(corruptedCheck.valid, false);
+  assert.ok(corruptedCheck.error?.includes("valid PDF file header"));
+
+  const fakeHeaderCorrupted = new TextEncoder().encode(
+    "%PDF-1.7\n1 0 obj\n<<corrupted syntax>>"
+  );
+  const fakeHeaderCheck = await inspectPdfBytes(
+    fakeHeaderCorrupted,
+    "corrupt-body.pdf"
+  );
+  assert.equal(fakeHeaderCheck.valid, false);
+
+  // Password-protected / encrypted PDF handling
+  const encryptedSimBytes = new TextEncoder().encode(
+    "%PDF-1.7\n1 0 obj\n<< /Filter /Standard /V 2 /R 3 /Length 128 >>\nendobj\ntrailer\n<< /Encrypt 1 0 R >>\n%%EOF"
+  );
+  const encryptedCheck = await inspectPdfBytes(
+    encryptedSimBytes,
+    "protected.pdf"
+  );
+  assert.equal(encryptedCheck.valid, false);
 });

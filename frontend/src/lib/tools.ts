@@ -192,8 +192,9 @@ export const TOOLS_REGISTRY: readonly ToolItem[] = [
     categoryId: "student",
     categoryLabel: "Student Tools",
     icon: "GraduationCap",
-    status: "coming-soon",
+    status: "available",
     featured: true,
+    href: "/tools/gpa-calculator",
     keywords: [
       "gpa",
       "grade",
@@ -214,8 +215,9 @@ export const TOOLS_REGISTRY: readonly ToolItem[] = [
     categoryId: "freelancer",
     categoryLabel: "Freelancer Tools",
     icon: "Receipt",
-    status: "coming-soon",
+    status: "available",
     featured: true,
+    href: "/tools/invoice-generator",
     keywords: [
       "invoice",
       "billing",
@@ -235,8 +237,9 @@ export const TOOLS_REGISTRY: readonly ToolItem[] = [
     categoryId: "freelancer",
     categoryLabel: "Freelancer Tools",
     icon: "Files",
-    status: "coming-soon",
+    status: "available",
     featured: true,
+    href: "/tools/pdf-merge-split",
     keywords: [
       "pdf",
       "merge",
