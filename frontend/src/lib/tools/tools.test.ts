@@ -1032,6 +1032,11 @@ test("Step 6 Production SEO: resolves https://one-tool-hub-sooty.vercel.app on V
     assert.equal(vercelProdCfg.isProductionDomainConfigured, true);
     assert.equal(vercelProdCfg.isPreview, false);
     assert.equal(isPreviewDeployment(), false);
+    assert.equal(
+      getGoogleSiteVerificationToken(),
+      "VzTJTHFVF7UaofXkbpnYPaFnn97slv1Gbq9rjnkw7gY"
+    );
+    assert.equal(getConfiguredGaMeasurementId(), "G-Y6CKKYZDWM");
 
     const prodPageMeta = buildPageMetadata({
       title: "GPA Calculator",

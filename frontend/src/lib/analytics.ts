@@ -101,12 +101,16 @@ export function isValidGaMeasurementId(value?: string | null): value is string {
   return GA_MEASUREMENT_ID_REGEX.test(value.trim());
 }
 
+const DEFAULT_GA_MEASUREMENT_ID = "G-Y6CKKYZDWM";
+
 /**
- * Reads and validates the configured NEXT_PUBLIC_GA_MEASUREMENT_ID environment variable.
- * Returns null if unconfigured or malformed.
+ * Reads and validates the configured NEXT_PUBLIC_GA_MEASUREMENT_ID environment variable
+ * (falling back to the project's production GA4 Measurement ID G-Y6CKKYZDWM).
+ * Returns null if explicitly empty or malformed.
  */
 export function getConfiguredGaMeasurementId(
-  envValue: string | undefined = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+  envValue: string | undefined = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ??
+    DEFAULT_GA_MEASUREMENT_ID
 ): string | null {
   const trimmed = envValue?.trim();
   if (!trimmed || !isValidGaMeasurementId(trimmed)) {

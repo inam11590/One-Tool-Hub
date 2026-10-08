@@ -114,13 +114,16 @@ export function getAbsoluteUrl(pathname: string): string {
 }
 
 const GOOGLE_SITE_VERIFICATION_REGEX = /^[A-Za-z0-9_-]{10,128}$/;
+const DEFAULT_GOOGLE_SITE_VERIFICATION =
+  "VzTJTHFVF7UaofXkbpnYPaFnn97slv1Gbq9rjnkw7gY";
 
 /**
- * Validates and returns the optional Google Search Console verification token
- * configured via NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION.
+ * Validates and returns the Google Search Console verification token
+ * configured via NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION (or the production default).
  */
 export function getGoogleSiteVerificationToken(
-  rawEnv: string | undefined = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+  rawEnv: string | undefined = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ??
+    DEFAULT_GOOGLE_SITE_VERIFICATION
 ): string | null {
   if (!rawEnv || typeof rawEnv !== "string") {
     return null;
