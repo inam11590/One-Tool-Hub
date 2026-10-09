@@ -47,6 +47,9 @@ export const metadata: Metadata = {
     title: `${SITE_CONFIG.name} — ${SITE_CONFIG.tagline}`,
     description: SITE_CONFIG.description,
   },
+  other: {
+    "google-adsense-account": "ca-pub-7695101102064578",
+  },
 };
 
 export default function RootLayout({
