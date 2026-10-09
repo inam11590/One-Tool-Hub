@@ -25,6 +25,7 @@ import { ArticleCard } from "@/components/learn/ArticleCard";
 import { ToolOpenTracker } from "@/components/analytics/ToolOpenTracker";
 import { ToolFeedbackCard } from "@/components/tools/ToolFeedbackCard";
 import { AdSlot } from "@/components/ads";
+import { ShareButton } from "@/components/ui/ShareButton";
 
 export interface ToolPracticalExample {
   title: string;
@@ -144,12 +145,20 @@ export function ToolPageShell({
             ) : null}
           </div>
 
-          <div className="flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-xs leading-relaxed text-emerald-950 lg:max-w-xs">
-            <ShieldCheck
-              className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700"
-              aria-hidden="true"
+          <div className="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end gap-3 lg:max-w-xs shrink-0">
+            <ShareButton
+              title={`${tool.name} — Free Browser Tool | OneToolHub`}
+              text={`Try this free, private ${tool.name} on OneToolHub:`}
+              url={`/tools/${tool.slug}`}
+              size="sm"
             />
-            <span>{privacyNote}</span>
+            <div className="flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-xs leading-relaxed text-emerald-950">
+              <ShieldCheck
+                className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700"
+                aria-hidden="true"
+              />
+              <span>{privacyNote}</span>
+            </div>
           </div>
         </div>
 

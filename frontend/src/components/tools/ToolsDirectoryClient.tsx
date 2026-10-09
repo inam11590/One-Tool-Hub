@@ -8,6 +8,7 @@ import type { ToolCategoryId } from "@/types/tools";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { ToolCard } from "@/components/ui/ToolCard";
+import { QuickAccessTools } from "@/components/tools/QuickAccessTools";
 
 export function ToolsDirectoryClient() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -55,6 +56,8 @@ export function ToolsDirectoryClient() {
             category or availability status to jump straight into a tool.
           </p>
         </div>
+
+        <QuickAccessTools className="mt-8" />
 
         {/* Search & Filter Controls */}
         <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50/70 p-5 sm:p-6">

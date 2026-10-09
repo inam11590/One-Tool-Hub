@@ -29,6 +29,7 @@ import { ToolIcon } from "@/components/ui/ToolIcon";
 import { ArticleCard } from "@/components/learn/ArticleCard";
 import { ToolCard } from "@/components/ui/ToolCard";
 import { AdSlot } from "@/components/ads";
+import { ShareButton } from "@/components/ui/ShareButton";
 
 export const dynamicParams = false;
 
@@ -126,26 +127,34 @@ export default async function LearnArticlePage({ params }: ArticlePageProps) {
 
         {/* 2. Article Header */}
         <header className="border-b border-slate-200 pb-8">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-inset ring-indigo-600/15">
-              <ToolIcon
-                name={article.icon}
-                className="h-5 w-5"
-                aria-hidden="true"
-              />
-            </span>
-            <Badge variant="primary">{article.categoryLabel}</Badge>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
-              <Clock className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-              <span>{article.readingTimeMinutes} min read</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
-              <Calendar
-                className="h-3.5 w-3.5 text-slate-500"
-                aria-hidden="true"
-              />
-              <span>Updated {article.updatedAt}</span>
-            </span>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-inset ring-indigo-600/15">
+                <ToolIcon
+                  name={article.icon}
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                />
+              </span>
+              <Badge variant="primary">{article.categoryLabel}</Badge>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                <Clock className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
+                <span>{article.readingTimeMinutes} min read</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                <Calendar
+                  className="h-3.5 w-3.5 text-slate-500"
+                  aria-hidden="true"
+                />
+                <span>Updated {article.updatedAt}</span>
+              </span>
+            </div>
+            <ShareButton
+              title={`${article.title} | OneToolHub Learning Center`}
+              text={`Read this free guide on OneToolHub:`}
+              url={`/learn/${article.slug}`}
+              size="sm"
+            />
           </div>
 
           <h1 className="mt-4 max-w-4xl text-2xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">

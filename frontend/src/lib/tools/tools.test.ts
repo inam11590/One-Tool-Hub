@@ -55,6 +55,23 @@ import {
   isValidAdSensePublisherId,
 } from "../ads.ts";
 import {
+  parseCsvText,
+  parseCsvLine,
+  parseGscQueries,
+  parseGscPages,
+  parseGscCountries,
+  parseGa4Pages,
+  buildGrowthSummary,
+} from "../growth-analytics.ts";
+import {
+  getFavoriteTools,
+  toggleFavoriteTool,
+  isFavoriteTool,
+  getRecentlyUsedTools,
+  recordRecentlyUsedTool,
+  clearRecentTools,
+} from "../user-preferences.ts";
+import {
   classifyErrorCategory,
   getErrorMonitoringConfig,
   getFriendlyBoundaryErrorMessage,
@@ -1342,6 +1359,143 @@ test("Step 8 Advertising Consent & Component Placement Safety", () => {
   assert.equal(isAllowedAdSlot("download_button"), false);
   assert.equal(isAllowedAdSlot("tool_input"), false);
   assert.equal(isAllowedAdSlot("header_nav"), false);
+});
+
+// ============================================================================
+// STEP 9: Growth Analytics CSV Parser & User Retention Tests
+// ============================================================================
+test("Step 9 Growth Analytics CSV Parser handles RFC quotes, BOM, and missing values", () => {
+  // 1. Quoted commas, escaped quotes, and empty entries
+  const lineTokens = parseCsvLine('"how to format json, safely","image compressor ""online""",40');
+  assert.equal(lineTokens.length, 3);
+  assert.equal(lineTokens[0], "how to format json, safely");
+  assert.equal(lineTokens[1], 'image compressor "online"');
+  assert.equal(lineTokens[2], "40");
+
+  const csvContent = `Top queries,Clicks,Impressions,CTR,Position
+"how to format json, safely",120,2500,4.8%,2.1
+"image compressor ""online""",85,1900,4.47%,3.4
+"simple word counter",40,800,5.0%,1.8`;
+
+  const records = parseCsvText(csvContent);
+  assert.equal(records.length, 3);
+  assert.equal(records[0]?.top_queries, "how to format json, safely");
+  assert.equal(records[0]?.clicks, "120");
+
+  // 2. Parse GSC Queries
+  const queries = parseGscQueries(records);
+  assert.equal(queries.length, 3);
+  assert.equal(queries[0]?.query, "how to format json, safely");
+  assert.equal(queries[0]?.clicks, 120);
+  assert.equal(queries[0]?.impressions, 2500);
+
+  // 3. Aggregate summary computation
+  const summary = buildGrowthSummary({ queries });
+  assert.equal(summary.totalClicks, 245);
+  assert.equal(summary.totalImpressions, 5200);
+  assert.ok(summary.topQueries.length === 3);
+  assert.equal(summary.topQueries[0]?.query, "how to format json, safely");
+});
+
+test("Step 9 Growth Analytics detects GA4 and GSC Pages datasets correctly", () => {
+  // GSC Pages dataset
+  const gscPagesCsv = `Top pages,Clicks,Impressions,CTR,Position
+https://one-tool-hub-sooty.vercel.app/tools/image-compressor,150,3000,5.0%,2.4
+https://one-tool-hub-sooty.vercel.app/learn/how-to-compress-images-without-losing-quality,90,2100,4.28%,3.1`;
+
+  const recordsGsc = parseCsvText(gscPagesCsv);
+  const pagesGsc = parseGscPages(recordsGsc);
+  assert.equal(pagesGsc.length, 2);
+  assert.equal(pagesGsc[0]?.clicks, 150);
+
+  const summaryGsc = buildGrowthSummary({ pages: pagesGsc });
+  assert.equal(summaryGsc.totalClicks, 240);
+  assert.equal(summaryGsc.topTools.length, 1);
+  assert.equal(summaryGsc.topTools[0]?.name, "Image Compressor");
+  assert.equal(summaryGsc.topTutorials.length, 1);
+
+  // GA4 Pages & Screens dataset
+  const ga4PagesCsv = `Page path and screen class,Page title,Views,Active users,Event count,Key events
+/tools/word-counter,Word Counter,450,320,1200,85
+/learn/word-count-guide-college-essays,Word Count Guide,210,180,600,40`;
+
+  const recordsGa4 = parseCsvText(ga4PagesCsv);
+  const pagesGa4 = parseGa4Pages(recordsGa4);
+  assert.equal(pagesGa4.length, 2);
+  assert.equal(pagesGa4[0]?.views, 450);
+  assert.equal(pagesGa4[0]?.activeUsers, 320);
+
+  const summaryGa4 = buildGrowthSummary({ gaPages: pagesGa4 });
+  assert.equal(summaryGa4.totalViews, 660);
+  assert.equal(summaryGa4.totalActiveUsers, 500);
+  assert.equal(summaryGa4.topTools.length, 1);
+  assert.equal(summaryGa4.topTools[0]?.name, "Word Counter");
+
+  // GSC Countries dataset
+  const gscCountryCsv = `Country,Clicks,Impressions,CTR,Position
+United States,180,3200,5.62%,2.8
+United Kingdom,90,1400,6.42%,2.5`;
+  const recordsCountry = parseCsvText(gscCountryCsv);
+  const countries = parseGscCountries(recordsCountry);
+  assert.equal(countries.length, 2);
+  assert.equal(countries[0]?.country, "United States");
+  assert.equal(countries[0]?.clicks, 180);
+});
+
+test("Step 9 User Preferences safely manages client favorites and recents", () => {
+  // Mock window.localStorage for Node environment testing
+  const storageMap = new Map<string, string>();
+  const mockStorage = {
+    getItem: (key: string) => storageMap.get(key) ?? null,
+    setItem: (key: string, val: string) => { storageMap.set(key, val); },
+    removeItem: (key: string) => { storageMap.delete(key); },
+    clear: () => { storageMap.clear(); },
+  };
+
+  const originalWindow = (globalThis as unknown as { window?: unknown }).window;
+  (globalThis as unknown as { window: unknown }).window = {
+    localStorage: mockStorage,
+    dispatchEvent: () => true,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  };
+
+  try {
+    // 1. Initial empty states
+    assert.deepEqual(getFavoriteTools(), []);
+    assert.deepEqual(getRecentlyUsedTools(), []);
+    assert.equal(isFavoriteTool("image-compressor"), false);
+
+    // 2. Toggle favorite
+    const favs1 = toggleFavoriteTool("image-compressor");
+    assert.deepEqual(favs1, ["image-compressor"]);
+    assert.equal(isFavoriteTool("image-compressor"), true);
+
+    const favs2 = toggleFavoriteTool("word-counter");
+    assert.deepEqual(favs2, ["image-compressor", "word-counter"]);
+
+    // Unfavorite
+    const favs3 = toggleFavoriteTool("image-compressor");
+    assert.deepEqual(favs3, ["word-counter"]);
+    assert.equal(isFavoriteTool("image-compressor"), false);
+
+    // 3. Record recently used tools
+    recordRecentlyUsedTool("json-formatter");
+    recordRecentlyUsedTool("qr-code-generator");
+    const recents = getRecentlyUsedTools();
+    assert.equal(recents[0], "qr-code-generator"); // most recent first
+    assert.equal(recents[1], "json-formatter");
+
+    // 4. Clear recents
+    clearRecentTools();
+    assert.deepEqual(getRecentlyUsedTools(), []);
+  } finally {
+    if (originalWindow !== undefined) {
+      (globalThis as unknown as { window: unknown }).window = originalWindow;
+    } else {
+      delete (globalThis as unknown as { window?: unknown }).window;
+    }
+  }
 });
 
 

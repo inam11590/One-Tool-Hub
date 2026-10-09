@@ -6,6 +6,7 @@ import type { ToolCategoryId } from "@/types/tools";
 import { Hero } from "@/components/home/Hero";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { FeaturedTools } from "@/components/home/FeaturedTools";
+import { QuickAccessTools } from "@/components/tools/QuickAccessTools";
 
 export function HomeClient() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,6 +32,7 @@ export function HomeClient() {
         totalToolsCount={TOOLS_REGISTRY.length}
         filteredToolsCount={filteredTools.length}
       />
+      <QuickAccessTools withContainer />
       <CategoryGrid
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}

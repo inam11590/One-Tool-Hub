@@ -6,6 +6,7 @@ import {
   trackToolEvent,
   type ValidToolSlug,
 } from "@/lib/analytics";
+import { recordRecentlyUsedTool } from "@/lib/user-preferences";
 import type { ToolCategoryId } from "@/types/tools";
 
 interface ToolOpenTrackerProps {
@@ -18,6 +19,9 @@ export function ToolOpenTracker({
   toolCategory,
 }: ToolOpenTrackerProps) {
   useEffect(() => {
+    // Update client-side recently used tools in local storage
+    recordRecentlyUsedTool(toolSlug);
+
     const fireOpen = () => {
       trackToolEvent("tool_open", {
         tool_slug: toolSlug,

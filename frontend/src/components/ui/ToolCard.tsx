@@ -1,8 +1,16 @@
+'use client';
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Clock } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock, Star } from "lucide-react";
 import type { ToolItem } from "@/types/tools";
 import { Badge } from "@/components/ui/Badge";
 import { ToolIcon } from "@/components/ui/ToolIcon";
+import {
+  isFavoriteTool,
+  toggleFavoriteTool,
+  subscribeUserPreferences,
+} from "@/lib/user-preferences";
 
 interface ToolCardProps {
   tool: ToolItem;
@@ -10,13 +18,30 @@ interface ToolCardProps {
 
 export function ToolCard({ tool }: ToolCardProps) {
   const isAvailable = tool.status === "available" && Boolean(tool.href);
+  const [favorite, setFavorite] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    setFavorite(isFavoriteTool(tool.slug));
+    const unsubscribe = subscribeUserPreferences(() => {
+      setFavorite(isFavoriteTool(tool.slug));
+    });
+    return () => unsubscribe();
+  }, [tool.slug]);
+
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavoriteTool(tool.slug);
+  };
 
   return (
     <article
       aria-label={`${tool.name} (${tool.categoryLabel}) - ${
         isAvailable ? "Available" : "Coming Soon"
       }`}
-      className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs transition-all hover:border-indigo-300 hover:shadow-md"
+      className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs transition-all hover:border-indigo-300 hover:shadow-md relative"
     >
       <div>
         <div className="flex items-start justify-between gap-3">
@@ -28,17 +53,35 @@ export function ToolCard({ tool }: ToolCardProps) {
             />
           </span>
 
-          {isAvailable ? (
-            <Badge variant="emerald">
-              <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
-              <span>Available</span>
-            </Badge>
-          ) : (
-            <Badge variant="amber">
-              <Clock className="h-3 w-3" aria-hidden="true" />
-              <span>Coming Soon</span>
-            </Badge>
-          )}
+          <div className="flex items-center gap-1.5">
+            {isAvailable && isMounted && (
+              <button
+                type="button"
+                onClick={handleToggleFavorite}
+                className="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg hover:bg-slate-100 transition-colors"
+                title={favorite ? "Remove from favorites" : "Save to favorites"}
+                aria-label={favorite ? `Unfavorite ${tool.name}` : `Favorite ${tool.name}`}
+              >
+                <Star
+                  className={`h-4 w-4 ${
+                    favorite ? "fill-amber-400 text-amber-500" : "text-slate-400"
+                  }`}
+                />
+              </button>
+            )}
+
+            {isAvailable ? (
+              <Badge variant="emerald">
+                <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
+                <span>Available</span>
+              </Badge>
+            ) : (
+              <Badge variant="amber">
+                <Clock className="h-3 w-3" aria-hidden="true" />
+                <span>Coming Soon</span>
+              </Badge>
+            )}
+          </div>
         </div>
 
         <div className="mt-5">
