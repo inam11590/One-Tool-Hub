@@ -3,7 +3,8 @@
 **Date**: October 2026  
 **Project**: OneToolHub  
 **Live Production URL**: `https://one-tool-hub-sooty.vercel.app`  
-**Status**: **READY TO APPLY — MANUAL APPROVAL REQUIRED**
+**Publisher ID**: `pub-7928844199781621` (`ca-pub-7928844199781621`)  
+**Status**: **STEP 8 COMPLETE — VERIFIED & SUBMITTED FOR REVIEW (GETTING READY)**
 
 ---
 
@@ -11,16 +12,15 @@
 
 Step 8 prepares OneToolHub for responsible website monetization through Google AdSense while protecting user privacy, website performance, search engine rankings, and user experience. 
 
-All **8 client-side tools** and all **8 Learning Center tutorials** remain fully operational, with zero regressions. In accordance with strict development and policy standards:
-- **No live advertising network requests** are initiated.
-- **Advertising is completely disabled by default** in both development and production.
-- **No fake, mock, or placeholder advertisements** are displayed.
-- **No fake or placeholder publisher IDs** are published.
-- **Zero layout shift** occurs while advertising is inactive (ad containers return `null`).
-- **An authorized sellers (`ads.txt`) route handler** is prepared at `/ads.txt` that safely returns an informative HTTP 404 until a verified publisher ID is configured by the site owner.
-- The Privacy Policy has been updated with comprehensive AdSense, cookie, and GDPR/EEA consent disclosures.
+All technical requirements, advertising component architecture, privacy disclosures, and account verification steps are complete:
+- **Site Ownership Verified**: Google AdSense successfully crawled and verified ownership via the `<meta name="google-adsense-account" content="ca-pub-7928844199781621">` tag and `/ads.txt`.
+- **Review Requested & In Progress**: Official review submitted in the Google AdSense dashboard (Status: **Getting ready**).
+- **Authorized Digital Sellers (`ads.txt`)**: Live and active at `https://one-tool-hub-sooty.vercel.app/ads.txt`.
+- **Privacy & Contact Disclosures**: Updated with direct support (`contact@onetoolhub.com`) and complete Google Consent Mode v2 / DoubleClick cookie policies.
+- **Client-Side Privacy Maintained**: All 8 tools process user files, JSON, text, QR codes, grades, invoices, and PDFs locally in browser memory without sending data to ad networks.
+- **Zero Overhead & Zero Layout Shift**: Inactive ad slots render `null` so no empty spaces or CLS penalties occur while the site is under review.
 
-All 30 unit tests pass, TypeScript compiles with 0 errors, ESLint reports 0 warnings, and the Next.js production build succeeds with all 28 routes generated cleanly.
+All 30 unit tests pass, TypeScript compiles with 0 errors, ESLint reports 0 warnings, and the Next.js production build succeeds with all 28 static routes plus dynamic `/ads.txt`.
 
 ---
 
@@ -168,22 +168,21 @@ All automated verification commands executed cleanly inside `frontend/`:
 
 ---
 
-## 11. Remaining Manual Actions for the Site Owner
+## 11. Current Operational Status & Next Steps
 
 1. **Contact Details Configured**:
-   - Both [`frontend/src/app/privacy/page.tsx`](file:///Users/mac/Documents/One-Tool-Hub/frontend/src/app/privacy/page.tsx) and [`frontend/src/app/contact/page.tsx`](file:///Users/mac/Documents/One-Tool-Hub/frontend/src/app/contact/page.tsx) are now configured with `contact@onetoolhub.com`.
-2. **Submit Google AdSense Application**:
-   - Register or sign in at `https://adsense.google.com/` using `inamullah11590@gmail.com`.
-   - Add your site URL (`https://one-tool-hub-sooty.vercel.app` or custom domain).
-3. **Configure Vercel Environment Variables Once Client ID is Assigned**:
-   - In Vercel Project Settings &rarr; Environment Variables, set `NEXT_PUBLIC_ADSENSE_CLIENT_ID="ca-pub-XXXXXXXXXXXXXXXX"` and `NEXT_PUBLIC_ENABLE_ADS="true"`.
-4. **Enable Certified CMP in AdSense Console**:
-   - In AdSense &rarr; "Privacy & messaging" &rarr; publish the GDPR consent message for EEA/UK visitors.
+   - Both [`frontend/src/app/privacy/page.tsx`](file:///Users/mac/Documents/One-Tool-Hub/frontend/src/app/privacy/page.tsx) and [`frontend/src/app/contact/page.tsx`](file:///Users/mac/Documents/One-Tool-Hub/frontend/src/app/contact/page.tsx) are active with `contact@onetoolhub.com`.
+2. **Site Ownership Verified by Google**:
+   - Google AdSense verified site ownership via `<meta name="google-adsense-account" content="ca-pub-7928844199781621">` and `/ads.txt`.
+3. **Application Submitted & Under Review**:
+   - Review requested on October 9, 2026. Dashboard status: **Getting ready**.
+4. **Post-Approval Action**:
+   - Once Google marks the site as **Ready**, turn on Auto ads in AdSense &rarr; Ads &rarr; By site &rarr; Auto ads: ON.
 
 ---
 
 ## 12. AdSense Application Readiness Status
 
-### **READY TO APPLY — MANUAL APPROVAL REQUIRED**
+### **STEP 8 COMPLETE — VERIFIED & SUBMITTED FOR REVIEW (GETTING READY)**
 
-*Notice: This status indicates that the codebase, content, navigation, and technical architecture satisfy official Google AdSense Publisher Policies. Final AdSense approval requires manual account submission and Google review of the live website.*
+*All Step 8 technical, architecture, privacy, testing, and documentation requirements are 100% completed. Google AdSense has verified site ownership and the application is actively queued for publisher review.*
