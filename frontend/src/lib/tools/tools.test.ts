@@ -46,6 +46,15 @@ import {
   trackToolEvent,
 } from "../analytics.ts";
 import {
+  buildAdsTxtRecord,
+  canRenderAds,
+  extractPublisherId,
+  isAdsEnvironmentActive,
+  isAllowedAdSlot,
+  isValidAdSenseClientId,
+  isValidAdSensePublisherId,
+} from "../ads.ts";
+import {
   classifyErrorCategory,
   getErrorMonitoringConfig,
   getFriendlyBoundaryErrorMessage,
@@ -1246,6 +1255,95 @@ test("Step 7 Search, Category Filtering, Internal Linking & Article JSON-LD: val
     else process.env.VERCEL_ENV = savedVercelEnv;
   }
 });
+
+test("Step 8 Google AdSense Readiness & Configuration Validation", () => {
+  // 1. Client ID format validation (ca-pub-XXXXXXXXXXXXXXXX)
+  assert.equal(isValidAdSenseClientId("ca-pub-1234567890123456"), true);
+  assert.equal(isValidAdSenseClientId("ca-pub-9876543210"), true);
+  assert.equal(isValidAdSenseClientId("ca-pub-123456789012345678"), false); // too long
+  assert.equal(isValidAdSenseClientId("pub-1234567890123456"), false); // missing ca-
+  assert.equal(isValidAdSenseClientId("ca-pub-abcdefghijkl"), false); // non-digits
+  assert.equal(isValidAdSenseClientId(""), false);
+  assert.equal(isValidAdSenseClientId(null), false);
+  assert.equal(isValidAdSenseClientId(undefined), false);
+
+  // 2. Publisher ID format validation (pub-XXXXXXXXXXXXXXXX)
+  assert.equal(isValidAdSensePublisherId("pub-1234567890123456"), true);
+  assert.equal(isValidAdSensePublisherId("pub-9876543210"), true);
+  assert.equal(isValidAdSensePublisherId("ca-pub-1234567890123456"), false);
+  assert.equal(isValidAdSensePublisherId("pub-abcdefghijkl"), false);
+
+  // 3. Publisher ID extraction
+  assert.equal(
+    extractPublisherId("ca-pub-1234567890123456"),
+    "pub-1234567890123456"
+  );
+  assert.equal(extractPublisherId("invalid"), null);
+
+  // 4. Ads environment gating (disabled by default)
+  assert.equal(isAdsEnvironmentActive({ clientId: null, featureEnabled: false }), false);
+  assert.equal(
+    isAdsEnvironmentActive({
+      clientId: "ca-pub-1234567890123456",
+      featureEnabled: false,
+    }),
+    false
+  );
+  assert.equal(
+    isAdsEnvironmentActive({ clientId: null, featureEnabled: true }),
+    false
+  );
+  assert.equal(
+    isAdsEnvironmentActive({
+      clientId: "ca-pub-1234567890123456",
+      featureEnabled: true,
+    }),
+    true
+  );
+
+  // 5. Authorized Digital Sellers (ads.txt) record generator
+  assert.equal(
+    buildAdsTxtRecord("pub-1234567890123456"),
+    "google.com, pub-1234567890123456, DIRECT, f08c47fec0942fa0"
+  );
+  assert.equal(
+    buildAdsTxtRecord("ca-pub-1234567890123456"),
+    "google.com, pub-1234567890123456, DIRECT, f08c47fec0942fa0"
+  );
+  assert.equal(buildAdsTxtRecord(null), null);
+  assert.equal(buildAdsTxtRecord("invalid"), null);
+});
+
+test("Step 8 Advertising Consent & Component Placement Safety", () => {
+  // 1. Consent gating for ad rendering
+  const activeEnv = {
+    clientId: "ca-pub-1234567890123456",
+    featureEnabled: true,
+  };
+  const inactiveEnv = {
+    clientId: null,
+    featureEnabled: false,
+  };
+
+  assert.equal(canRenderAds({ ...inactiveEnv, consentStatus: "accepted" }), false);
+  assert.equal(canRenderAds({ ...activeEnv, consentStatus: "undecided" }), false);
+  assert.equal(canRenderAds({ ...activeEnv, consentStatus: "rejected" }), false);
+  assert.equal(canRenderAds({ ...activeEnv, consentStatus: "accepted" }), true);
+
+  // 2. Allowed slot policy validation
+  assert.equal(isAllowedAdSlot("learn_article_body"), true);
+  assert.equal(isAllowedAdSlot("learn_sidebar"), true);
+  assert.equal(isAllowedAdSlot("learn_article_bottom"), true);
+  assert.equal(isAllowedAdSlot("tool_page_bottom"), true);
+  assert.equal(isAllowedAdSlot("informational_page_bottom"), true);
+
+  // Reject hazardous placement attempts
+  assert.equal(isAllowedAdSlot("tool_workspace"), false);
+  assert.equal(isAllowedAdSlot("download_button"), false);
+  assert.equal(isAllowedAdSlot("tool_input"), false);
+  assert.equal(isAllowedAdSlot("header_nav"), false);
+});
+
 
 
 

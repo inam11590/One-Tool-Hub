@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { SITE_CONFIG } from "@/lib/tools";
 import { getGoogleSiteVerificationToken } from "@/lib/seo";
 import { AnalyticsAndConsentManager } from "@/components/analytics/AnalyticsAndConsentManager";
+import { AdProvider } from "@/components/ads";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -64,15 +65,18 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <Header />
-        <main id="main-content" className="flex-1">
-          {children}
-        </main>
-        <Footer />
-        <Suspense fallback={null}>
-          <AnalyticsAndConsentManager />
-        </Suspense>
+        <AdProvider>
+          <Header />
+          <main id="main-content" className="flex-1">
+            {children}
+          </main>
+          <Footer />
+          <Suspense fallback={null}>
+            <AnalyticsAndConsentManager />
+          </Suspense>
+        </AdProvider>
       </body>
     </html>
   );
 }
+

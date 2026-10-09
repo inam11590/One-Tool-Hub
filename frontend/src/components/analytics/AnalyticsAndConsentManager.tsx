@@ -14,6 +14,10 @@ import {
   setStoredAnalyticsConsent,
   trackPageView,
 } from "@/lib/analytics";
+import {
+  setStoredAdvertisingConsent,
+  isAdsEnvironmentActive,
+} from "@/lib/ads";
 
 export const OPEN_CONSENT_MODAL_EVENT = "onetoolhub:open-consent-preferences";
 
@@ -29,6 +33,7 @@ export function AnalyticsAndConsentManager() {
   const analyticsConfiguredAndAllowed = isAnalyticsEnvironmentEnabled({
     measurementId,
   });
+  const adsConfiguredAndAllowed = isAdsEnvironmentActive();
 
   const [mounted, setMounted] = useState(false);
   const [consentStatus, setConsentStatus] =
@@ -91,12 +96,14 @@ export function AnalyticsAndConsentManager() {
 
   const handleAccept = () => {
     setStoredAnalyticsConsent("accepted");
+    setStoredAdvertisingConsent("accepted");
     setConsentStatus("accepted");
     setIsPreferencesOpen(false);
   };
 
   const handleReject = () => {
     setStoredAnalyticsConsent("rejected");
+    setStoredAdvertisingConsent("rejected");
     setConsentStatus("rejected");
     setGtagReady(false);
     setIsPreferencesOpen(false);
@@ -112,7 +119,8 @@ export function AnalyticsAndConsentManager() {
     consentStatus === "accepted";
 
   const showBanner =
-    (analyticsConfiguredAndAllowed && consentStatus === "undecided") ||
+    ((analyticsConfiguredAndAllowed || adsConfiguredAndAllowed) &&
+      consentStatus === "undecided") ||
     isPreferencesOpen;
 
   return (
@@ -180,15 +188,16 @@ export function AnalyticsAndConsentManager() {
                 </div>
 
                 <h2 className="text-base font-bold text-slate-900">
-                  Optional Anonymous Usage Analytics
+                  Optional Usage Analytics &amp; Advertising
                 </h2>
                 <p className="text-xs leading-relaxed text-slate-600 sm:text-sm">
                   All 8 tools on OneToolHub process your files and text locally
                   in your browser. With your permission, we use optional Google
                   Analytics 4 cookies to measure aggregate pageviews and
-                  anonymous tool actions (such as which tools are opened or
-                  downloaded). We never transmit your uploaded files, JSON,
-                  text, QR links, grades, or invoice details.{" "}
+                  anonymous tool actions, and may display optional Google
+                  AdSense advertising. We never transmit your uploaded files,
+                  JSON, text, QR links, grades, or invoice details to analytics
+                  or advertising networks.{" "}
                   <Link
                     href="/privacy"
                     className="font-semibold text-indigo-600 underline hover:text-indigo-700"
@@ -198,10 +207,10 @@ export function AnalyticsAndConsentManager() {
                   .
                 </p>
 
-                {!analyticsConfiguredAndAllowed ? (
+                {!analyticsConfiguredAndAllowed && !adsConfiguredAndAllowed ? (
                   <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600">
-                    <strong>Current Status:</strong> Google Analytics is not
-                    active in this environment (no production Measurement ID
+                    <strong>Current Status:</strong> Analytics and advertising
+                    are not active in this environment (no production IDs
                     configured). Your preference below is saved locally in your
                     browser:{" "}
                     <span className="font-semibold text-slate-900">
@@ -209,7 +218,7 @@ export function AnalyticsAndConsentManager() {
                         ? "Accepted"
                         : consentStatus === "rejected"
                           ? "Rejected"
-                          : "Not set (Analytics disabled)"}
+                          : "Not set (Tracking disabled)"}
                     </span>
                     .
                   </p>
@@ -218,10 +227,10 @@ export function AnalyticsAndConsentManager() {
                     Current preference:{" "}
                     <strong className="font-semibold text-slate-900">
                       {consentStatus === "accepted"
-                        ? "Optional Analytics Accepted"
+                        ? "Optional Analytics & Ads Accepted"
                         : consentStatus === "rejected"
-                          ? "Optional Analytics Rejected"
-                          : "Awaiting Your Choice (Analytics Not Loaded)"}
+                          ? "Optional Analytics & Ads Rejected"
+                          : "Awaiting Your Choice (Tracking Not Loaded)"}
                     </strong>
                   </p>
                 )}
@@ -233,7 +242,7 @@ export function AnalyticsAndConsentManager() {
                   onClick={handleReject}
                   className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 transition-colors hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:text-sm"
                 >
-                  Reject Optional Analytics
+                  Reject Optional Analytics &amp; Ads
                 </button>
                 <button
                   type="button"
@@ -244,7 +253,7 @@ export function AnalyticsAndConsentManager() {
                     className="h-3.5 w-3.5"
                     aria-hidden="true"
                   />
-                  <span>Accept Optional Analytics</span>
+                  <span>Accept Optional Analytics &amp; Ads</span>
                 </button>
                 {isPreferencesOpen ? (
                   <button

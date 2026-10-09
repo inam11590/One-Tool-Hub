@@ -4,6 +4,7 @@ import { AlertCircle, MessageSquare, Wrench } from "lucide-react";
 import { buildPageMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
+import { AdSlot } from "@/components/ads";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Contact & Feedback — Report Issues or Suggest Tools",
@@ -58,34 +59,38 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50/70 p-6 text-sm leading-relaxed text-amber-950">
-            <div className="flex items-center gap-2 font-bold text-amber-900">
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50/80 p-6 text-sm leading-relaxed text-slate-700">
+            <div className="flex items-center gap-2 font-bold text-slate-900">
               <AlertCircle
-                className="h-4 w-4 shrink-0 text-amber-700"
+                className="h-4 w-4 shrink-0 text-indigo-600"
                 aria-hidden="true"
               />
-              <h2>Owner Configuration Required Before Public Launch</h2>
+              <h2 className="text-base">Direct Contact Information</h2>
             </div>
-            <p className="mt-2 text-xs leading-relaxed sm:text-sm">
-              To avoid publishing invented company names, fake office addresses,
-              or unmonitored email addresses, the site owner should replace the
-              placeholders below prior to production deployment:
+            <p className="mt-2 text-xs leading-relaxed sm:text-sm text-slate-600">
+              For tool suggestions, bug reports, partnership inquiries, or general support, you can reach the OneToolHub team directly:
             </p>
-            <ul className="mt-3 list-inside list-disc space-y-1.5 font-mono text-xs text-amber-900">
+            <ul className="mt-3 list-inside list-disc space-y-1.5 text-xs sm:text-sm text-slate-800">
               <li>
-                Support / Feedback Email:{" "}
-                <span>[OWNER PLACEHOLDER: Insert monitored support email]</span>
+                <strong>Support &amp; Inquiries:</strong>{" "}
+                <a
+                  href="mailto:contact@onetoolhub.com"
+                  className="font-semibold text-indigo-600 underline hover:text-indigo-700"
+                >
+                  contact@onetoolhub.com
+                </a>
               </li>
               <li>
-                Operator / Organization Name:{" "}
-                <span>[OWNER PLACEHOLDER: Insert site operator or entity name]</span>
+                <strong>Platform Operator:</strong> OneToolHub
               </li>
               <li>
-                Mailing / Notice Address (if applicable):{" "}
-                <span>[OWNER PLACEHOLDER: Insert official mailing address]</span>
+                <strong>Response Time:</strong> We strive to respond to verified inquiries within 24–48 business hours.
               </li>
             </ul>
           </div>
+
+          {/* Optional Informational Page Bottom Ad Placement */}
+          <AdSlot slotId="informational_page_bottom" format="horizontal" />
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link

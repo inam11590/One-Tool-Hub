@@ -24,6 +24,7 @@ import { ToolIcon } from "@/components/ui/ToolIcon";
 import { ArticleCard } from "@/components/learn/ArticleCard";
 import { ToolOpenTracker } from "@/components/analytics/ToolOpenTracker";
 import { ToolFeedbackCard } from "@/components/tools/ToolFeedbackCard";
+import { AdSlot } from "@/components/ads";
 
 export interface ToolPracticalExample {
   title: string;
@@ -327,6 +328,9 @@ export function ToolPageShell({
             </dl>
           </section>
         </div>
+
+        {/* Optional Safe Ad Placement Strictly Below Tool Workspace, FAQs & Feedback */}
+        <AdSlot slotId="tool_page_bottom" format="horizontal" />
 
         {/* 6. Related Learning Center Guides Section */}
         {relatedArticles.length > 0 ? (

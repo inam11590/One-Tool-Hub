@@ -156,42 +156,97 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section aria-labelledby="third-parties-heading">
+            <section aria-labelledby="advertising-heading">
               <h2
-                id="third-parties-heading"
+                id="advertising-heading"
                 className="text-lg font-bold text-slate-900"
               >
-                5. Accounts, Payments, and Advertising
+                5. Planned Advertising &amp; Google AdSense Disclosures
               </h2>
               <p className="mt-2">
-                OneToolHub does not currently include user account registration,
-                paid subscriptions, payment processing, or advertising networks.
+                OneToolHub does not operate user account registration or paid
+                subscriptions. To remain free and accessible worldwide, OneToolHub
+                prepares for responsible website monetization through Google
+                AdSense.
               </p>
+              <div className="mt-4 space-y-3">
+                <p>
+                  <strong>How Google AdSense Uses Cookies:</strong> Third-party
+                  vendors, including Google, use cookies to serve ads based on a
+                  user&apos;s prior visits to this website or other websites on
+                  the Internet. Google&apos;s use of advertising cookies enables
+                  it and its partners to serve ads based on your visit to
+                  OneToolHub and/or other sites on the Internet.
+                </p>
+                <p>
+                  <strong>Personalized vs. Non-Personalized Ads:</strong> Where
+                  permitted and consented, Google may serve personalized ads.
+                  Users may opt out of personalized advertising by visiting{" "}
+                  <a
+                    href="https://myadcenter.google.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-indigo-600 underline hover:text-indigo-700"
+                  >
+                    Google My Ad Center
+                  </a>{" "}
+                  or by visiting{" "}
+                  <a
+                    href="https://optout.aboutads.info/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-indigo-600 underline hover:text-indigo-700"
+                  >
+                    AboutAds.info
+                  </a>
+                  .
+                </p>
+                <p>
+                  <strong>Strict Privacy Isolation from Tool Processing:</strong>{" "}
+                  Advertising code and cookies operate strictly at the webpage
+                  shell level. <strong>None</strong> of your uploaded files,
+                  JSON snippets, images, QR codes, word essays, video timestamps,
+                  GPA grade records, invoice items, or PDF documents are ever
+                  accessible to, shared with, or transmitted to Google AdSense or
+                  any third-party advertising network.
+                </p>
+                <p>
+                  <strong>European Economic Area (EEA), UK &amp; Switzerland Requirements:</strong>{" "}
+                  In accordance with Google&apos;s EU User Consent Policy, before
+                  activating advertising for visitors in the EEA, UK, or
+                  Switzerland, OneToolHub integrates an official Google-certified
+                  Consent Management Platform (CMP) complying with the IAB Europe
+                  Transparency and Consent Framework (TCF v2.2).
+                </p>
+              </div>
             </section>
 
-            <section aria-labelledby="operator-placeholder-heading">
+            <section aria-labelledby="operator-details-heading">
               <h2
-                id="operator-placeholder-heading"
+                id="operator-details-heading"
                 className="text-lg font-bold text-slate-900"
               >
-                6. Data Controller &amp; Privacy Contact Placeholders
+                6. Data Controller &amp; Privacy Contact Information
               </h2>
-              <div className="mt-2 rounded-xl border border-amber-200 bg-amber-50/70 p-4 text-xs leading-relaxed text-amber-950 sm:text-sm">
-                <p className="font-semibold text-amber-900">
-                  Owner Action Required Before Public Launch:
+              <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50/80 p-4 text-xs leading-relaxed text-slate-700 sm:text-sm">
+                <p className="font-semibold text-slate-900">
+                  Data Controller &amp; Inquiries Contact:
                 </p>
-                <ul className="mt-2 list-inside list-disc space-y-1 font-mono text-xs">
+                <ul className="mt-2 list-inside list-disc space-y-1 text-xs sm:text-sm">
                   <li>
-                    Site Operator / Data Controller:{" "}
-                    <span>[OWNER PLACEHOLDER: Insert legal name or entity]</span>
+                    <strong>Platform Operator / Controller:</strong> OneToolHub
                   </li>
                   <li>
-                    Privacy Contact Email:{" "}
-                    <span>[OWNER PLACEHOLDER: Insert privacy contact email]</span>
+                    <strong>Privacy Contact Email:</strong>{" "}
+                    <a
+                      href="mailto:contact@onetoolhub.com"
+                      className="font-semibold text-indigo-600 underline hover:text-indigo-700"
+                    >
+                      contact@onetoolhub.com
+                    </a>
                   </li>
                   <li>
-                    Effective Date:{" "}
-                    <span>[OWNER PLACEHOLDER: Insert production launch date]</span>
+                    <strong>Effective / Last Modified Date:</strong> October 2026
                   </li>
                 </ul>
               </div>

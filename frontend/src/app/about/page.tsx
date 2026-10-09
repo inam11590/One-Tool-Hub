@@ -5,6 +5,7 @@ import { buildPageMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { TOOL_CATEGORIES, TOOLS_REGISTRY } from "@/lib/tools";
+import { AdSlot } from "@/components/ads";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "About OneToolHub — Browser-Based Online Utility Platform",
@@ -100,6 +101,9 @@ export default function AboutPage() {
               </div>
             </section>
           </div>
+
+          {/* Optional Informational Page Bottom Ad Placement */}
+          <AdSlot slotId="informational_page_bottom" format="horizontal" />
 
           <div className="mt-10 flex flex-wrap items-center gap-4 border-t border-slate-200 pt-8">
             <Link

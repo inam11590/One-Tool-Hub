@@ -28,6 +28,7 @@ import { Badge } from "@/components/ui/Badge";
 import { ToolIcon } from "@/components/ui/ToolIcon";
 import { ArticleCard } from "@/components/learn/ArticleCard";
 import { ToolCard } from "@/components/ui/ToolCard";
+import { AdSlot } from "@/components/ads";
 
 export const dynamicParams = false;
 
@@ -339,6 +340,9 @@ export default async function LearnArticlePage({ params }: ArticlePageProps) {
               </p>
             </section>
 
+            {/* Optional Educational Article Mid-Body Ad Placement */}
+            <AdSlot slotId="learn_article_body" format="horizontal" />
+
             {/* Section 4: Common Mistakes */}
             <section
               id="common-mistakes"
@@ -479,6 +483,9 @@ export default async function LearnArticlePage({ params }: ArticlePageProps) {
                 </div>
               ) : null}
             </section>
+
+            {/* Optional End-of-Article Educational Ad Placement */}
+            <AdSlot slotId="learn_article_bottom" format="horizontal" />
           </article>
 
           {/* Sticky Right Sidebar: Table of Contents + Matching Tool Card */}
@@ -584,6 +591,9 @@ export default async function LearnArticlePage({ params }: ArticlePageProps) {
                   </Link>
                 </div>
               ) : null}
+
+              {/* Optional Desktop Sidebar Ad Placement */}
+              <AdSlot slotId="learn_sidebar" format="rectangle" />
             </div>
           </aside>
         </div>
