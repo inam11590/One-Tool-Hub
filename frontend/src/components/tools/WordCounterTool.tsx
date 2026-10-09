@@ -60,6 +60,14 @@ export function WordCounterTool() {
   };
 
   const handleClear = () => {
+    if (
+      text.trim().length > 0 &&
+      text !== SAMPLE_TEXT &&
+      typeof window !== "undefined" &&
+      !window.confirm("Clear all text editor content? Any unsaved writing will be lost.")
+    ) {
+      return;
+    }
     setText("");
     setCopied(false);
     trackToolEvent("tool_reset", {
@@ -67,6 +75,18 @@ export function WordCounterTool() {
       tool_category: TOOL_CATEGORY,
       operation_type: "clear",
     });
+  };
+
+  const handleLoadSample = () => {
+    if (
+      text.trim().length > 0 &&
+      text !== SAMPLE_TEXT &&
+      typeof window !== "undefined" &&
+      !window.confirm("Replace current editor text with sample document?")
+    ) {
+      return;
+    }
+    setText(SAMPLE_TEXT);
   };
 
   return (
@@ -183,7 +203,7 @@ export function WordCounterTool() {
 
           <button
             type="button"
-            onClick={() => setText(SAMPLE_TEXT)}
+            onClick={handleLoadSample}
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
           >
             <FileText className="h-3.5 w-3.5" aria-hidden="true" />

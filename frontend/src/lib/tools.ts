@@ -5,7 +5,8 @@ import type {
   ToolCategoryId,
   ToolItem,
 } from "@/types/tools";
-import { getSiteOrigin } from "@/lib/seo";
+import { getSiteOrigin } from "./seo.ts";
+import { searchTools } from "./search.ts";
 
 export const SITE_CONFIG = {
   name: "OneToolHub",
@@ -134,6 +135,7 @@ export const TOOLS_REGISTRY: readonly ToolItem[] = [
     href: "/tools/image-compressor",
     keywords: [
       "image",
+      "compress",
       "compressor",
       "optimize",
       "thumbnail",
@@ -384,38 +386,26 @@ export function filterTools(
   categoryId: ToolCategoryId | "all" = "all",
   statusFilter: "all" | "available" | "coming-soon" = "all"
 ): ToolItem[] {
-  const normalizedQuery = query.trim().toLowerCase();
+  const normalizedQuery = query.trim();
 
-  return tools.filter((tool) => {
-    const matchesCategory =
-      categoryId === "all" || tool.categoryId === categoryId;
+  // If no query string, perform simple category and status filtering
+  if (!normalizedQuery) {
+    return tools.filter((tool) => {
+      const matchesCategory =
+        categoryId === "all" || tool.categoryId === categoryId;
+      const matchesStatus =
+        statusFilter === "all" || tool.status === statusFilter;
+      return matchesCategory && matchesStatus;
+    });
+  }
 
-    if (!matchesCategory) {
-      return false;
-    }
-
-    const matchesStatus =
-      statusFilter === "all" || tool.status === statusFilter;
-
-    if (!matchesStatus) {
-      return false;
-    }
-
-    if (!normalizedQuery) {
-      return true;
-    }
-
-    const inName = tool.name.toLowerCase().includes(normalizedQuery);
-    const inDescription = tool.shortDescription
-      .toLowerCase()
-      .includes(normalizedQuery);
-    const inCategory = tool.categoryLabel
-      .toLowerCase()
-      .includes(normalizedQuery);
-    const inKeywords = tool.keywords.some((kw) =>
-      kw.toLowerCase().includes(normalizedQuery)
-    );
-
-    return inName || inDescription || inCategory || inKeywords;
+  // Use deterministic, typo-tolerant search
+  const ranked = searchTools(tools, normalizedQuery, {
+    maxResults: 50,
+    categoryId,
   });
+
+  return ranked
+    .map((r) => r.tool)
+    .filter((tool) => statusFilter === "all" || tool.status === statusFilter);
 }

@@ -168,7 +168,18 @@ export function GpaCalculatorTool() {
     );
   };
 
+  const hasCustomCourses = semesters.some((s) =>
+    s.courses.some((c) => c.name.trim() !== "")
+  );
+
   const handleResetAll = () => {
+    if (
+      hasCustomCourses &&
+      typeof window !== "undefined" &&
+      !window.confirm("Reset all semesters and courses? This action cannot be undone.")
+    ) {
+      return;
+    }
     setScalePreset("4.0");
     setGradeMappings(getDefaultGradeMappings("4.0"));
     setSemesters([
@@ -193,10 +204,24 @@ export function GpaCalculatorTool() {
   };
 
   const handleLoadSampleSingle = () => {
+    if (
+      hasCustomCourses &&
+      typeof window !== "undefined" &&
+      !window.confirm("Replace current courses with sample semester data?")
+    ) {
+      return;
+    }
     setSemesters(createSampleSemesters());
   };
 
   const handleLoadSampleMulti = () => {
+    if (
+      hasCustomCourses &&
+      typeof window !== "undefined" &&
+      !window.confirm("Replace current courses with multi-semester sample data?")
+    ) {
+      return;
+    }
     setSemesters(createMultiSemesterSample());
   };
 

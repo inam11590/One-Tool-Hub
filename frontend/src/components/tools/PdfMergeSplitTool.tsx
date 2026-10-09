@@ -208,6 +208,13 @@ export function PdfMergeSplitTool() {
   };
 
   const handleLoadSampleMergePdfs = async () => {
+    if (
+      mergeFiles.length > 0 &&
+      typeof window !== "undefined" &&
+      !window.confirm("Replace current uploaded PDF files with sample PDFs?")
+    ) {
+      return;
+    }
     setMergeError(null);
     if (mergeResult) {
       revokeUrl(mergeResult.objectUrl);
@@ -262,6 +269,13 @@ export function PdfMergeSplitTool() {
   };
 
   const handleResetMerge = () => {
+    if (
+      mergeFiles.length > 0 &&
+      typeof window !== "undefined" &&
+      !window.confirm("Clear all uploaded PDF files? This action cannot be undone.")
+    ) {
+      return;
+    }
     if (mergeResult) {
       revokeUrl(mergeResult.objectUrl);
       setMergeResult(null);
@@ -388,6 +402,13 @@ export function PdfMergeSplitTool() {
   };
 
   const handleLoadSampleSplitPdf = async () => {
+    if (
+      splitFile &&
+      typeof window !== "undefined" &&
+      !window.confirm("Replace current uploaded PDF file with sample PDF?")
+    ) {
+      return;
+    }
     setSplitError(null);
     revokeSplitResults(splitResults);
     setSplitResults([]);
@@ -509,6 +530,13 @@ export function PdfMergeSplitTool() {
   };
 
   const handleResetSplit = () => {
+    if (
+      splitFile &&
+      typeof window !== "undefined" &&
+      !window.confirm("Clear uploaded PDF file and extracted results?")
+    ) {
+      return;
+    }
     revokeSplitResults(splitResults);
     setSplitResults([]);
     setSplitFile(null);

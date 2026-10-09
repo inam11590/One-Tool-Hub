@@ -34,11 +34,15 @@ export const VALID_TOOL_CATEGORIES: readonly ToolCategoryId[] = [
 
 export const ANALYTICS_EVENT_NAMES = [
   "tool_open",
+  "tool_process_start",
   "tool_process_success",
   "tool_process_error",
   "tool_download",
   "tool_copy",
   "tool_reset",
+  "tool_search",
+  "favorite_add",
+  "favorite_remove",
 ] as const;
 
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];

@@ -72,6 +72,13 @@ import {
   clearRecentTools,
 } from "../user-preferences.ts";
 import {
+  TOOLS_REGISTRY,
+} from "../tools.ts";
+import {
+  searchTools,
+  levenshteinDistance,
+} from "../search.ts";
+import {
   classifyErrorCategory,
   getErrorMonitoringConfig,
   getFriendlyBoundaryErrorMessage,
@@ -1496,6 +1503,53 @@ test("Step 9 User Preferences safely manages client favorites and recents", () =
       delete (globalThis as unknown as { window?: unknown }).window;
     }
   }
+});
+
+test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
+  // 1. Levenshtein edit distance calculations
+  assert.equal(levenshteinDistance("word", "word"), 0);
+  assert.equal(levenshteinDistance("word", "work"), 1);
+  assert.equal(levenshteinDistance("invoic", "invoice"), 1);
+  assert.equal(levenshteinDistance("conpress", "compress"), 1);
+  assert.equal(levenshteinDistance("kitten", "sitting"), 3);
+
+  // 2. Empty query returns all tools
+  const allResults = searchTools(TOOLS_REGISTRY, "");
+  assert.equal(allResults.length, 8);
+
+  // 3. Exact matching by tool name
+  const jsonResults = searchTools(TOOLS_REGISTRY, "JSON");
+  assert.ok(jsonResults.length >= 1);
+  assert.equal(jsonResults[0]?.item.slug, "json-formatter");
+
+  // 4. Category matching
+  const devResults = searchTools(TOOLS_REGISTRY, "developer");
+  assert.ok(devResults.length >= 2);
+  const devSlugs = devResults.map((r) => r.item.slug);
+  assert.ok(devSlugs.includes("json-formatter"));
+  assert.ok(devSlugs.includes("qr-code-generator"));
+
+  // 5. Keyword & intent matching
+  const combineResults = searchTools(TOOLS_REGISTRY, "combine");
+  assert.ok(combineResults.length >= 1);
+  assert.equal(combineResults[0]?.item.slug, "pdf-merge-split");
+
+  const thumbnailResults = searchTools(TOOLS_REGISTRY, "thumbnail");
+  assert.ok(thumbnailResults.length >= 1);
+  assert.equal(thumbnailResults[0]?.item.slug, "image-compressor");
+
+  // 6. Typo-tolerant matching
+  const typoResults1 = searchTools(TOOLS_REGISTRY, "invoicer");
+  assert.ok(typoResults1.length >= 1);
+  assert.equal(typoResults1[0]?.item.slug, "invoice-generator");
+
+  const typoResults2 = searchTools(TOOLS_REGISTRY, "conpress");
+  assert.ok(typoResults2.length >= 1);
+  assert.equal(typoResults2[0]?.item.slug, "image-compressor");
+
+  const typoResults3 = searchTools(TOOLS_REGISTRY, "yt chapter");
+  assert.ok(typoResults3.length >= 1);
+  assert.equal(typoResults3[0]?.item.slug, "youtube-timestamp-formatter");
 });
 
 

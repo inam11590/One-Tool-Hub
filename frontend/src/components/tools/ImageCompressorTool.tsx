@@ -281,7 +281,72 @@ export function ImageCompressorTool() {
     }
   };
 
+  const handleLoadDemoImage = async () => {
+    if (
+      imageState &&
+      typeof window !== "undefined" &&
+      !window.confirm("Replace current loaded image with sample demo graphic?")
+    ) {
+      return;
+    }
+    // Generate an in-browser canvas demo sample image
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1200;
+      canvas.height = 800;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // Gradient background
+      const grad = ctx.createLinearGradient(0, 0, 1200, 800);
+      grad.addColorStop(0, "#4f46e5");
+      grad.addColorStop(0.5, "#7c3aed");
+      grad.addColorStop(1, "#db2777");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1200, 800);
+
+      // Decorative shapes
+      ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.beginPath();
+      ctx.arc(300, 250, 180, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(900, 550, 240, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Heading text
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 56px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("OneToolHub Demo Graphic", 600, 380);
+
+      ctx.font = "32px sans-serif";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+      ctx.fillText("1200 x 800 px Test Image (High-Res)", 600, 440);
+
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/jpeg", 0.95)
+      );
+      if (!blob) return;
+
+      const demoFile = new File([blob], "onetoolhub-demo-banner.jpg", {
+        type: "image/jpeg",
+      });
+      await handleSelectFile(demoFile);
+    } catch {
+      // Fallback ignore
+    }
+  };
+
   const handleReset = () => {
+    if (
+      imageState &&
+      typeof window !== "undefined" &&
+      !window.confirm("Clear current image and compression results?")
+    ) {
+      return;
+    }
     revokeUrls();
     setImageState(null);
     setError(null);
@@ -442,13 +507,22 @@ export function ImageCompressorTool() {
             className="peer sr-only"
             id="image-compressor-file-input"
           />
-          <label
-            htmlFor="image-compressor-file-input"
-            className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-indigo-700 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-indigo-600 sm:text-sm"
-          >
-            <ImageIcon className="h-4 w-4" aria-hidden="true" />
-            <span>Select Image File</span>
-          </label>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <label
+              htmlFor="image-compressor-file-input"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-indigo-700 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-indigo-600 sm:text-sm"
+            >
+              <ImageIcon className="h-4 w-4" aria-hidden="true" />
+              <span>Select Image File</span>
+            </label>
+            <button
+              type="button"
+              onClick={() => void handleLoadDemoImage()}
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 sm:text-sm"
+            >
+              <span>Try Demo Graphic</span>
+            </button>
+          </div>
         </div>
       ) : (
         /* Preview & Results Comparison */

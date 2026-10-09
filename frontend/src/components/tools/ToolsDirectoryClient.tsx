@@ -190,18 +190,34 @@ export function ToolsDirectoryClient() {
             ))}
           </div>
         ) : (
-          <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
+          <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
             <h2 className="text-base font-bold text-slate-900">
               No tools match your current filter
             </h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
-              Try clearing your search query or switching the category and
-              status filters.
+              We couldn&apos;t find any tools matching &ldquo;{searchQuery}&rdquo;. Try clearing your query or exploring our popular categories.
             </p>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-600">
+              <span className="font-medium text-slate-400">Popular searches:</span>
+              {["JSON", "Image", "PDF", "GPA", "Invoice", "QR Code"].map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery(tag);
+                    setSelectedCategory("all");
+                    setStatusFilter("all");
+                  }}
+                  className="rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-600"
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
             <button
               type="button"
               onClick={handleReset}
-              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-700"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               <RotateCcw className="h-4 w-4" aria-hidden="true" />
               <span>Reset All Filters</span>

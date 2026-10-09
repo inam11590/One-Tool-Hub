@@ -160,12 +160,33 @@ export function InvoiceGeneratorTool() {
     }));
   };
 
+  const hasCustomData = Boolean(
+    formData.businessName.trim() ||
+      formData.customerName.trim() ||
+      formData.invoiceNumber.trim() ||
+      formData.items.some((item) => item.description.trim() !== "")
+  );
+
   const handleLoadSample = () => {
+    if (
+      hasCustomData &&
+      typeof window !== "undefined" &&
+      !window.confirm("Replace your current invoice data with sample data?")
+    ) {
+      return;
+    }
     setFormData(createSampleInvoiceData());
     setPdfError(null);
   };
 
   const handleResetBlank = () => {
+    if (
+      hasCustomData &&
+      typeof window !== "undefined" &&
+      !window.confirm("Clear all invoice fields? This action cannot be undone.")
+    ) {
+      return;
+    }
     setFormData(createBlankInvoiceData());
     setPdfError(null);
     trackToolEvent("tool_reset", {

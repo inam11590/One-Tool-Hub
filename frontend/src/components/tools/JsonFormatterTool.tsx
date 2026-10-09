@@ -219,6 +219,14 @@ export function JsonFormatterTool() {
   };
 
   const handleClear = () => {
+    if (
+      input.trim().length > 0 &&
+      input !== SAMPLE_JSON_DOCUMENT &&
+      typeof window !== "undefined" &&
+      !window.confirm("Clear all JSON editor content? Any unsaved edits will be lost.")
+    ) {
+      return;
+    }
     setInput("");
     setOutput("");
     setError(null);
@@ -232,6 +240,14 @@ export function JsonFormatterTool() {
   };
 
   const handleLoadSample = () => {
+    if (
+      input.trim().length > 0 &&
+      input !== SAMPLE_JSON_DOCUMENT &&
+      typeof window !== "undefined" &&
+      !window.confirm("Replace current editor content with sample JSON?")
+    ) {
+      return;
+    }
     setInput(SAMPLE_JSON_DOCUMENT);
     setOutput(SAMPLE_JSON_DOCUMENT);
     setError(null);

@@ -119,7 +119,27 @@ export function QrCodeGeneratorTool() {
     });
   };
 
+  const handleApplyPreset = (presetText: string) => {
+    if (
+      text.trim().length > 0 &&
+      text !== DEFAULT_QR_TEXT &&
+      typeof window !== "undefined" &&
+      !window.confirm("Replace current QR text with this preset?")
+    ) {
+      return;
+    }
+    setText(presetText);
+  };
+
   const handleReset = () => {
+    if (
+      text.trim().length > 0 &&
+      text !== DEFAULT_QR_TEXT &&
+      typeof window !== "undefined" &&
+      !window.confirm("Reset QR code generator settings to defaults?")
+    ) {
+      return;
+    }
     setText(DEFAULT_QR_TEXT);
     setSize(DEFAULT_QR_SIZE_PX);
     setForegroundColor(DEFAULT_FG_COLOR);
@@ -157,6 +177,30 @@ export function QrCodeGeneratorTool() {
               rows={4}
               className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50/50 p-3.5 text-sm text-slate-900 shadow-2xs transition-colors placeholder:text-slate-400 focus:border-indigo-600 focus:bg-white focus:outline-2 focus:outline-offset-0 focus:outline-indigo-600"
             />
+            <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs">
+              <span className="text-[11px] font-semibold text-slate-500">Presets:</span>
+              <button
+                type="button"
+                onClick={() => handleApplyPreset("https://one-tool-hub-sooty.vercel.app")}
+                className="rounded-lg border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:border-indigo-300 hover:text-indigo-600 shadow-2xs transition-colors"
+              >
+                Website URL
+              </button>
+              <button
+                type="button"
+                onClick={() => handleApplyPreset("WIFI:S:GuestNetwork;T:WPA;P:Welcome2026;;")}
+                className="rounded-lg border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:border-indigo-300 hover:text-indigo-600 shadow-2xs transition-colors"
+              >
+                Wi-Fi Network
+              </button>
+              <button
+                type="button"
+                onClick={() => handleApplyPreset("mailto:contact@onetoolhub.com?subject=Inquiry")}
+                className="rounded-lg border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:border-indigo-300 hover:text-indigo-600 shadow-2xs transition-colors"
+              >
+                Email Contact
+              </button>
+            </div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <button
                 type="button"

@@ -70,7 +70,26 @@ export function YouTubeTimestampTool() {
     });
   };
 
+  const handleLoadSample = () => {
+    if (
+      input.trim() &&
+      input !== SAMPLE_YOUTUBE_TIMESTAMPS &&
+      typeof window !== "undefined" &&
+      !window.confirm("Replace current timestamps with sample chapters?")
+    ) {
+      return;
+    }
+    setInput(SAMPLE_YOUTUBE_TIMESTAMPS);
+  };
+
   const handleReset = () => {
+    if (
+      input.trim() &&
+      typeof window !== "undefined" &&
+      !window.confirm("Clear all chapters? This action cannot be undone.")
+    ) {
+      return;
+    }
     setInput("");
     setSortChronologically(false);
     setCopied(false);
@@ -195,7 +214,7 @@ export function YouTubeTimestampTool() {
 
           <button
             type="button"
-            onClick={() => setInput(SAMPLE_YOUTUBE_TIMESTAMPS)}
+            onClick={handleLoadSample}
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
           >
             <span>Load Sample</span>
