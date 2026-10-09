@@ -58,11 +58,11 @@ export function extractPublisherId(clientId?: string | null): string | null {
   return clientId.trim().replace(/^ca-/, "");
 }
 
-export const DEFAULT_ADSENSE_CLIENT_ID = "ca-pub-7695101102064578";
+export const DEFAULT_ADSENSE_CLIENT_ID = "ca-pub-7928844199781621";
 
 /**
  * Reads and validates the configured NEXT_PUBLIC_ADSENSE_CLIENT_ID environment variable
- * (falling back to the project's production AdSense Client ID ca-pub-7695101102064578).
+ * (falling back to the project's production AdSense Client ID ca-pub-7928844199781621).
  * Returns null if unset, empty, or malformed.
  * NEVER returns a placeholder or dummy ID.
  */
