@@ -412,6 +412,7 @@ export function ImageToPdfTool() {
                       #{index + 1}
                     </span>
                     <div className="w-12 h-12 rounded-lg bg-zinc-950 overflow-hidden shrink-0 border border-zinc-800">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={item.objectUrl}
                         alt={item.name}

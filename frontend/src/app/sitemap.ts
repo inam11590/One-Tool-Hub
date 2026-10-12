@@ -17,30 +17,40 @@ export default function sitemap(): MetadataRoute.Sitemap {
     (tool) => tool.status === "available" && tool.href
   ).map((tool) => tool.href!);
 
-  const articleRoutes = LEARN_ARTICLES.map(
-    (article) => `/learn/${article.slug}`
-  );
 
-  const allRoutes = [...staticRoutes, ...availableToolRoutes, ...articleRoutes];
-  const lastModified = new Date("2026-10-08T00:00:00.000Z");
+  const defaultDate = new Date("2026-10-12T00:00:00.000Z");
 
-  return allRoutes.map((route) => ({
+  const staticEntries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({
     url: getAbsoluteUrl(route),
-    lastModified,
-    changeFrequency:
-      route === "/" ||
-      route === "/tools" ||
-      route === "/learn" ||
-      route.startsWith("/tools/")
-        ? "weekly"
-        : "monthly",
-    priority:
-      route === "/"
-        ? 1.0
-        : route.startsWith("/tools/") || route === "/learn"
-          ? 0.9
-          : route.startsWith("/learn/")
-            ? 0.85
-            : 0.8,
+    lastModified: defaultDate,
+    changeFrequency: route === "/" || route === "/tools" || route === "/learn" ? "weekly" : "monthly",
+    priority: route === "/" ? 1.0 : route === "/tools" || route === "/learn" ? 0.9 : 0.8,
   }));
+
+  const toolEntries: MetadataRoute.Sitemap = availableToolRoutes.map((route) => ({
+    url: getAbsoluteUrl(route),
+    lastModified: defaultDate,
+    changeFrequency: "weekly",
+    priority: 0.9,
+  }));
+
+  const articleEntries: MetadataRoute.Sitemap = LEARN_ARTICLES.map((article) => {
+    let articleDate = defaultDate;
+    try {
+      if (article.updatedAt) {
+        articleDate = new Date(`${article.updatedAt}T00:00:00.000Z`);
+      }
+    } catch {
+      articleDate = defaultDate;
+    }
+
+    return {
+      url: getAbsoluteUrl(`/learn/${article.slug}`),
+      lastModified: articleDate,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    };
+  });
+
+  return [...staticEntries, ...toolEntries, ...articleEntries];
 }

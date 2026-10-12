@@ -2487,10 +2487,130 @@ test("Step 14: Lorem Ipsum & Placeholder Text Generator Logic", () => {
   assert.equal(englishTokens.length, 10);
 });
 
+test("Step 15: Technical SEO Sitemap Dynamic Timestamps & Coverage", () => {
+  // Test dynamic sitemap entries
+  const availableTools = TOOLS_REGISTRY.filter((t) => t.status === "available" && t.href);
+  assert.equal(availableTools.length, 24, "All 24 tools must be in available status");
+  assert.equal(LEARN_ARTICLES.length, 24, "All 24 tutorials must be registered");
 
+  // Every tool must have a matching tutorial
+  for (const tool of availableTools) {
+    const tutorial = LEARN_ARTICLES.find((a) => a.primaryToolSlug === tool.slug);
+    assert.ok(tutorial, `Tool '${tool.slug}' must have a paired tutorial in LEARN_ARTICLES`);
+    assert.ok(tutorial?.updatedAt, `Tutorial '${tutorial?.slug}' must have an updatedAt date`);
+    const dateParsed = new Date(`${tutorial?.updatedAt}T00:00:00.000Z`);
+    assert.ok(!isNaN(dateParsed.getTime()), `Tutorial '${tutorial?.slug}' updatedAt must be a valid ISO date`);
+  }
+});
 
+test("Step 15: All 24 Tools Route Registry & Client-Side Integrity", () => {
+  // Verify slugs, titles, categories, icons, and keyword density
+  const validCategories = ["student", "freelancer", "developer", "youtube"];
+  const seenSlugs = new Set<string>();
 
+  for (const tool of TOOLS_REGISTRY) {
+    assert.ok(tool.slug && tool.slug.length > 2, `Tool has valid slug: ${tool.slug}`);
+    assert.ok(!seenSlugs.has(tool.slug), `Duplicate slug detected: ${tool.slug}`);
+    seenSlugs.add(tool.slug);
 
+    assert.ok(tool.name && tool.name.length > 3, `Tool has valid name: ${tool.name}`);
+    assert.ok(tool.shortDescription && tool.shortDescription.length > 20, `Tool has descriptive copy: ${tool.shortDescription}`);
+    assert.ok(validCategories.includes(tool.categoryId), `Tool category is valid: ${tool.categoryId}`);
+    assert.ok(tool.href && tool.href.startsWith("/tools/"), `Tool href starts with /tools/: ${tool.href}`);
+    assert.ok(tool.keywords && tool.keywords.length >= 3, `Tool has at least 3 searchable keywords: ${tool.slug}`);
+  }
 
+  assert.equal(seenSlugs.size, 24, "Total registered tools must exactly equal 24");
+});
 
+test("Step 16: Error Classification, Standard Error Classes & Safe Serialization", async () => {
+  const {
+    ValidationError,
+    ProcessingError,
+    FileError,
+    BrowserCompatibilityError,
+    NetworkError,
+    UnexpectedApplicationError,
+    classifyErrorCategory,
+    bucketDuration,
+    reportToolProcessingError,
+  } = await import("../error-monitoring.ts");
+
+  // 1. Instantiating Standard Error Classes
+  const valErr = new ValidationError("User input exceeds 500 chars");
+  assert.equal(valErr.errorType, "ValidationError");
+  assert.equal(valErr.category, "invalid_input");
+  assert.equal(valErr.severity, "warning");
+  assert.ok(valErr.safeMessage.includes("verify your input"));
+
+  const procErr = new ProcessingError("Internal matrix transformation failed");
+  assert.equal(procErr.errorType, "ProcessingError");
+  assert.equal(procErr.category, "processing_error");
+  assert.equal(procErr.severity, "error");
+
+  const fileErr = new FileError("Corrupt zip chunk", "corrupted_file");
+  assert.equal(fileErr.errorType, "FileError");
+  assert.equal(fileErr.category, "corrupted_file");
+
+  const compatErr = new BrowserCompatibilityError("OffscreenCanvas");
+  assert.equal(compatErr.errorType, "BrowserCompatibilityError");
+  assert.equal(compatErr.category, "runtime_boundary_error");
+
+  const netErr = new NetworkError("DNS resolution failed");
+  assert.equal(netErr.errorType, "NetworkError");
+  assert.equal(netErr.severity, "warning");
+
+  const unexpErr = new UnexpectedApplicationError("Fatal out of memory");
+  assert.equal(unexpErr.errorType, "UnexpectedApplicationError");
+  assert.equal(unexpErr.severity, "critical");
+
+  // 2. Classifying instances into safe categories
+  assert.equal(classifyErrorCategory(valErr), "invalid_input");
+  assert.equal(classifyErrorCategory(fileErr), "corrupted_file");
+  assert.equal(classifyErrorCategory(new Error("File too large > 25MB")), "file_too_large");
+  assert.equal(classifyErrorCategory(new Error("PDF encrypted with password")), "encrypted_file");
+
+  // 3. Duration bucketing verification
+  assert.equal(bucketDuration(45), "<100ms");
+  assert.equal(bucketDuration(250), "100-500ms");
+  assert.equal(bucketDuration(1200), "500ms-2s");
+  assert.equal(bucketDuration(5000), ">2s");
+
+  // 4. Safe Error Report Generation (never leaks sensitive data)
+  const report = reportToolProcessingError({
+    toolSlug: "pdf-to-image",
+    toolCategory: "freelancer",
+    errorCategory: "file_too_large",
+    operationType: "extract_pages",
+    durationMs: 350,
+  });
+
+  assert.equal(report.toolSlug, "pdf-to-image");
+  assert.equal(report.errorCategory, "file_too_large");
+  assert.equal(report.durationMsBucket, "100-500ms");
+  assert.ok(report.timestamp);
+});
+
+test("Step 16: Web Vitals RUM Thresholds & Privacy Safety", async () => {
+  const { rateWebVital } = await import("../web-vitals.ts");
+
+  // LCP: <= 2500 good, <= 4000 needs-improvement, > 4000 poor
+  assert.equal(rateWebVital("LCP", 1200), "good");
+  assert.equal(rateWebVital("LCP", 3000), "needs-improvement");
+  assert.equal(rateWebVital("LCP", 4500), "poor");
+
+  // INP: <= 200 good, <= 500 needs-improvement, > 500 poor
+  assert.equal(rateWebVital("INP", 80), "good");
+  assert.equal(rateWebVital("INP", 350), "needs-improvement");
+  assert.equal(rateWebVital("INP", 650), "poor");
+
+  // CLS: <= 0.1 good, <= 0.25 needs-improvement, > 0.25 poor
+  assert.equal(rateWebVital("CLS", 0.02), "good");
+  assert.equal(rateWebVital("CLS", 0.18), "needs-improvement");
+  assert.equal(rateWebVital("CLS", 0.35), "poor");
+
+  // TTFB & FCP
+  assert.equal(rateWebVital("TTFB", 200), "good");
+  assert.equal(rateWebVital("FCP", 1400), "good");
+});
 

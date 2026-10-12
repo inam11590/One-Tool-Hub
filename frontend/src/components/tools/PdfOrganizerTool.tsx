@@ -371,6 +371,7 @@ export function PdfOrganizerTool() {
                   {/* Page Preview Thumbnail */}
                   <div className="relative aspect-[3/4] bg-zinc-950 rounded-xl overflow-hidden flex items-center justify-center border border-zinc-850">
                     {page.thumbnailUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={page.thumbnailUrl}
                         alt={`Page ${index + 1}`}

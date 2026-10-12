@@ -2,8 +2,20 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getToolBySlug } from "@/lib/tools";
 import { buildPageMetadata } from "@/lib/seo";
+import dynamic from "next/dynamic";
 import { ToolPageShell } from "@/components/tools/ToolPageShell";
-import { PdfToImageTool } from "@/components/tools/PdfToImageTool";
+
+const PdfToImageTool = dynamic(
+  () => import("@/components/tools/PdfToImageTool").then((mod) => mod.PdfToImageTool),
+  {
+    loading: () => (
+      <div className="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 text-center animate-pulse">
+        <div className="h-8 w-48 bg-zinc-800 rounded mx-auto mb-4" />
+        <p className="text-sm text-zinc-500">Loading PDF to Image Converter...</p>
+      </div>
+    ),
+  }
+);
 
 const TOOL_SLUG = "pdf-to-image";
 

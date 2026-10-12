@@ -490,6 +490,7 @@ export function PdfToImageTool() {
                     >
                       <div className="aspect-[3/4] bg-zinc-950 rounded-lg overflow-hidden flex items-center justify-center mb-1.5 border border-zinc-800">
                         {p.thumbnailUrl ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
                           <img
                             src={p.thumbnailUrl}
                             alt={`Page ${p.pageNumber}`}
@@ -563,6 +564,7 @@ export function PdfToImageTool() {
                     className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 space-y-3 flex flex-col justify-between"
                   >
                     <div className="aspect-[4/3] bg-zinc-950 rounded-lg overflow-hidden flex items-center justify-center border border-zinc-850">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={img.objectUrl}
                         alt={`Page ${img.pageNumber} converted`}
