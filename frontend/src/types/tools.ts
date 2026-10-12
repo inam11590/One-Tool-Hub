@@ -26,7 +26,11 @@ export type ToolIconName =
   | "Regex"
   | "GitCompare"
   | "Palette"
-  | "Fingerprint";
+  | "Fingerprint"
+  | "Type"
+  | "FileSearch"
+  | "Eraser"
+  | "Pilcrow";
 
 export type CategoryIconName =
   | "GraduationCap"

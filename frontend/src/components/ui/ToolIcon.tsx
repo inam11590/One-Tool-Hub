@@ -26,6 +26,10 @@ import {
   GitCompare,
   Palette,
   Fingerprint,
+  Type,
+  FileSearch,
+  Eraser,
+  Pilcrow,
   type LucideProps,
 } from "lucide-react";
 import type { CategoryIconName, ToolIconName } from "@/types/tools";
@@ -75,6 +79,14 @@ export function ToolIcon({
       return <Palette {...props} />;
     case "Fingerprint":
       return <Fingerprint {...props} />;
+    case "Type":
+      return <Type {...props} />;
+    case "FileSearch":
+      return <FileSearch {...props} />;
+    case "Eraser":
+      return <Eraser {...props} />;
+    case "Pilcrow":
+      return <Pilcrow {...props} />;
   }
 }
 

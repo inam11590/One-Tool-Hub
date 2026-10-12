@@ -33,6 +33,10 @@ export const VALID_TOOL_SLUGS = [
   "code-diff-checker",
   "color-picker",
   "uuid-generator",
+  "text-case-converter",
+  "text-compare",
+  "text-cleaner",
+  "lorem-ipsum-generator",
 ] as const;
 
 export type ValidToolSlug = (typeof VALID_TOOL_SLUGS)[number];

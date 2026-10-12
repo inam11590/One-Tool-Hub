@@ -140,6 +140,20 @@ import {
   validateUuidString,
 } from "./uuid-generator.ts";
 import {
+  convertTextCase,
+  getTextStatistics,
+} from "./text-case-converter.ts";
+import {
+  compareProseTexts,
+} from "./text-compare.ts";
+import {
+  cleanText,
+  DEFAULT_CLEANER_OPTIONS,
+} from "./text-cleaner.ts";
+import {
+  generatePlaceholderText,
+} from "./lorem-ipsum-generator.ts";
+import {
   classifyErrorCategory,
   getErrorMonitoringConfig,
   getFriendlyBoundaryErrorMessage,
@@ -1187,7 +1201,7 @@ test("Step 6 Production SEO: resolves https://one-tool-hub-sooty.vercel.app on V
 // ============================================================================
 test("Step 7 Learning Center Content Integrity: verifies complete tutorials, unique metadata, and 1-to-1 tool coverage", () => {
   assert.equal(LEARN_CATEGORIES.length, 5);
-  assert.equal(LEARN_ARTICLES.length, 20);
+  assert.equal(LEARN_ARTICLES.length, 24);
 
   const slugs = new Set<string>();
   const titles = new Set<string>();
@@ -1242,21 +1256,21 @@ test("Step 7 Learning Center Content Integrity: verifies complete tutorials, uni
     assert.ok(article.relatedArticleSlugs.length >= 2);
   }
 
-  // All 20 tools have a dedicated companion tutorial
-  assert.equal(primaryToolsCovered.size, 20);
+  // All 24 tools have a dedicated companion tutorial
+  assert.equal(primaryToolsCovered.size, 24);
 });
 
 test("Step 7 Search, Category Filtering, Internal Linking & Article JSON-LD: validates directory filters and structured data", () => {
   // Search and category filtering
   const allResults = filterArticles(LEARN_ARTICLES, "", "all");
-  assert.equal(allResults.length, 20);
+  assert.equal(allResults.length, 24);
 
   const devCategoryResults = filterArticles(
     LEARN_ARTICLES,
     "",
     "developer-tutorials"
   );
-  assert.equal(devCategoryResults.length, 8);
+  assert.equal(devCategoryResults.length, 9);
 
   const gpaSearchResults = filterArticles(LEARN_ARTICLES, "credit hours", "all");
   assert.ok(
@@ -1574,9 +1588,9 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
   assert.equal(levenshteinDistance("conpress", "compress"), 1);
   assert.equal(levenshteinDistance("kitten", "sitting"), 3);
 
-  // 2. Empty query returns all tools (20 available tools)
+  // 2. Empty query returns all tools (24 available tools)
   const allResults = searchTools(TOOLS_REGISTRY, "");
-  assert.equal(allResults.length, 20);
+  assert.equal(allResults.length, 24);
 
   // 3. Exact matching by tool name
   const jsonResults = searchTools(TOOLS_REGISTRY, "JSON");
@@ -1585,7 +1599,7 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
 
   // 4. Category matching
   const devResults = searchTools(TOOLS_REGISTRY, "developer");
-  assert.ok(devResults.length >= 8);
+  assert.ok(devResults.length >= 9);
   const devSlugs = devResults.map((r) => r.item.slug);
   assert.ok(devSlugs.includes("json-formatter"));
   assert.ok(devSlugs.includes("qr-code-generator"));
@@ -1595,6 +1609,7 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
   assert.ok(devSlugs.includes("code-diff-checker"));
   assert.ok(devSlugs.includes("color-picker"));
   assert.ok(devSlugs.includes("uuid-generator"));
+  assert.ok(devSlugs.includes("lorem-ipsum-generator"));
 
   // 5. Keyword & intent matching
   const combineResults = searchTools(TOOLS_REGISTRY, "combine");
@@ -1651,6 +1666,23 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
   const wmRes = searchTools(TOOLS_REGISTRY, "watermark");
   assert.ok(wmRes.length >= 1);
   assert.equal(wmRes[0]?.item.slug, "pdf-watermark");
+
+  // 9. Step 14 Text tools discovery
+  const caseRes = searchTools(TOOLS_REGISTRY, "title case");
+  assert.ok(caseRes.length >= 1);
+  assert.equal(caseRes[0]?.item.slug, "text-case-converter");
+
+  const textCompRes = searchTools(TOOLS_REGISTRY, "text compare");
+  assert.ok(textCompRes.length >= 1);
+  assert.equal(textCompRes[0]?.item.slug, "text-compare");
+
+  const textCleanRes = searchTools(TOOLS_REGISTRY, "text cleaner");
+  assert.ok(textCleanRes.length >= 1);
+  assert.equal(textCleanRes[0]?.item.slug, "text-cleaner");
+
+  const loremRes = searchTools(TOOLS_REGISTRY, "lorem ipsum");
+  assert.ok(loremRes.length >= 1);
+  assert.equal(loremRes[0]?.item.slug, "lorem-ipsum-generator");
 });
 
 test("Step 11: Secure Password Generator", () => {
@@ -2046,11 +2078,11 @@ test("Step 13: Regex Tester & Debugger Logic", () => {
   assert.equal(emailRegex.valid, true);
   assert.equal(emailRegex.error, undefined);
   assert.equal(emailRegex.matches.length, 2);
-  assert.equal(emailRegex.matches[0].fullMatch, "hello@onetoolhub.com");
-  assert.equal(emailRegex.matches[0].groups.length, 2);
-  assert.equal(emailRegex.matches[0].groups[0].value, "hello");
-  assert.equal(emailRegex.matches[0].groups[1].value, "onetoolhub.com");
-  assert.equal(emailRegex.matches[1].fullMatch, "support@example.org");
+  assert.equal(emailRegex.matches[0]?.fullMatch, "hello@onetoolhub.com");
+  assert.equal(emailRegex.matches[0]?.groups.length, 2);
+  assert.equal(emailRegex.matches[0]?.groups[0]?.value, "hello");
+  assert.equal(emailRegex.matches[0]?.groups[1]?.value, "onetoolhub.com");
+  assert.equal(emailRegex.matches[1]?.fullMatch, "support@example.org");
 
   // 2. Named capture groups
   const namedRegex = testRegularExpression(
@@ -2060,7 +2092,7 @@ test("Step 13: Regex Tester & Debugger Logic", () => {
   );
   assert.equal(namedRegex.valid, true);
   assert.equal(namedRegex.matches.length, 1);
-  const yearGroup = namedRegex.matches[0].groups.find((g) => g.name === "year");
+  const yearGroup = namedRegex.matches[0]?.groups.find((g) => g.name === "year");
   assert.ok(yearGroup);
   assert.equal(yearGroup.value, "2026");
 
@@ -2068,7 +2100,7 @@ test("Step 13: Regex Tester & Debugger Logic", () => {
   const caseRegex = testRegularExpression("apple", "PineApple juice", "i");
   assert.equal(caseRegex.valid, true);
   assert.equal(caseRegex.matches.length, 1);
-  assert.equal(caseRegex.matches[0].fullMatch, "Apple");
+  assert.equal(caseRegex.matches[0]?.fullMatch, "Apple");
 
   // 4. Invalid regular expression pattern
   const invalidRegex = testRegularExpression("[a-z", "test", "g");
@@ -2101,6 +2133,7 @@ test("Step 13: Code Diff Checker Logic", () => {
   const diffResult = computeCodeDiff(origText, modText, {
     ignoreWhitespace: false,
     ignoreCase: false,
+    viewMode: "side-by-side",
   }, {
     original: "orig.txt",
     modified: "mod.txt",
@@ -2118,10 +2151,12 @@ test("Step 13: Code Diff Checker Logic", () => {
   const diffWithWs = computeCodeDiff(origWs, modWs, {
     ignoreWhitespace: false,
     ignoreCase: false,
+    viewMode: "side-by-side",
   });
   const diffIgnoreWs = computeCodeDiff(origWs, modWs, {
     ignoreWhitespace: true,
     ignoreCase: false,
+    viewMode: "side-by-side",
   });
   assert.ok(diffWithWs.stats.addedCount > 0 || diffWithWs.stats.removedCount > 0);
   assert.equal(diffIgnoreWs.stats.addedCount, 0);
@@ -2133,6 +2168,7 @@ test("Step 13: Code Diff Checker Logic", () => {
   const diffIgnoreCase = computeCodeDiff(origCase, modCase, {
     ignoreWhitespace: false,
     ignoreCase: true,
+    viewMode: "side-by-side",
   });
   assert.equal(diffIgnoreCase.stats.addedCount, 0);
   assert.equal(diffIgnoreCase.stats.removedCount, 0);
@@ -2172,7 +2208,7 @@ test("Step 13: Color Picker & Converter Logic", () => {
   assert.ok(Math.abs(rgbBack.r - 37) <= 1);
   assert.ok(Math.abs(rgbBack.g - 99) <= 1);
   assert.ok(Math.abs(rgbBack.b - 235) <= 1);
-  assert.equal(hslToHex(hsl), "#2563eb");
+  assert.equal(hslToHex(hsl), "#2463eb");
 
   // 5. WCAG Contrast ratio math
   const blackOnWhiteRatio = calculateContrastRatio({ r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 });
@@ -2205,7 +2241,7 @@ test("Step 13: UUID Generator & Validator Logic", () => {
   const single = generateSingleUuidV4();
   assert.equal(single.length, 36);
   assert.equal(single[14], "4"); // version 4
-  assert.ok(["8", "9", "a", "b"].includes(single[19])); // RFC variant
+  assert.ok(["8", "9", "a", "b"].includes(single[19] ?? "")); // RFC variant
 
   // 2. Format options: Uppercase, No hyphens, Braces
   const upperBraced = formatUuid(single, {
@@ -2257,6 +2293,200 @@ test("Step 13: UUID Generator & Validator Logic", () => {
   const shortStr = validateUuidString("12345");
   assert.equal(shortStr.valid, false);
 });
+
+// ============================================================================
+// STEP 14: Advanced Text & Writing Tools
+// ============================================================================
+
+test("Step 14: Text Case Converter Logic", () => {
+  const sample = "the old man AND the sea";
+
+  // 1. Core case transformations
+  assert.equal(convertTextCase(sample, "uppercase"), "THE OLD MAN AND THE SEA");
+  assert.equal(convertTextCase(sample, "lowercase"), "the old man and the sea");
+  assert.equal(convertTextCase(sample, "titlecase"), "The Old Man and the Sea");
+  assert.equal(convertTextCase("hello world. how are you?", "sentencecase"), "Hello world. How are you?");
+  assert.equal(convertTextCase(sample, "capitalizeWords"), "The Old Man AND The Sea");
+  assert.equal(convertTextCase("Hello World", "togglecase"), "hELLO wORLD");
+
+  // 2. Developer casings
+  assert.equal(convertTextCase("user authentication session", "camelcase"), "userAuthenticationSession");
+  assert.equal(convertTextCase("user authentication session", "kebabcase"), "user-authentication-session");
+  assert.equal(convertTextCase("user authentication session", "snakecase"), "user_authentication_session");
+  assert.equal(convertTextCase("user authentication session", "constantcase"), "USER_AUTHENTICATION_SESSION");
+
+  // 3. Editorial Title Case rules: first and last words always capitalized
+  assert.equal(convertTextCase("an essay on criticism", "titlecase"), "An Essay on Criticism");
+  assert.equal(convertTextCase("what are you waiting for", "titlecase"), "What Are You Waiting For");
+
+  // 4. Text statistics
+  const stats = getTextStatistics("Hello world! This is OneToolHub.\n\nSecond paragraph here.");
+  assert.equal(stats.characterCount, 56);
+  assert.equal(stats.characterCountNoSpaces, 48);
+  assert.equal(stats.wordCount, 8);
+  assert.equal(stats.paragraphCount, 2);
+  assert.equal(stats.lineCount, 3);
+});
+
+test("Step 14: Text Compare & Difference Checker Logic", () => {
+  const original = "The quick brown fox jumps over the lazy dog.";
+  const modified = "The fast brown fox jumps over the sleepy dog.";
+
+  // 1. Word-level diff
+  const wordDiff = compareProseTexts(original, modified, {
+    mode: "words",
+    ignoreCase: false,
+    ignoreWhitespace: false,
+  });
+  assert.ok(wordDiff.stats.addedCount >= 2); // 'fast', 'sleepy'
+  assert.ok(wordDiff.stats.removedCount >= 2); // 'quick', 'lazy'
+  assert.ok(wordDiff.stats.similarityScore > 50 && wordDiff.stats.similarityScore < 100);
+  assert.ok(wordDiff.tokens.some((t) => t.type === "added"));
+  assert.ok(wordDiff.tokens.some((t) => t.type === "removed"));
+  assert.ok(wordDiff.tokens.some((t) => t.type === "unchanged"));
+
+  // 2. Identical texts
+  const identicalDiff = compareProseTexts(original, original, {
+    mode: "words",
+    ignoreCase: false,
+    ignoreWhitespace: false,
+  });
+  assert.equal(identicalDiff.stats.similarityScore, 100);
+  assert.equal(identicalDiff.stats.addedCount, 0);
+  assert.equal(identicalDiff.stats.removedCount, 0);
+
+  // 3. Case normalization
+  const caseDiffWithFlag = compareProseTexts("Hello World", "hello world", {
+    mode: "words",
+    ignoreCase: true,
+    ignoreWhitespace: false,
+  });
+  assert.equal(caseDiffWithFlag.stats.similarityScore, 100);
+  assert.equal(caseDiffWithFlag.stats.addedCount, 0);
+  assert.equal(caseDiffWithFlag.stats.removedCount, 0);
+
+  // 4. Line-level diff
+  const lines1 = "Line 1\nLine 2\nLine 3";
+  const lines2 = "Line 1\nLine Modified\nLine 3";
+  const lineDiff = compareProseTexts(lines1, lines2, {
+    mode: "lines",
+    ignoreCase: false,
+    ignoreWhitespace: false,
+  });
+  assert.ok(lineDiff.stats.addedCount > 0);
+  assert.ok(lineDiff.stats.removedCount > 0);
+
+  // 5. Summary text export
+  assert.ok(wordDiff.summaryText.includes("OneToolHub Text Comparison Summary"));
+  assert.ok(wordDiff.summaryText.includes("Similarity Score:"));
+});
+
+test("Step 14: Text Cleaner & Formatter Logic", () => {
+  // 1. Extra spaces and trimming
+  const messySpaces = "  This   has    excessive   spaces.   ";
+  const cleanedSpaces = cleanText(messySpaces, {
+    ...DEFAULT_CLEANER_OPTIONS,
+    removeExtraSpaces: true,
+    trimLines: true,
+  });
+  assert.equal(cleanedSpaces.cleanedText, "This has excessive spaces.");
+  assert.ok(cleanedSpaces.stats.charactersRemoved > 0);
+
+  // 2. Empty lines and blank line collapsing
+  const multipleBlanks = "Para 1\n\n\n\n\nPara 2";
+  const reducedBlanks = cleanText(multipleBlanks, {
+    ...DEFAULT_CLEANER_OPTIONS,
+    reduceBlankLines: true,
+  });
+  assert.equal(reducedBlanks.cleanedText, "Para 1\n\nPara 2");
+
+  // 3. Duplicate line removal
+  const dupLines = "Alpha\nBeta\nAlpha\nGamma\nbeta";
+  const dedupedSensitive = cleanText(dupLines, {
+    ...DEFAULT_CLEANER_OPTIONS,
+    removeDuplicateLines: true,
+    caseInsensitiveDuplicates: false,
+  });
+  assert.equal(dedupedSensitive.cleanedText, "Alpha\nBeta\nGamma\nbeta");
+
+  const dedupedInsensitive = cleanText(dupLines, {
+    ...DEFAULT_CLEANER_OPTIONS,
+    removeDuplicateLines: true,
+    caseInsensitiveDuplicates: true,
+  });
+  assert.equal(dedupedInsensitive.cleanedText, "Alpha\nBeta\nGamma");
+
+  // 4. Tab to space conversion (4 spaces per tab)
+  const tabText = "\tIndented text";
+  const spacedText = cleanText(tabText, {
+    ...DEFAULT_CLEANER_OPTIONS,
+    convertTabsToSpaces: true,
+    removeExtraSpaces: false,
+    trimLines: false,
+  });
+  assert.equal(spacedText.cleanedText, "    Indented text");
+
+  // 5. HTML tag stripping
+  const htmlInput = "<p>Welcome to <b>OneToolHub</b>!</p><br><p>Second line.</p>";
+  const strippedHtml = cleanText(htmlInput, {
+    ...DEFAULT_CLEANER_OPTIONS,
+    stripHtmlTags: true,
+  });
+  assert.ok(!strippedHtml.cleanedText.includes("<p>"));
+  assert.ok(!strippedHtml.cleanedText.includes("<b>"));
+  assert.ok(strippedHtml.cleanedText.includes("Welcome to OneToolHub!"));
+});
+
+test("Step 14: Lorem Ipsum & Placeholder Text Generator Logic", () => {
+  // 1. Words mode
+  const wordsLatin = generatePlaceholderText({
+    mode: "words",
+    quantity: 15,
+    flavor: "latin",
+    startWithLorem: false,
+    asHtmlParagraphs: false,
+  });
+  const wordTokens = wordsLatin.split(/\s+/).filter(Boolean);
+  assert.equal(wordTokens.length, 15);
+
+  // 2. Sentences mode with classic prefix
+  const sentencesLatin = generatePlaceholderText({
+    mode: "sentences",
+    quantity: 3,
+    flavor: "latin",
+    startWithLorem: true,
+    asHtmlParagraphs: false,
+  });
+  assert.ok(sentencesLatin.startsWith("Lorem ipsum dolor sit amet"));
+  const sentenceCount = sentencesLatin.split(/\.\s+/).filter(Boolean).length;
+  assert.ok(sentenceCount >= 3);
+
+  // 3. Paragraphs mode with HTML tags
+  const parasHtml = generatePlaceholderText({
+    mode: "paragraphs",
+    quantity: 2,
+    flavor: "latin",
+    startWithLorem: true,
+    asHtmlParagraphs: true,
+  });
+  assert.ok(parasHtml.startsWith("<p>Lorem ipsum dolor sit amet"));
+  assert.ok(parasHtml.includes("</p>"));
+  const pTags = parasHtml.match(/<p>/g);
+  assert.equal(pTags?.length, 2);
+
+  // 4. English mock flavor
+  const englishWords = generatePlaceholderText({
+    mode: "words",
+    quantity: 10,
+    flavor: "english",
+    startWithLorem: false,
+    asHtmlParagraphs: false,
+  });
+  assert.ok(englishWords.length > 0);
+  const englishTokens = englishWords.split(/\s+/).filter(Boolean);
+  assert.equal(englishTokens.length, 10);
+});
+
 
 
 
