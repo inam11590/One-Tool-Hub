@@ -2136,6 +2136,498 @@ export const LEARN_ARTICLES: readonly LearnArticle[] = [
       ctaLabel: "Open PDF Watermark Tool",
     },
   },
+  {
+    slug: "how-to-test-regular-expressions-online",
+    title: "How to Test Regular Expressions Online — Syntax, Flags & Debugging",
+    seoTitle: "How to Test Regular Expressions Online — Syntax & Debugging Guide",
+    metaDescription:
+      "Learn how to test, debug, and optimize regular expressions safely in your browser. Master JavaScript regex flags, capture groups, match ranges, and ReDoS backtracking prevention.",
+    excerpt:
+      "Understand JavaScript regex syntax, explore global, multiline, and dotAll flags, inspect named capture groups, and prevent catastrophic ReDoS backtracking without sending data to servers.",
+    categoryId: "developer-tutorials",
+    categoryLabel: "Developer Tutorials",
+    icon: "Regex",
+    readingTimeMinutes: 7,
+    publishedAt: "2026-10-12",
+    updatedAt: "2026-10-12",
+    featured: true,
+    primaryToolSlug: "regex-tester",
+    relatedToolSlugs: ["code-diff-checker", "json-formatter", "base64-encoder-decoder"],
+    relatedArticleSlugs: [
+      "how-to-format-and-validate-json",
+      "how-base64-encoding-and-decoding-works",
+      "how-to-generate-strong-passwords-safely",
+    ],
+    keywords: [
+      "how to test regular expressions online",
+      "regex debugger javascript tutorial",
+      "regex capture groups and flags explained",
+      "prevent regex catastrophic backtracking",
+      "regex tester online free",
+    ],
+    introduction: [
+      "Regular expressions (regex) are among the most versatile tools in modern software development for text parsing, input validation, and data extraction.",
+      "From validating contact forms to parsing server logs and cleaning datasets, regex allows engineers to express complex string patterns in compact syntax.",
+      "However, debugging regular expressions can be frustrating when subtle flag behaviors, zero-length boundary matches, or greedy quantifiers cause unexpected results. Testing patterns in an interactive client-side sandbox helps you inspect every match position and capture group with immediate visual feedback.",
+    ],
+    problemSolved: {
+      heading: "Overcoming Regex Syntax Errors, Backtracking Bottlenecks, and Edge Cases",
+      paragraphs: [
+        "Constructing complex regular expressions directly inside production code often leads to subtle bugs, unexpected match failures, and catastrophic backtracking risks.",
+        "OneToolHub provides an in-browser ECMAScript regex debugger that evaluates patterns in real time, highlights exact character boundaries, and inspects capture groups without transmitting sensitive data to external servers.",
+      ],
+      keyTakeaways: [
+        "ECMAScript regex compiles locally in the browser with zero server data transfer.",
+        "Toggle g, i, m, s, and u flags with instant visual match feedback.",
+        "Inspect numbered and named capture groups with character index ranges.",
+        "Guard against catastrophic backtracking (ReDoS) by avoiding nested quantifiers.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Input Your Pattern and Flags",
+        stepDescription:
+          "Enter your regular expression between the pattern delimiters or select a template from the pre-built library.",
+      },
+      {
+        stepTitle: "Configure Execution Flags",
+        stepDescription:
+          "Toggle flags such as Global (g), Ignore Case (i), or Multiline (m) to match your runtime environment.",
+      },
+      {
+        stepTitle: "Supply Sample Test Text",
+        stepDescription:
+          "Paste sample input strings into the test area to verify matching behavior across diverse edge cases.",
+      },
+      {
+        stepTitle: "Inspect Matches and Capture Groups",
+        stepDescription:
+          "Review color-highlighted matches, start/end index positions, and extracted capture groups in the results table.",
+      },
+    ],
+    practicalExample: {
+      title: "Validating and Parsing ISO 8601 Date Strings",
+      scenario: "Extracting year, month, and day components from date strings using named capture groups.",
+      inputLabel: "Regex Pattern & Sample Text",
+      inputSample: "/(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})/g on '2026-10-12 and 2027-01-01'",
+      outputLabel: "Extracted Named Groups",
+      outputSample: "Match 1: year=2026, month=10, day=12; Match 2: year=2027, month=01, day=01",
+      explanation:
+        "Named capture groups (?<name>...) extract structured fields cleanly, making date parsing self-documenting and resilient.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Forgetting the Global (g) flag when looking for all occurrences",
+        whyItHappens: "Without the 'g' flag, JavaScript regex engines stop after finding the first match.",
+        howToFix: "Enable the 'g' flag toggle whenever you need to enumerate multiple matches in the test text.",
+      },
+      {
+        mistake: "Unescaped special characters like dots, parentheses, or question marks",
+        whyItHappens: "Assuming that literal characters like '.' in URLs or emails match periods rather than any character.",
+        howToFix: "Escape literal syntax characters with a backslash (e.g. \\. instead of .).",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Pattern produces zero matches despite matching visually",
+        solution: "Check whether the pattern includes rigid ^ or $ anchors while the test string contains surrounding text or newlines without the 'm' flag.",
+      },
+      {
+        symptom: "Named capture groups do not appear in the results table",
+        solution: "Verify syntax follows (?<name>...) with valid identifier characters and no leading digits.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Is this regex engine 100% identical to Python or PHP regex?",
+        answer: "This tester uses the JavaScript ECMAScript standard. While basic expressions are universal, advanced features like lookbehinds or atomic groups may vary across Python (re) or PHP (PCRE).",
+      },
+      {
+        question: "Is my test data uploaded to any server?",
+        answer: "No. All regular expression compilation and matching execute 100% inside your browser tab.",
+      },
+      {
+        question: "How does the tool safeguard against ReDoS freezes?",
+        answer: "The executor monitors nested quantifiers and applies loop iteration ceilings to abort potentially runaway patterns gracefully.",
+      },
+    ],
+    conclusion: {
+      heading: "Write Accurate, Safe Regular Expressions with Confidence",
+      paragraphs: [
+        "Testing regular expressions in an interactive environment guarantees pattern accuracy, highlights edge cases, and safeguards against performance bottlenecks.",
+      ],
+      ctaLabel: "Open Regex Tester & Debugger",
+    },
+  },
+  {
+    slug: "how-to-compare-code-and-find-differences",
+    title: "How to Compare Code and Find Differences Online — Diff Checker Guide",
+    seoTitle: "How to Compare Code and Find Differences Online — Code Diff Guide",
+    metaDescription:
+      "Learn how to compare two code snippets, text files, or configurations online. Master side-by-side vs unified diff views, whitespace filtering, line numbers, and standard Git .patch file exports.",
+    excerpt:
+      "Understand Myers diff algorithms, compare source files with side-by-side and unified views, filter insignificant whitespace changes, and generate standard Git .patch files privately.",
+    categoryId: "developer-tutorials",
+    categoryLabel: "Developer Tutorials",
+    icon: "GitCompare",
+    readingTimeMinutes: 6,
+    publishedAt: "2026-10-12",
+    updatedAt: "2026-10-12",
+    featured: true,
+    primaryToolSlug: "code-diff-checker",
+    relatedToolSlugs: ["regex-tester", "json-formatter", "word-counter"],
+    relatedArticleSlugs: [
+      "how-to-format-and-validate-json",
+      "how-to-test-regular-expressions-online",
+      "how-to-count-words-and-reading-time",
+    ],
+    keywords: [
+      "how to compare code differences online",
+      "code diff checker tutorial side by side",
+      "unified diff vs split diff view",
+      "generate git patch online",
+      "compare text files free",
+    ],
+    introduction: [
+      "Comparing text and code differences is an indispensable daily task for software engineers, code reviewers, and technical writers.",
+      "Whether you are verifying changes before submitting a pull request, debugging configuration drift between environments, or reviewing edits in an essay, automated diff utilities highlight exact line changes instantly.",
+      "OneToolHub provides an in-browser diff viewer that runs entirely in your browser memory, ensuring your proprietary code and private documents are never uploaded to third-party servers.",
+    ],
+    problemSolved: {
+      heading: "Isolating Meaningful Code Changes Without Accidental Regressions or Exposure",
+      paragraphs: [
+        "Manual side-by-side inspection of source code is tedious and error-prone, especially when whitespace adjustments or reformatting obscure functional edits.",
+        "OneToolHub's Code Diff Checker leverages the Myers difference algorithm to pinpoint added, removed, and modified lines in split or unified views, allowing instant .patch file exports for seamless version control.",
+      ],
+      keyTakeaways: [
+        "Myers diff algorithm calculates optimal Longest Common Subsequence modifications.",
+        "Side-by-side split view aligns corresponding lines for high-resolution desktop comparison.",
+        "Unified view streams additions and deletions sequentially for mobile and CLI readability.",
+        "Whitespace and case-sensitivity filters isolate functional edits from formatting noise.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Paste or Upload Baseline Code",
+        stepDescription:
+          "Paste your original source code or upload the baseline file into the left editor.",
+      },
+      {
+        stepTitle: "Supply Modified Code",
+        stepDescription:
+          "Enter the revised version into the right editor or upload the secondary file.",
+      },
+      {
+        stepTitle: "Select View and Comparison Filters",
+        stepDescription:
+          "Toggle between Side-by-Side and Unified views, and enable Ignore Whitespace if necessary.",
+      },
+      {
+        stepTitle: "Inspect Differences and Export Patch",
+        stepDescription:
+          "Review green additions, red deletions, and download a standard Git .patch file.",
+      },
+    ],
+    practicalExample: {
+      title: "Comparing Refactored JavaScript Functions",
+      scenario: "Verifying that a legacy callback was correctly converted to an async/await function.",
+      inputLabel: "Original vs Modified",
+      inputSample: "Original: function fetchUser(id, cb) {...} | Modified: async function fetchUser(id) {...}",
+      outputLabel: "Diff Output",
+      outputSample: "- function fetchUser(id, cb) {\\n+ async function fetchUser(id) {",
+      explanation:
+        "The diff highlights the exact function signature adjustment and lines removed, preventing accidental argument drops.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Leaving whitespace differences enabled during linter reformatting",
+        whyItHappens: "Prettier or ESLint re-indentation creates diff noise that masks actual code changes.",
+        howToFix: "Enable 'Ignore Whitespace' to suppress pure indentation changes.",
+      },
+      {
+        mistake: "Reversing original and modified inputs",
+        whyItHappens: "Pasting the new version on the left flips additions into deletions.",
+        howToFix: "Use the 'Swap Inputs' button to instantly exchange both sides.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Diff shows entire document as completely modified",
+        solution: "Check if the files use different line ending formats (Windows CRLF vs Unix LF); OneToolHub normalizes line endings automatically.",
+      },
+      {
+        symptom: "Lines appear misaligned in Side-by-Side view",
+        solution: "Large single-side additions push adjacent lines down; switch to Unified view for a compact sequential reading flow.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Can I compare proprietary source code without privacy concerns?",
+        answer: "Yes. All diff computations execute 100% client-side in your browser. No code is transmitted to external servers.",
+      },
+      {
+        question: "What file types can I upload?",
+        answer: "Any plain text or code file format: .js, .ts, .py, .json, .html, .css, .md, .env, or .txt.",
+      },
+      {
+        question: "How do I apply the exported .patch file in Git?",
+        answer: "Run 'git apply filename.patch' in your repository root terminal to apply the unified diff directly.",
+      },
+    ],
+    conclusion: {
+      heading: "Streamline Code Reviews with Clean, Local Diffs",
+      paragraphs: [
+        "Verifying code changes side-by-side prevents accidental regressions, clarifies logic adjustments, and speeds up pull request workflows.",
+      ],
+      ctaLabel: "Open Code Diff Checker",
+    },
+  },
+  {
+    slug: "how-to-convert-hex-rgb-hsl-colors",
+    title: "How to Convert HEX, RGB, and HSL Colors — Web Accessibility & Contrast",
+    seoTitle: "How to Convert HEX, RGB, and HSL Colors — Web Contrast Guide",
+    metaDescription:
+      "Master web color conversions across HEX, RGB, and HSL models. Learn WCAG 2.1 contrast formulas, AA and AAA accessibility thresholds, and harmonic palette generation for web design.",
+    excerpt:
+      "Understand sRGB mathematics, convert between HEX, RGB, and HSL, calculate WCAG 2.1 relative luminance and contrast ratios, and export clean CSS custom properties.",
+    categoryId: "developer-tutorials",
+    categoryLabel: "Developer Tutorials",
+    icon: "Palette",
+    readingTimeMinutes: 6,
+    publishedAt: "2026-10-12",
+    updatedAt: "2026-10-12",
+    featured: true,
+    primaryToolSlug: "color-picker",
+    relatedToolSlugs: ["image-resizer", "image-compressor", "qr-code-generator"],
+    relatedArticleSlugs: [
+      "how-to-compress-images-for-web",
+      "how-to-resize-images-online",
+      "how-to-format-and-validate-json",
+    ],
+    keywords: [
+      "how to convert hex rgb hsl colors",
+      "wcag contrast ratio calculation guide",
+      "color picker and converter online",
+      "web accessibility color contrast aa aaa",
+      "css custom properties color palette",
+    ],
+    introduction: [
+      "Color selection in modern web design is not only an aesthetic choice—it is a critical accessibility requirement governed by international standards.",
+      "Developers and designers frequently convert color values between 6-digit hexadecimal codes for CSS stylesheets, RGB vectors for canvas manipulation, and intuitive HSL percentages for responsive theme adjustments.",
+      "Understanding how these models interact and verifying contrast against WCAG 2.1 standards ensures digital products remain accessible to users with low vision or color vision deficiencies.",
+    ],
+    problemSolved: {
+      heading: "Ensuring Inclusive Readability and Seamless Color Model Conversion",
+      paragraphs: [
+        "Inaccessible low-contrast color combinations make web interfaces difficult or impossible to navigate for millions of users worldwide.",
+        "The OneToolHub Color Picker & Converter provides instant mathematical translation across HEX, RGB, and HSL formats while verifying WCAG 2.1 AA and AAA contrast ratios against dark and light backgrounds in real time.",
+      ],
+      keyTakeaways: [
+        "Bidirectional conversion across HEX, decimal RGB, and cylindrical HSL models.",
+        "WCAG 2.1 relative luminance calculation ensures AA (4.5:1) and AAA (7:1) contrast compliance.",
+        "Harmonic palette generation creates complementary, analogous, and monochromatic accents.",
+        "Export design tokens directly into CSS custom properties (:root variables) or JSON.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Pick or Enter a Baseline Color",
+        stepDescription:
+          "Click the interactive canvas color swatch or paste a 6-digit HEX, RGB, or HSL code.",
+      },
+      {
+        stepTitle: "Fine-Tune Channels with Sliders",
+        stepDescription:
+          "Adjust red, green, blue or hue, saturation, lightness sliders with synchronized two-way updates.",
+      },
+      {
+        stepTitle: "Evaluate WCAG Contrast Scores",
+        stepDescription:
+          "Verify whether text on white and black backgrounds passes minimum 4.5:1 (AA) and 7:1 (AAA) thresholds.",
+      },
+      {
+        stepTitle: "Generate Palettes & Export CSS",
+        stepDescription:
+          "Browse harmonic schemes and export CSS variables for immediate integration into your design system.",
+      },
+    ],
+    practicalExample: {
+      title: "Checking Brand Primary Button Contrast",
+      scenario: "Testing brand blue #2563EB with white text #FFFFFF for WCAG AA compliance.",
+      inputLabel: "Button Background Color",
+      inputSample: "#2563EB (RGB: 37, 99, 235 | HSL: 221°, 83%, 53%)",
+      outputLabel: "Calculated Contrast Ratio",
+      outputSample: "4.56:1 vs #FFFFFF (Passes WCAG AA for normal text, AAA for large text)",
+      explanation:
+        "At 4.56:1, the button background clears the minimum 4.5:1 ratio required by WCAG 2.1 Level AA for accessible body text.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Assuming high saturation equals high contrast",
+        whyItHappens: "Vibrant yellow or neon green looks intense but has very low contrast against white backgrounds.",
+        howToFix: "Always check mathematical contrast ratio numbers rather than relying on uncalibrated monitor perception.",
+      },
+      {
+        mistake: "Rounding HSL percentages too aggressively",
+        whyItHappens: "Truncating floating-point numbers can cause subtle color drift across conversions.",
+        howToFix: "Use standard rounded integer representations calibrated to standard 8-bit sRGB channels.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Contrast ratio fails AA standard on primary brand color",
+        solution: "Lower lightness (L) slider in HSL mode by 10-15% until contrast reaches 4.5:1 while preserving hue identity.",
+      },
+      {
+        symptom: "Shorthand hex (#abc) expands incorrectly",
+        solution: "Remember that #abc expands to #aabbcc in standard CSS, not #abc000.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Does passing WCAG contrast ensure complete visual accessibility?",
+        answer: "Contrast is essential, but font weight, size, line spacing, and non-reliance on color alone are also vital for full accessibility.",
+      },
+      {
+        question: "Is my color data tracked or logged?",
+        answer: "No. All conversions and luminance math execute locally in your web browser.",
+      },
+      {
+        question: "What is the difference between WCAG AA and AAA standards?",
+        answer: "Level AA requires a 4.5:1 ratio for normal body text (3:1 for large text). Level AAA requires an enhanced 7:1 ratio (4.5:1 for large text).",
+      },
+    ],
+    conclusion: {
+      heading: "Design Inclusive Web Interfaces with Accessible Colors",
+      paragraphs: [
+        "Verifying contrast ratios and generating harmonic color tokens guarantees both visual beauty and inclusive readability for all users.",
+      ],
+      ctaLabel: "Open Color Picker & Converter",
+    },
+  },
+  {
+    slug: "how-to-generate-and-validate-uuids",
+    title: "How to Generate and Validate UUIDs Online — RFC 9562 v4 Standards",
+    seoTitle: "How to Generate and Validate UUIDs Online — RFC 9562 v4 Guide",
+    metaDescription:
+      "Learn how to generate cryptographically secure UUID v4 identifiers in bulk and validate existing UUID strings. Understand RFC 9562/4122 versions, variants, and collision probabilities.",
+    excerpt:
+      "Understand RFC 9562 standards, generate cryptographically random UUID v4 strings with Web Crypto, validate UUID versions, and avoid common security pitfalls.",
+    categoryId: "developer-tutorials",
+    categoryLabel: "Developer Tutorials",
+    icon: "Fingerprint",
+    readingTimeMinutes: 5,
+    publishedAt: "2026-10-12",
+    updatedAt: "2026-10-12",
+    featured: true,
+    primaryToolSlug: "uuid-generator",
+    relatedToolSlugs: ["password-generator", "base64-encoder-decoder", "regex-tester"],
+    relatedArticleSlugs: [
+      "how-to-generate-strong-passwords-safely",
+      "how-base64-encoding-and-decoding-works",
+      "how-to-format-and-validate-json",
+    ],
+    keywords: [
+      "how to generate and validate uuids online",
+      "uuid v4 generator rfc 9562 rfc 4122",
+      "guid vs uuid difference explained",
+      "uuid collision probability calculation",
+      "bulk uuid generator online",
+    ],
+    introduction: [
+      "Universally Unique Identifiers (UUIDs), also known as Globally Unique Identifiers (GUIDs), are 128-bit values designed to guarantee uniqueness across distributed systems without central coordination.",
+      "Modern cloud databases, event queues, and microservice architectures rely on UUIDs as primary keys, correlation IDs, and idempotent transaction identifiers.",
+      "Generating standards-compliant UUIDs requires cryptographically strong entropy sources to prevent predictable sequence generation and ensure collision resistance.",
+    ],
+    problemSolved: {
+      heading: "Eliminating Distributed Identifier Collisions and Weak Randomness Risks",
+      paragraphs: [
+        "Using predictable pseudo-random algorithms like Math.random() can produce duplicate primary keys in distributed databases and expose systems to security vulnerabilities.",
+        "The OneToolHub UUID Generator & Validator creates RFC 9562 / RFC 4122 v4 identifiers using browser-native Web Crypto APIs, offering bulk batch exports and an instant validator to inspect UUID versions and variants.",
+      ],
+      keyTakeaways: [
+        "RFC 9562 / RFC 4122 v4 identifiers utilize 122 bits of cryptographically secure random entropy.",
+        "Native Web Crypto (crypto.randomUUID) guarantees high-entropy randomness directly from OS kernels.",
+        "Bulk generation up to 1,000 UUIDs with customizable hyphens, uppercase formatting, and text download.",
+        "Built-in validator inspects string length, hyphen positions, version nibbles, and variant bits.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Select Quantity and Formatting",
+        stepDescription:
+          "Choose how many UUIDs you need (1 to 1,000) and select uppercase, hyphens, or braces options.",
+      },
+      {
+        stepTitle: "Generate Secure Identifiers",
+        stepDescription:
+          "Click 'Generate UUIDs' to produce fresh identifiers using native Web Crypto entropy.",
+      },
+      {
+        stepTitle: "Copy or Download Batch",
+        stepDescription:
+          "Copy individual identifiers to your clipboard or download the full batch as a .txt file for database seeding.",
+      },
+      {
+        stepTitle: "Validate Existing UUID Strings",
+        stepDescription:
+          "Paste candidate identifiers into the validator card to verify RFC compliance and detect UUID version numbers.",
+      },
+    ],
+    practicalExample: {
+      title: "Generating Primary Keys for Database Seeding",
+      scenario: "Creating 5 uppercase hyphenated UUID v4 records for distributed database initialization.",
+      inputLabel: "Generator Configuration",
+      inputSample: "Quantity: 5 | Format: Hyphenated | Letter Case: Uppercase",
+      outputLabel: "Generated Output Sample",
+      outputSample: "F47AC10B-58CC-4372-A567-0E02B2C3D479 (Version 4, RFC 4122 Variant)",
+      explanation:
+        "Character 13 is '4' (UUID v4) and character 17 is 'A' (RFC variant bits 10xx), ensuring strict database engine compatibility.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Treating UUIDs as secret authentication tokens",
+        whyItHappens: "Assuming that because a UUID is random and unguessable, it can serve as a secure password or API secret.",
+        howToFix: "Use cryptographically signed tokens (like JWTs) with expiration and validation for authentication.",
+      },
+      {
+        mistake: "Stripping hyphens without documenting format requirements",
+        whyItHappens: "Saving compact 32-hex characters in databases that expect canonical 36-char hyphenated strings.",
+        howToFix: "Adhere to the standard 8-4-4-4-12 hyphenated layout unless storage constraints explicitly dictate raw bytes.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Validator reports candidate UUID has unknown version",
+        solution: "Inspect character 13; if it does not equal 1, 2, 3, 4, or 5, the identifier was not constructed under RFC 4122 / RFC 9562 standards.",
+      },
+      {
+        symptom: "Bulk generation output exceeds clipboard limits",
+        solution: "Use the 'Download .txt' button for large batches rather than copy-pasting.",
+      },
+    ],
+    faqs: [
+      {
+        question: "What is the difference between a UUID and a GUID?",
+        answer: "GUID (Globally Unique Identifier) is Microsoft's implementation of the universal UUID standard; they represent the same 128-bit concept.",
+      },
+      {
+        question: "Are generated UUIDs stored or tracked by OneToolHub?",
+        answer: "No. UUID generation runs strictly on your machine using crypto.randomUUID(). Identifiers are never sent to external servers.",
+      },
+      {
+        question: "Can two UUID v4 values ever collide?",
+        answer: "With 122 bits of cryptographic entropy, the probability of generating a duplicate is approximately 1 in 5.3 x 10^36, making collisions virtually impossible in practice.",
+      },
+    ],
+    conclusion: {
+      heading: "Reliable, Standards-Compliant Identification for Distributed Systems",
+      paragraphs: [
+        "Generating cryptographic UUIDs guarantees unique keys, eliminates database lock contention, and streamlines microservice tracking.",
+      ],
+      ctaLabel: "Open UUID Generator & Validator",
+    },
+  },
 ] as const;
 
 export function getArticleBySlug(slug: string): LearnArticle | undefined {

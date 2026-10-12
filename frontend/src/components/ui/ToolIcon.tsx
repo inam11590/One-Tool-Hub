@@ -22,6 +22,10 @@ import {
   Images,
   Layers,
   Stamp,
+  Regex,
+  GitCompare,
+  Palette,
+  Fingerprint,
   type LucideProps,
 } from "lucide-react";
 import type { CategoryIconName, ToolIconName } from "@/types/tools";
@@ -63,6 +67,14 @@ export function ToolIcon({
       return <Layers {...props} />;
     case "Stamp":
       return <Stamp {...props} />;
+    case "Regex":
+      return <Regex {...props} />;
+    case "GitCompare":
+      return <GitCompare {...props} />;
+    case "Palette":
+      return <Palette {...props} />;
+    case "Fingerprint":
+      return <Fingerprint {...props} />;
   }
 }
 

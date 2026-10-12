@@ -29,6 +29,10 @@ export const VALID_TOOL_SLUGS = [
   "image-to-pdf",
   "pdf-organizer",
   "pdf-watermark",
+  "regex-tester",
+  "code-diff-checker",
+  "color-picker",
+  "uuid-generator",
 ] as const;
 
 export type ValidToolSlug = (typeof VALID_TOOL_SLUGS)[number];

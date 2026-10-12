@@ -114,6 +114,32 @@ import {
   applyWatermarkToPdf,
 } from "./pdf-watermark.ts";
 import {
+  testRegularExpression,
+  detectPotentialCatastrophicBacktracking,
+  REGEX_LIBRARY_PRESETS,
+} from "./regex-tester.ts";
+import {
+  computeCodeDiff,
+  SAMPLE_CODE_DIFF,
+} from "./code-diff-checker.ts";
+import {
+  hexToRgb,
+  rgbToHex,
+  rgbToHsl,
+  hslToRgb,
+  hslToHex,
+  calculateContrastRatio,
+  evaluateWcagCompliance,
+  generateHarmonicPalettes,
+  exportPaletteAsCss,
+} from "./color-picker.ts";
+import {
+  generateSingleUuidV4,
+  formatUuid,
+  generateBulkUuids,
+  validateUuidString,
+} from "./uuid-generator.ts";
+import {
   classifyErrorCategory,
   getErrorMonitoringConfig,
   getFriendlyBoundaryErrorMessage,
@@ -1161,7 +1187,7 @@ test("Step 6 Production SEO: resolves https://one-tool-hub-sooty.vercel.app on V
 // ============================================================================
 test("Step 7 Learning Center Content Integrity: verifies complete tutorials, unique metadata, and 1-to-1 tool coverage", () => {
   assert.equal(LEARN_CATEGORIES.length, 5);
-  assert.equal(LEARN_ARTICLES.length, 16);
+  assert.equal(LEARN_ARTICLES.length, 20);
 
   const slugs = new Set<string>();
   const titles = new Set<string>();
@@ -1216,21 +1242,21 @@ test("Step 7 Learning Center Content Integrity: verifies complete tutorials, uni
     assert.ok(article.relatedArticleSlugs.length >= 2);
   }
 
-  // All 16 tools have a dedicated companion tutorial
-  assert.equal(primaryToolsCovered.size, 16);
+  // All 20 tools have a dedicated companion tutorial
+  assert.equal(primaryToolsCovered.size, 20);
 });
 
 test("Step 7 Search, Category Filtering, Internal Linking & Article JSON-LD: validates directory filters and structured data", () => {
   // Search and category filtering
   const allResults = filterArticles(LEARN_ARTICLES, "", "all");
-  assert.equal(allResults.length, 16);
+  assert.equal(allResults.length, 20);
 
   const devCategoryResults = filterArticles(
     LEARN_ARTICLES,
     "",
     "developer-tutorials"
   );
-  assert.equal(devCategoryResults.length, 4);
+  assert.equal(devCategoryResults.length, 8);
 
   const gpaSearchResults = filterArticles(LEARN_ARTICLES, "credit hours", "all");
   assert.ok(
@@ -1548,9 +1574,9 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
   assert.equal(levenshteinDistance("conpress", "compress"), 1);
   assert.equal(levenshteinDistance("kitten", "sitting"), 3);
 
-  // 2. Empty query returns all tools (16 available tools)
+  // 2. Empty query returns all tools (20 available tools)
   const allResults = searchTools(TOOLS_REGISTRY, "");
-  assert.equal(allResults.length, 16);
+  assert.equal(allResults.length, 20);
 
   // 3. Exact matching by tool name
   const jsonResults = searchTools(TOOLS_REGISTRY, "JSON");
@@ -1559,12 +1585,16 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
 
   // 4. Category matching
   const devResults = searchTools(TOOLS_REGISTRY, "developer");
-  assert.ok(devResults.length >= 4);
+  assert.ok(devResults.length >= 8);
   const devSlugs = devResults.map((r) => r.item.slug);
   assert.ok(devSlugs.includes("json-formatter"));
   assert.ok(devSlugs.includes("qr-code-generator"));
   assert.ok(devSlugs.includes("password-generator"));
   assert.ok(devSlugs.includes("base64-encoder-decoder"));
+  assert.ok(devSlugs.includes("regex-tester"));
+  assert.ok(devSlugs.includes("code-diff-checker"));
+  assert.ok(devSlugs.includes("color-picker"));
+  assert.ok(devSlugs.includes("uuid-generator"));
 
   // 5. Keyword & intent matching
   const combineResults = searchTools(TOOLS_REGISTRY, "combine");
@@ -2002,6 +2032,232 @@ test("Step 12: PDF Watermark Tool Logic", async () => {
   const loadedTiled = await PDFDocument.load(tiled.bytes);
   assert.equal(loadedTiled.getPageCount(), 2);
 });
+
+// ============================================================================
+// STEP 13: Advanced Developer Tools Expansion
+// ============================================================================
+test("Step 13: Regex Tester & Debugger Logic", () => {
+  // 1. Valid execution with matches and capture groups
+  const emailRegex = testRegularExpression(
+    "([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})",
+    "Contact us at hello@onetoolhub.com or support@example.org today.",
+    "g"
+  );
+  assert.equal(emailRegex.valid, true);
+  assert.equal(emailRegex.error, undefined);
+  assert.equal(emailRegex.matches.length, 2);
+  assert.equal(emailRegex.matches[0].fullMatch, "hello@onetoolhub.com");
+  assert.equal(emailRegex.matches[0].groups.length, 2);
+  assert.equal(emailRegex.matches[0].groups[0].value, "hello");
+  assert.equal(emailRegex.matches[0].groups[1].value, "onetoolhub.com");
+  assert.equal(emailRegex.matches[1].fullMatch, "support@example.org");
+
+  // 2. Named capture groups
+  const namedRegex = testRegularExpression(
+    "(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})",
+    "Release date: 2026-10-12",
+    "g"
+  );
+  assert.equal(namedRegex.valid, true);
+  assert.equal(namedRegex.matches.length, 1);
+  const yearGroup = namedRegex.matches[0].groups.find((g) => g.name === "year");
+  assert.ok(yearGroup);
+  assert.equal(yearGroup.value, "2026");
+
+  // 3. Flags handling: case-insensitive & non-global
+  const caseRegex = testRegularExpression("apple", "PineApple juice", "i");
+  assert.equal(caseRegex.valid, true);
+  assert.equal(caseRegex.matches.length, 1);
+  assert.equal(caseRegex.matches[0].fullMatch, "Apple");
+
+  // 4. Invalid regular expression pattern
+  const invalidRegex = testRegularExpression("[a-z", "test", "g");
+  assert.equal(invalidRegex.valid, false);
+  assert.ok(invalidRegex.error && invalidRegex.error.length > 0);
+  assert.equal(invalidRegex.matches.length, 0);
+
+  // 5. Zero-length match loop guard (e.g. empty or non-advancing regex)
+  const zeroLenRegex = testRegularExpression("(?=a)", "aaa", "g");
+  assert.equal(zeroLenRegex.valid, true);
+  assert.ok(zeroLenRegex.matches.length <= 10);
+
+  // 6. Catastrophic backtracking detection
+  const backtrackCheck = detectPotentialCatastrophicBacktracking("(a+)+$");
+  assert.equal(backtrackCheck.suspicious, true);
+  assert.ok(backtrackCheck.warning && backtrackCheck.warning.length > 10);
+
+  // 7. Built-in presets presence
+  assert.ok(REGEX_LIBRARY_PRESETS.length >= 5);
+  assert.ok(REGEX_LIBRARY_PRESETS.some((p) => p.name.includes("Email")));
+  assert.ok(REGEX_LIBRARY_PRESETS.some((p) => p.name.includes("URL")));
+  assert.ok(REGEX_LIBRARY_PRESETS.some((p) => p.name.includes("IPv4")));
+});
+
+test("Step 13: Code Diff Checker Logic", () => {
+  const origText = "line 1\nline 2\nline 3\nline 4";
+  const modText = "line 1\nline 2 (modified)\nline 3\nline 5";
+
+  // 1. Basic diff computation
+  const diffResult = computeCodeDiff(origText, modText, {
+    ignoreWhitespace: false,
+    ignoreCase: false,
+  }, {
+    original: "orig.txt",
+    modified: "mod.txt",
+  });
+
+  assert.ok(diffResult.stats.addedCount >= 1);
+  assert.ok(diffResult.stats.removedCount >= 1);
+  assert.ok(diffResult.unifiedLines.length > 0);
+  assert.ok(diffResult.sideBySideRows.length > 0);
+  assert.ok(diffResult.patchString.startsWith("Index: orig.txt") || diffResult.patchString.includes("--- orig.txt"));
+
+  // 2. Ignore whitespace option
+  const origWs = "  hello world  \nfoo";
+  const modWs = "hello world\nfoo";
+  const diffWithWs = computeCodeDiff(origWs, modWs, {
+    ignoreWhitespace: false,
+    ignoreCase: false,
+  });
+  const diffIgnoreWs = computeCodeDiff(origWs, modWs, {
+    ignoreWhitespace: true,
+    ignoreCase: false,
+  });
+  assert.ok(diffWithWs.stats.addedCount > 0 || diffWithWs.stats.removedCount > 0);
+  assert.equal(diffIgnoreWs.stats.addedCount, 0);
+  assert.equal(diffIgnoreWs.stats.removedCount, 0);
+
+  // 3. Ignore case option
+  const origCase = "function Test() {}";
+  const modCase = "function test() {}";
+  const diffIgnoreCase = computeCodeDiff(origCase, modCase, {
+    ignoreWhitespace: false,
+    ignoreCase: true,
+  });
+  assert.equal(diffIgnoreCase.stats.addedCount, 0);
+  assert.equal(diffIgnoreCase.stats.removedCount, 0);
+
+  // 4. Sample diff presence
+  assert.ok(SAMPLE_CODE_DIFF.original.length > 20);
+  assert.ok(SAMPLE_CODE_DIFF.modified.length > 20);
+});
+
+test("Step 13: Color Picker & Converter Logic", () => {
+  // 1. HEX to RGB conversion
+  const rgbFromHex = hexToRgb("#2563eb");
+  assert.ok(rgbFromHex);
+  assert.equal(rgbFromHex.r, 37);
+  assert.equal(rgbFromHex.g, 99);
+  assert.equal(rgbFromHex.b, 235);
+
+  // 2. Shorthand 3-char HEX
+  const shorthand = hexToRgb("#fff");
+  assert.ok(shorthand);
+  assert.equal(shorthand.r, 255);
+  assert.equal(shorthand.g, 255);
+  assert.equal(shorthand.b, 255);
+
+  // 3. RGB to HEX conversion
+  assert.equal(rgbToHex({ r: 37, g: 99, b: 235 }), "#2563eb");
+  assert.equal(rgbToHex({ r: 255, g: 255, b: 255 }), "#ffffff");
+  assert.equal(rgbToHex({ r: 0, g: 0, b: 0 }), "#000000");
+
+  // 4. RGB to HSL and HSL to RGB roundtrip
+  const hsl = rgbToHsl({ r: 37, g: 99, b: 235 });
+  assert.equal(hsl.h, 221);
+  assert.equal(hsl.s, 83);
+  assert.equal(hsl.l, 53);
+
+  const rgbBack = hslToRgb(hsl);
+  assert.ok(Math.abs(rgbBack.r - 37) <= 1);
+  assert.ok(Math.abs(rgbBack.g - 99) <= 1);
+  assert.ok(Math.abs(rgbBack.b - 235) <= 1);
+  assert.equal(hslToHex(hsl), "#2563eb");
+
+  // 5. WCAG Contrast ratio math
+  const blackOnWhiteRatio = calculateContrastRatio({ r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 });
+  assert.equal(blackOnWhiteRatio, 21);
+  const evalBlackOnWhite = evaluateWcagCompliance(blackOnWhiteRatio);
+  assert.equal(evalBlackOnWhite.normalTextAa, true);
+  assert.equal(evalBlackOnWhite.normalTextAaa, true);
+
+  const whiteOnWhiteRatio = calculateContrastRatio({ r: 255, g: 255, b: 255 }, { r: 255, g: 255, b: 255 });
+  assert.equal(whiteOnWhiteRatio, 1);
+  const evalWhiteOnWhite = evaluateWcagCompliance(whiteOnWhiteRatio);
+  assert.equal(evalWhiteOnWhite.normalTextAa, false);
+
+  // 6. Harmonic palettes
+  const palettes = generateHarmonicPalettes("#2563eb");
+  assert.ok(palettes.complementary.hex);
+  assert.ok(palettes.analogous1.hex);
+  assert.ok(palettes.analogous2.hex);
+  assert.ok(palettes.tintLight.hex);
+  assert.ok(palettes.shadeDark.hex);
+
+  // 7. CSS variable export
+  const cssVars = exportPaletteAsCss("#2563eb");
+  assert.ok(cssVars.includes(":root {"));
+  assert.ok(cssVars.includes("--color-primary: #2563eb;"));
+});
+
+test("Step 13: UUID Generator & Validator Logic", () => {
+  // 1. Single UUID generation
+  const single = generateSingleUuidV4();
+  assert.equal(single.length, 36);
+  assert.equal(single[14], "4"); // version 4
+  assert.ok(["8", "9", "a", "b"].includes(single[19])); // RFC variant
+
+  // 2. Format options: Uppercase, No hyphens, Braces
+  const upperBraced = formatUuid(single, {
+    uppercase: true,
+    hyphens: true,
+    braces: true,
+  });
+  assert.ok(upperBraced.startsWith("{"));
+  assert.ok(upperBraced.endsWith("}"));
+  assert.equal(upperBraced, upperBraced.toUpperCase());
+
+  const compact = formatUuid(single, {
+    uppercase: false,
+    hyphens: false,
+    braces: false,
+  });
+  assert.equal(compact.length, 32);
+  assert.equal(compact.includes("-"), false);
+
+  // 3. Bulk generation and uniqueness
+  const bulk = generateBulkUuids(100, {
+    uppercase: false,
+    hyphens: true,
+    braces: false,
+  });
+  assert.equal(bulk.length, 100);
+  const uniqueSet = new Set(bulk);
+  assert.equal(uniqueSet.size, 100);
+
+  // 4. Batch text list
+  const batchText = bulk.slice(0, 5).join("\n");
+  assert.equal(batchText.split("\n").length, 5);
+
+  // 5. Validation of valid UUID
+  const validCheck = validateUuidString("f47ac10b-58cc-4372-a567-0e02b2c3d479");
+  assert.equal(validCheck.valid, true);
+  assert.equal(validCheck.version, 4);
+  assert.equal(validCheck.variant, "RFC 4122 / RFC 9562");
+
+  // 6. Validation of Nil UUID
+  const nilCheck = validateUuidString("00000000-0000-0000-0000-000000000000");
+  assert.equal(nilCheck.valid, true);
+  assert.equal(nilCheck.version, "nil");
+
+  // 7. Validation of invalid UUIDs
+  const badChar = validateUuidString("f47ac10b-58cc-4372-a567-0e02b2c3d47z");
+  assert.equal(badChar.valid, false);
+
+  const shortStr = validateUuidString("12345");
+  assert.equal(shortStr.valid, false);
+});
+
 
 
 

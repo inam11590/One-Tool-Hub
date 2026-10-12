@@ -22,7 +22,11 @@ export type ToolIconName =
   | "FileImage"
   | "Images"
   | "Layers"
-  | "Stamp";
+  | "Stamp"
+  | "Regex"
+  | "GitCompare"
+  | "Palette"
+  | "Fingerprint";
 
 export type CategoryIconName =
   | "GraduationCap"
