@@ -21,6 +21,10 @@ export const VALID_TOOL_SLUGS = [
   "gpa-calculator",
   "invoice-generator",
   "pdf-merge-split",
+  "password-generator",
+  "image-resizer",
+  "base64-encoder-decoder",
+  "percentage-calculator",
 ] as const;
 
 export type ValidToolSlug = (typeof VALID_TOOL_SLUGS)[number];

@@ -14,6 +14,10 @@ import {
   UserCheck,
   Video,
   Zap,
+  KeyRound,
+  Scaling,
+  Binary,
+  Percent,
   type LucideProps,
 } from "lucide-react";
 import type { CategoryIconName, ToolIconName } from "@/types/tools";
@@ -39,6 +43,14 @@ export function ToolIcon({
       return <Receipt {...props} />;
     case "Files":
       return <Files {...props} />;
+    case "KeyRound":
+      return <KeyRound {...props} />;
+    case "Scaling":
+      return <Scaling {...props} />;
+    case "Binary":
+      return <Binary {...props} />;
+    case "Percent":
+      return <Percent {...props} />;
   }
 }
 

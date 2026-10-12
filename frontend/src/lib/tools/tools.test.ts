@@ -79,6 +79,22 @@ import {
   levenshteinDistance,
 } from "../search.ts";
 import {
+  generateSecurePassword,
+  evaluatePasswordStrength,
+} from "./password-generator.ts";
+import {
+  calculateAspectDimension,
+  validateTargetDimensions,
+} from "./image-resizer.ts";
+import {
+  encodeUtf8ToBase64,
+  decodeBase64ToUtf8,
+} from "./base64.ts";
+import {
+  calculatePercentage,
+  formatPercentageNumber,
+} from "./percentage-calculator.ts";
+import {
   classifyErrorCategory,
   getErrorMonitoringConfig,
   getFriendlyBoundaryErrorMessage,
@@ -1124,9 +1140,9 @@ test("Step 6 Production SEO: resolves https://one-tool-hub-sooty.vercel.app on V
 // ============================================================================
 // STEP 7: Learning Center Architecture, 8 Tutorials, Internal Linking & Article JSON-LD
 // ============================================================================
-test("Step 7 Learning Center Content Integrity: verifies 8 complete tutorials, unique metadata, and 1-to-1 tool coverage", () => {
+test("Step 7 Learning Center Content Integrity: verifies complete tutorials, unique metadata, and 1-to-1 tool coverage", () => {
   assert.equal(LEARN_CATEGORIES.length, 5);
-  assert.equal(LEARN_ARTICLES.length, 8);
+  assert.equal(LEARN_ARTICLES.length, 12);
 
   const slugs = new Set<string>();
   const titles = new Set<string>();
@@ -1181,21 +1197,21 @@ test("Step 7 Learning Center Content Integrity: verifies 8 complete tutorials, u
     assert.ok(article.relatedArticleSlugs.length >= 2);
   }
 
-  // All 8 tools have a dedicated companion tutorial
-  assert.equal(primaryToolsCovered.size, 8);
+  // All 12 tools have a dedicated companion tutorial
+  assert.equal(primaryToolsCovered.size, 12);
 });
 
 test("Step 7 Search, Category Filtering, Internal Linking & Article JSON-LD: validates directory filters and structured data", () => {
   // Search and category filtering
   const allResults = filterArticles(LEARN_ARTICLES, "", "all");
-  assert.equal(allResults.length, 8);
+  assert.equal(allResults.length, 12);
 
   const devCategoryResults = filterArticles(
     LEARN_ARTICLES,
     "",
     "developer-tutorials"
   );
-  assert.equal(devCategoryResults.length, 2);
+  assert.equal(devCategoryResults.length, 4);
 
   const gpaSearchResults = filterArticles(LEARN_ARTICLES, "credit hours", "all");
   assert.ok(
@@ -1513,9 +1529,9 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
   assert.equal(levenshteinDistance("conpress", "compress"), 1);
   assert.equal(levenshteinDistance("kitten", "sitting"), 3);
 
-  // 2. Empty query returns all tools
+  // 2. Empty query returns all tools (12 available tools)
   const allResults = searchTools(TOOLS_REGISTRY, "");
-  assert.equal(allResults.length, 8);
+  assert.equal(allResults.length, 12);
 
   // 3. Exact matching by tool name
   const jsonResults = searchTools(TOOLS_REGISTRY, "JSON");
@@ -1524,10 +1540,12 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
 
   // 4. Category matching
   const devResults = searchTools(TOOLS_REGISTRY, "developer");
-  assert.ok(devResults.length >= 2);
+  assert.ok(devResults.length >= 4);
   const devSlugs = devResults.map((r) => r.item.slug);
   assert.ok(devSlugs.includes("json-formatter"));
   assert.ok(devSlugs.includes("qr-code-generator"));
+  assert.ok(devSlugs.includes("password-generator"));
+  assert.ok(devSlugs.includes("base64-encoder-decoder"));
 
   // 5. Keyword & intent matching
   const combineResults = searchTools(TOOLS_REGISTRY, "combine");
@@ -1550,6 +1568,192 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
   const typoResults3 = searchTools(TOOLS_REGISTRY, "yt chapter");
   assert.ok(typoResults3.length >= 1);
   assert.equal(typoResults3[0]?.item.slug, "youtube-timestamp-formatter");
+
+  // 7. New Step 11 tools discovery
+  const passResults = searchTools(TOOLS_REGISTRY, "passwrd");
+  assert.ok(passResults.length >= 1);
+  assert.equal(passResults[0]?.item.slug, "password-generator");
+
+  const resizeResults = searchTools(TOOLS_REGISTRY, "resizer");
+  assert.ok(resizeResults.length >= 1);
+  assert.equal(resizeResults[0]?.item.slug, "image-resizer");
+
+  const base64Results = searchTools(TOOLS_REGISTRY, "base64");
+  assert.ok(base64Results.length >= 1);
+  assert.equal(base64Results[0]?.item.slug, "base64-encoder-decoder");
+
+  const percentResults = searchTools(TOOLS_REGISTRY, "percentage");
+  assert.ok(percentResults.length >= 1);
+  assert.equal(percentResults[0]?.item.slug, "percentage-calculator");
+});
+
+test("Step 11: Secure Password Generator", () => {
+  // 1. Default generation
+  const res = generateSecurePassword({ length: 16 });
+  assert.equal(res.error, undefined);
+  assert.equal(res.password.length, 16);
+
+  // 2. Character diversity check
+  const complex = generateSecurePassword({
+    length: 24,
+    includeUppercase: true,
+    includeLowercase: true,
+    includeNumbers: true,
+    includeSymbols: true,
+  });
+  assert.ok(/[A-Z]/.test(complex.password));
+  assert.ok(/[a-z]/.test(complex.password));
+  assert.ok(/[0-9]/.test(complex.password));
+  assert.ok(/[^A-Za-z0-9]/.test(complex.password));
+
+  // 3. Length boundaries (min 8, max 128)
+  const tooShort = generateSecurePassword({ length: 4 });
+  assert.equal(tooShort.password.length, 8); // clamped to min 8
+
+  const tooLong = generateSecurePassword({ length: 256 });
+  assert.equal(tooLong.password.length, 128); // clamped to max 128
+
+  // 4. Ambiguous character exclusion
+  const noAmbiguous = generateSecurePassword({
+    length: 32,
+    excludeAmbiguous: true,
+  });
+  assert.equal(/[Il1O0o|]/.test(noAmbiguous.password), false);
+
+  // 5. Invalid options (no character categories selected)
+  const invalid = generateSecurePassword({
+    includeUppercase: false,
+    includeLowercase: false,
+    includeNumbers: false,
+    includeSymbols: false,
+  });
+  assert.ok(invalid.error !== undefined);
+  assert.equal(invalid.password, "");
+
+  // 6. Strength evaluation
+  const weak = evaluatePasswordStrength("abc");
+  assert.ok(weak.score <= 1);
+  const strong = evaluatePasswordStrength(complex.password);
+  assert.ok(strong.score >= 3);
+  assert.ok(strong.entropyBits > 60);
+});
+
+test("Step 11: Image Resizer Logic", () => {
+  // 1. Aspect ratio calculation
+  const aspect1 = calculateAspectDimension(1920, 1080, 1280, undefined);
+  assert.equal(aspect1.width, 1280);
+  assert.equal(aspect1.height, 720);
+
+  const aspect2 = calculateAspectDimension(800, 600, undefined, 300);
+  assert.equal(aspect2.width, 400);
+  assert.equal(aspect2.height, 300);
+
+  // 2. Target dimension validation
+  assert.equal(validateTargetDimensions(1280, 720).valid, true);
+  assert.equal(validateTargetDimensions(0, 100).valid, false);
+  assert.equal(validateTargetDimensions(-50, 100).valid, false);
+  assert.equal(validateTargetDimensions(9000, 720).valid, false); // exceeds 8192px cap
+});
+
+test("Step 11: Base64 Encoder & Decoder", () => {
+  // 1. Standard ASCII encoding and decoding
+  const asciiText = "Hello World!";
+  const encodedAscii = encodeUtf8ToBase64(asciiText);
+  assert.equal(encodedAscii.success, true);
+  assert.equal(encodedAscii.output, "SGVsbG8gV29ybGQh");
+
+  const decodedAscii = decodeBase64ToUtf8(encodedAscii.output);
+  assert.equal(decodedAscii.success, true);
+  assert.equal(decodedAscii.output, asciiText);
+
+  // 2. Unicode and emoji roundtrip
+  const unicodeText = "OneToolHub 🚀 世界 €100";
+  const encodedUnicode = encodeUtf8ToBase64(unicodeText);
+  assert.equal(encodedUnicode.success, true);
+
+  const decodedUnicode = decodeBase64ToUtf8(encodedUnicode.output);
+  assert.equal(decodedUnicode.success, true);
+  assert.equal(decodedUnicode.output, unicodeText);
+
+  // 3. Empty input handling
+  assert.equal(encodeUtf8ToBase64("").output, "");
+  assert.equal(decodeBase64ToUtf8("").output, "");
+
+  // 4. Invalid Base64 error handling
+  const invalidBase64 = decodeBase64ToUtf8("ThisIsNotValidBase64!!!");
+  assert.equal(invalidBase64.success, false);
+  assert.ok(invalidBase64.error !== undefined);
+});
+
+test("Step 11: Percentage Calculator", () => {
+  // Mode 1: What is X% of Y?
+  const res1 = calculatePercentage({
+    mode: "what-is-x-percent-of-y",
+    valX: 15,
+    valY: 250,
+  });
+  assert.equal(res1.valid, true);
+  assert.equal(res1.value, 37.5);
+  assert.equal(res1.formattedResult, "37.5");
+
+  // Mode 2: X is what % of Y?
+  const res2 = calculatePercentage({
+    mode: "x-is-what-percent-of-y",
+    valX: 45,
+    valY: 180,
+  });
+  assert.equal(res2.valid, true);
+  assert.equal(res2.value, 25);
+  assert.equal(res2.formattedResult, "25%");
+
+  // Division by zero denominator
+  const resZero = calculatePercentage({
+    mode: "x-is-what-percent-of-y",
+    valX: 50,
+    valY: 0,
+  });
+  assert.equal(resZero.valid, false);
+  assert.ok(resZero.error?.includes("denominator"));
+
+  // Mode 3: Percentage increase / decrease
+  const inc = calculatePercentage({
+    mode: "percentage-change",
+    valX: 80,
+    valY: 100,
+  });
+  assert.equal(inc.valid, true);
+  assert.equal(inc.value, 25);
+  assert.equal(inc.direction, "increase");
+
+  const dec = calculatePercentage({
+    mode: "percentage-change",
+    valX: 100,
+    valY: 80,
+  });
+  assert.equal(dec.valid, true);
+  assert.equal(dec.value, -20);
+  assert.equal(dec.direction, "decrease");
+
+  // Mode 4: Add X% to Y (tax/markup)
+  const add = calculatePercentage({
+    mode: "add-x-percent-to-y",
+    valX: 10,
+    valY: 150,
+  });
+  assert.equal(add.valid, true);
+  assert.equal(add.value, 165);
+
+  // Mode 5: Subtract X% from Y (discount)
+  const sub = calculatePercentage({
+    mode: "subtract-x-percent-from-y",
+    valX: 20,
+    valY: 80,
+  });
+  assert.equal(sub.valid, true);
+  assert.equal(sub.value, 64);
+
+  // Helper formatting
+  assert.equal(formatPercentageNumber(12.34567, 2), "12.35");
 });
 
 

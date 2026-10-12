@@ -69,7 +69,7 @@ export function searchTools(
   rawQuery: string,
   options: SearchToolsOptions = {}
 ): SearchResultItem[] {
-  const { maxResults = 10, categoryId = 'all', availableOnly = false } = options;
+  const { maxResults = 50, categoryId = 'all', availableOnly = false } = options;
   const cleanQuery = (rawQuery || '').trim().toLowerCase();
 
   // Filter category and availability first

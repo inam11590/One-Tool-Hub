@@ -14,7 +14,11 @@ export type ToolIconName =
   | "FileText"
   | "GraduationCap"
   | "Receipt"
-  | "Files";
+  | "Files"
+  | "KeyRound"
+  | "Scaling"
+  | "Binary"
+  | "Percent";
 
 export type CategoryIconName =
   | "GraduationCap"

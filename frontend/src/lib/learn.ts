@@ -1196,6 +1196,476 @@ export const LEARN_ARTICLES: readonly LearnArticle[] = [
       ctaLabel: "Open PDF Merge & Split Tool",
     },
   },
+  {
+    slug: "how-to-generate-strong-passwords-safely",
+    title: "How to Generate Strong Passwords Safely",
+    seoTitle: "How to Generate Strong Passwords Safely — Cryptographic Entropy Guide",
+    metaDescription:
+      "Learn how to generate cryptographically secure passwords in your browser using crypto.getRandomValues(). Understand password entropy, modulo bias, and credential security.",
+    excerpt:
+      "Explore password entropy fundamentals, learn why Math.random() is unsafe for security, and discover how to create strong, random passwords locally without third-party exposure.",
+    categoryId: "developer-tutorials",
+    categoryLabel: "Developer Tutorials",
+    icon: "KeyRound",
+    readingTimeMinutes: 7,
+    publishedAt: "2026-10-12",
+    updatedAt: "2026-10-12",
+    featured: true,
+    primaryToolSlug: "password-generator",
+    relatedToolSlugs: ["base64-encoder-decoder", "qr-code-generator", "json-formatter"],
+    relatedArticleSlugs: ["how-to-format-and-validate-json", "how-base64-encoding-and-decoding-works"],
+    keywords: [
+      "generate strong passwords safely",
+      "password entropy guide",
+      "crypto getrandomvalues vs math random",
+      "prevent modulo bias in random passwords",
+      "client side secure password generator",
+    ],
+    introduction: [
+      "Standard programming random functions like JavaScript's Math.random() are Pseudo-Random Number Generators (PRNGs) designed for statistical uniformity in animations and games—not for security. Because their internal state can be deduced after observing a sequence of outputs, passwords generated with Math.random() are vulnerable to predictive attacks.",
+      "Cryptographically Secure Pseudo-Random Number Generators (CSPRNG), accessible in modern browsers via crypto.getRandomValues(), draw entropy from system hardware noise and kernel entropy pools. This makes succeeding outputs mathematically unpredictable even if an attacker inspects prior generations.",
+    ],
+    problemSolved: {
+      heading: "Why Predictable Passwords Threaten Online Accounts",
+      paragraphs: [
+        "Automated credential stuffing and offline dictionary attacks can cycle through billions of candidate hashes per second on modern GPUs. Short passwords with predictable substitutions like '@' for 'a' or '1' for 'i' are solved in mere seconds.",
+        "Generating passwords client-side using native cryptographic APIs ensures that high-entropy credentials are created without ever traversing the internet or being retained in server access logs.",
+      ],
+      keyTakeaways: [
+        "crypto.getRandomValues() provides true CSPRNG entropy derived from OS hardware randomness.",
+        "Character length contributes exponentially more entropy than symbol complexity alone.",
+        "Rejection sampling eliminates modulo bias across irregular character set sizes.",
+        "Client-side generation guarantees zero server logging or credential interception.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Select an Appropriate Length for Your Threat Model",
+        stepDescription:
+          "Aim for at least 16 characters for standard consumer logins, and 24 to 32 characters for critical credentials such as master email accounts and cloud API tokens.",
+        proTip: "Longer random strings offer superior resilience compared to shorter strings crammed with rare symbols.",
+      },
+      {
+        stepTitle: "Include Diverse Character Categories",
+        stepDescription:
+          "Enable uppercase letters, lowercase letters, digits, and punctuation symbols. This expands the character pool to 94 possible glyphs per character slot.",
+      },
+      {
+        stepTitle: "Exclude Visually Ambiguous Glyphs When Typing Manually",
+        stepDescription:
+          "If you need to enter the password on mobile devices, smart TVs, or console terminals, toggle 'Exclude Ambiguous Characters' to prevent confusing lowercase 'l' with uppercase 'I' or digit '1'.",
+      },
+      {
+        stepTitle: "Copy Generated Credentials Directly into an Encrypted Vault",
+        stepDescription:
+          "Never save raw passwords in unencrypted notes files or send them across messaging apps. Copy them immediately into a dedicated password manager.",
+      },
+    ],
+    practicalExample: {
+      title: "Generating a High-Entropy Master Secret for a Cloud Vault",
+      scenario: "Setting up a 24-character master passphrase with all character categories enabled.",
+      inputLabel: "Generator Configuration",
+      inputSample: "Length: 24, Upper, Lower, Numbers, Symbols, No Ambiguous",
+      outputLabel: "Sample Generated Password",
+      outputSample: "x7#Kq9$mP2*vL4~zW9#mR7!k",
+      explanation: "Contains mixed casing, digits, and punctuation with over 130 bits of cryptographic entropy, resistant to offline hash cracking.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Using Math.random() in custom scripts",
+        whyItHappens: "Developers unfamiliar with browser security assume all random functions provide equal randomness.",
+        howToFix: "Always use window.crypto.getRandomValues() when generating passwords, tokens, or encryption nonces.",
+      },
+      {
+        mistake: "Saving generated credentials in browser storage or plaintext files",
+        whyItHappens: "Users copy credentials into desktop scratchpads for temporary convenience.",
+        howToFix: "Copy newly generated passwords directly into an encrypted password manager or identity vault.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Website rejects symbols during registration",
+        solution: "Some legacy login forms limit accepted symbols. Uncheck the 'Symbols' box and increase length to 20+ characters to maintain high entropy.",
+      },
+      {
+        symptom: "Copy button does not trigger clipboard paste",
+        solution: "Check browser clipboard permissions or manually highlight and copy the generated password string.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Are generated passwords sent across the internet to OneToolHub servers?",
+        answer: "No. The password generator executes 100% on your device using native browser Web Crypto primitives. No passwords or parameters are ever transmitted or saved.",
+      },
+      {
+        question: "How many characters should a master password have?",
+        answer: "For master vaults and cloud administrative credentials, we recommend a minimum of 20 to 32 characters.",
+      },
+      {
+        question: "What is modulo bias and why does it matter?",
+        answer: "Modulo bias occurs when mapping a range of random bytes (0-255) into a non-factor alphabet size, making lower-indexed characters slightly more probable. Our generator uses rejection sampling to eliminate this bias completely.",
+      },
+    ],
+    conclusion: {
+      heading: "Build High-Entropy Credentials with Zero-Knowledge Tools",
+      paragraphs: [
+        "Strong passwords protect your digital identity across personal and professional accounts. By leveraging client-side CSPRNGs and ample character lengths, you eliminate vulnerability to brute-force credential stuffing.",
+      ],
+      ctaLabel: "Open Secure Password Generator",
+    },
+  },
+  {
+    slug: "how-to-resize-images-without-unnecessary-quality-loss",
+    title: "How to Resize Images Without Unnecessary Quality Loss",
+    seoTitle: "How to Resize Images Without Quality Loss — Resolution & Aspect Ratio Guide",
+    metaDescription:
+      "Learn how to resize PNG, JPEG, and WebP images to exact pixel dimensions without distortion or blurring. Master aspect ratio locking and downscaling techniques.",
+    excerpt:
+      "Understand pixel dimensions, bicubic canvas scaling, aspect ratio preservation, and how to downscale photographs for web publication without artifacting.",
+    categoryId: "image-pdf-guides",
+    categoryLabel: "Image & PDF Guides",
+    icon: "Scaling",
+    readingTimeMinutes: 6,
+    publishedAt: "2026-10-12",
+    updatedAt: "2026-10-12",
+    featured: true,
+    primaryToolSlug: "image-resizer",
+    relatedToolSlugs: ["image-compressor", "youtube-timestamp-formatter", "qr-code-generator"],
+    relatedArticleSlugs: ["how-to-compress-images-for-web", "how-to-format-and-validate-json"],
+    keywords: [
+      "resize images without quality loss",
+      "lock aspect ratio image resizer",
+      "downscale photos for web",
+      "resize webp jpeg png online",
+      "image dimension scaling guide",
+    ],
+    introduction: [
+      "Downscaling an image involves reducing the total number of pixels by blending adjacent pixel values using interpolation algorithms such as high-quality bicubic resampling. Because high-resolution source data is condensed into fewer pixels, downscaled images typically look sharp and crisp.",
+      "Upscaling, on the other hand, requires an algorithm to invent pixel data that does not exist in the source file. While smoothing filters prevent pixelation, upscaling cannot reconstruct genuine high-frequency detail. Whenever possible, always resize from a high-resolution master image down to your desired display dimensions.",
+    ],
+    problemSolved: {
+      heading: "Why Oversized and Distorted Images Degrade User Experience",
+      paragraphs: [
+        "Uploading high-resolution 4K or 12-megapixel smartphone photos directly to web pages drastically inflates load times, consumes mobile user bandwidth, and triggers poor Core Web Vitals scores.",
+        "Furthermore, arbitrarily altering width and height without locking proportions squashes or stretches subjects, producing amateurish visual artifacts.",
+      ],
+      keyTakeaways: [
+        "Always lock aspect ratio when resizing to maintain natural proportions.",
+        "Downscaling preserves perceived sharpness, while upscaling softens fine details.",
+        "HTML5 Canvas bicubic interpolation produces smooth, artifact-free edges.",
+        "Client-side image processing protects user privacy and reduces cloud upload latency.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Upload Your Original Source File",
+        stepDescription:
+          "Select a high-resolution JPEG, PNG, or WebP graphic. The tool immediately reads and displays native pixel dimensions.",
+      },
+      {
+        stepTitle: "Define Target Width and Height",
+        stepDescription:
+          "Enter your target width or height. Ensure 'Aspect Ratio Locked' is checked unless intentional non-uniform stretching is required.",
+        proTip: "Use one of the common presets (e.g. 1280×720 for YouTube or 1920×1080 for HD) for one-click standard sizing.",
+      },
+      {
+        stepTitle: "Select Export Format and Quality",
+        stepDescription:
+          "Choose modern WebP for general web publishing, PNG if transparent layers must be retained, or JPEG for general photography.",
+      },
+      {
+        stepTitle: "Preview Dimensions and Download",
+        stepDescription:
+          "Verify the calculated dimensions in the live preview and click Download to save the scaled image directly to your local disk.",
+      },
+    ],
+    practicalExample: {
+      title: "Downscaling a 4K Photograph for a Web Hero Banner",
+      scenario: "Preparing a 3840×2160 pixel camera upload for a 1280×720 YouTube video thumbnail or web header.",
+      inputLabel: "Original Camera Master",
+      inputSample: "3840×2160 px JPEG (6.4 MB)",
+      outputLabel: "Optimized Output",
+      outputSample: "1280×720 px WebP (~110 KB)",
+      explanation: "Maintains exact 16:9 proportions while shedding over 95% of unnecessary raw file weight with crisp visual fidelity.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Unlocking aspect ratio and creating distorted faces or text",
+        whyItHappens: "Users manually enter arbitrary width and height values without checking original proportions.",
+        howToFix: "Keep aspect ratio locking enabled so height adjusts automatically as width changes.",
+      },
+      {
+        mistake: "Upscaling low-resolution thumbnails to print dimensions",
+        whyItHappens: "Expecting digital tools to magically generate missing detail from heavily pixelated sources.",
+        howToFix: "Always source high-resolution raw assets before downsizing to final layout dimensions.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Exported JPEG has a black background where transparency was",
+        solution: "JPEG does not support alpha channels. Select WebP or PNG format to preserve transparent backgrounds.",
+      },
+      {
+        symptom: "Image appears blurry after drastic downscaling",
+        solution: "Ensure you are using the high-quality smoothing mode and avoid repeatedly resizing an already compressed file.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Does resizing photos locally in the browser preserve privacy?",
+        answer: "Yes. Processing occurs in an HTML5 Canvas element entirely in browser memory. No graphic data is uploaded to remote servers.",
+      },
+      {
+        question: "Which format should I choose: WebP, PNG, or JPEG?",
+        answer: "WebP offers the best modern web compression with transparency support. Choose PNG for lossless graphics with text, and JPEG for universal photographic compatibility.",
+      },
+      {
+        question: "What is the maximum image resolution supported?",
+        answer: "The browser resizer supports photos up to 100 megapixels or 25 MB depending on your device's available RAM.",
+      },
+    ],
+    conclusion: {
+      heading: "Scale Graphics with Precision and High Visual Fidelity",
+      paragraphs: [
+        "Properly sized images ensure fast page loads, sharp displays, and professional presentation across all digital platforms.",
+      ],
+      ctaLabel: "Open Image Resizer Tool",
+    },
+  },
+  {
+    slug: "how-base64-encoding-and-decoding-works",
+    title: "How Base64 Encoding and Decoding Works",
+    seoTitle: "How Base64 Encoding and Decoding Works — Complete Developer Guide",
+    metaDescription:
+      "Understand Base64 encoding and decoding mechanisms. Learn how 8-bit binary data maps to 6-bit ASCII characters, handles padding, and why Base64 is not encryption.",
+    excerpt:
+      "Master the mechanics of Base64 encoding. Understand bit grouping, ASCII character tables, padding rules, and UTF-8 multi-byte Unicode handling.",
+    categoryId: "developer-tutorials",
+    categoryLabel: "Developer Tutorials",
+    icon: "Binary",
+    readingTimeMinutes: 7,
+    publishedAt: "2026-10-12",
+    updatedAt: "2026-10-12",
+    featured: true,
+    primaryToolSlug: "base64-encoder-decoder",
+    relatedToolSlugs: ["json-formatter", "password-generator", "qr-code-generator"],
+    relatedArticleSlugs: ["how-to-format-and-validate-json", "how-to-generate-strong-passwords-safely"],
+    keywords: [
+      "how base64 encoding works",
+      "base64 decoding tutorial",
+      "base64 padding equals sign explained",
+      "utf8 unicode base64 in browser",
+      "why base64 is not encryption",
+    ],
+    introduction: [
+      "Legacy network protocols like SMTP email and early HTTP transmission channels were designed strictly for 7-bit ASCII text. When arbitrary 8-bit binary data (such as images, compressed archives, or compiled binaries) was transmitted across these channels, control characters could be dropped or corrupted.",
+      "Base64 solves this by taking every 3 bytes (24 bits) of raw data and splitting them into 4 groups of 6 bits each. Each 6-bit value (ranging from 0 to 63) maps directly to one of 64 universally safe printable ASCII characters: A–Z, a–z, 0–9, '+', and '/'.",
+    ],
+    problemSolved: {
+      heading: "Why Raw Binary Data Cannot Travel Across 7-Bit ASCII Text Channels",
+      paragraphs: [
+        "Transmitting binary files across text-first protocols often results in character truncation or unintended line wrap insertion by intermediary mail transfer agents and proxy gateways.",
+        "Base64 converts arbitrary byte sequences into safe, printable ASCII characters, enabling inline data URIs in CSS and HTML, JSON payload attachments, and credential token encoding.",
+      ],
+      keyTakeaways: [
+        "Base64 maps 3 bytes (24 bits) into 4 printable ASCII characters (6 bits each).",
+        "Encoded data increases by approximately 33% in total byte length.",
+        "Trailing '=' characters indicate padding when input byte lengths are not multiples of three.",
+        "Base64 is an encoding format for safe transport, not an encryption method for data confidentiality.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Convert Characters to UTF-8 Byte Sequences",
+        stepDescription:
+          "Modern text contains emojis, accented characters, and CJK ideographs that require 2 to 4 bytes per character. Standard browser TextEncoder ensures proper byte translation.",
+      },
+      {
+        stepTitle: "Group Bits and Map to Base64 Alphabet",
+        stepDescription:
+          "The byte sequence is sliced into 6-bit integers and translated into standard printable ASCII characters.",
+      },
+      {
+        stepTitle: "Apply Appropriate Padding Where Necessary",
+        stepDescription:
+          "If the remaining bytes are not divisible by three, append one or two '=' characters so decoders can compute exact byte counts.",
+      },
+      {
+        stepTitle: "Decode and Verify Integrity",
+        stepDescription:
+          "Reverse the process by mapping ASCII glyphs back to 6-bit chunks, reconstructing original 8-bit bytes, and decoding UTF-8 strings via TextDecoder.",
+      },
+    ],
+    practicalExample: {
+      title: "Encoding Unicode String with International Emojis",
+      scenario: "Encoding the string 'OneToolHub 🚀' into safe ASCII Base64 format.",
+      inputLabel: "Plain Text",
+      inputSample: "OneToolHub 🚀",
+      outputLabel: "Base64 Output",
+      outputSample: "T25lVG9vbEh1YiDwn5qA",
+      explanation: "Properly slices 15 UTF-8 bytes into 20 Base64 characters, preserving the 4-byte UTF-8 sequence of the rocket emoji.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Treating Base64 as encryption or security protection",
+        whyItHappens: "Because encoded output appears scrambled, beginners confuse encoding with cryptographic hashing or encryption.",
+        howToFix: "Never store credentials or sensitive tokens in Base64 without authenticated encryption (e.g. AES-GCM).",
+      },
+      {
+        mistake: "Using naive btoa() on multi-byte Unicode strings",
+        whyItHappens: "JavaScript's native btoa() throws an error when encountered with character codes above 255.",
+        howToFix: "Use TextEncoder or encodeURIComponent byte mapping before calling btoa().",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Decoder throws 'Invalid Character' error",
+        solution: "Check for non-base64 characters, unescaped whitespace, or missing trailing padding '=' characters.",
+      },
+      {
+        symptom: "Decoded output shows question marks or replacement characters",
+        solution: "Verify that the input was decoded using UTF-8 rather than Latin-1 or ASCII encoding.",
+      },
+    ],
+    faqs: [
+      {
+        question: "How much larger is a Base64 string compared to the original binary file?",
+        answer: "Base64 increases data size by approximately 33% (every 3 bytes expand into 4 bytes, plus potential padding).",
+      },
+      {
+        question: "Why does Base64 sometimes end with one or two '=' signs?",
+        answer: "The equals sign '=' represents padding to make the total number of characters a multiple of 4 when the input byte length was not a multiple of 3.",
+      },
+      {
+        question: "What is URL-safe Base64?",
+        answer: "Standard Base64 uses '+' and '/', which have special meanings in URL query strings. URL-safe Base64 replaces '+' with '-' and '/' with '_'.",
+      },
+    ],
+    conclusion: {
+      heading: "Reliable Data Serialization Across Text Protocols",
+      paragraphs: [
+        "Understanding Base64 encoding allows you to debug API payloads, inspect data URIs, and transmit binary data reliably.",
+      ],
+      ctaLabel: "Open Base64 Encoder & Decoder",
+    },
+  },
+  {
+    slug: "how-to-calculate-percentages-increases-and-decreases",
+    title: "How to Calculate Percentages, Increases, and Decreases",
+    seoTitle: "How to Calculate Percentages, Increases, and Decreases — Practical Guide",
+    metaDescription:
+      "Master essential percentage formulas for academic, freelance, and everyday calculations. Learn how to calculate percentage shares, markups, discounts, and growth rates.",
+    excerpt:
+      "A comprehensive walkthrough of fundamental percentage mathematics. Learn formulas for discounts, sales tax, percentage changes, and relative comparisons.",
+    categoryId: "student-resources",
+    categoryLabel: "Student Resources",
+    icon: "Percent",
+    readingTimeMinutes: 6,
+    publishedAt: "2026-10-12",
+    updatedAt: "2026-10-12",
+    featured: true,
+    primaryToolSlug: "percentage-calculator",
+    relatedToolSlugs: ["gpa-calculator", "invoice-generator", "word-counter"],
+    relatedArticleSlugs: ["how-to-calculate-gpa-weighted-unweighted", "how-to-create-freelance-invoices"],
+    keywords: [
+      "how to calculate percentages",
+      "percentage increase decrease formula",
+      "calculate discount percentage",
+      "math percentage guide students",
+      "percentage change calculation",
+    ],
+    introduction: [
+      "The word 'percent' originates from the Latin 'per centum', meaning 'by the hundred'. A percentage is simply a ratio or fraction expressed with a denominator of 100. For example, 25% represents 25 parts out of 100, which simplifies to the decimal 0.25 or the fraction 1/4.",
+      "Because percentages normalize different numbers onto a common scale of 100, they allow meaningful comparison across quantities of vastly different sizes, whether measuring grade point averages, ecommerce discounts, or annual inflation.",
+    ],
+    problemSolved: {
+      heading: "Why Percentage Calculations Cause Expensive Real-World Errors",
+      paragraphs: [
+        "Applying markups and discounts in the wrong sequential order or dividing by the wrong baseline value frequently causes costly accounting errors for freelancers and confusion for students.",
+        "Understanding the exact algebraic formulas for percentage changes, ratios, and differences guarantees accurate financial projections and error-free invoices.",
+      ],
+      keyTakeaways: [
+        "Always divide by the original starting baseline when calculating percentage increase or decrease.",
+        "Discounts and price increases do not cancel each other out symmetrically.",
+        "Convert percentage rates to decimals by dividing by 100 prior to multiplication.",
+        "Percentage points and percentage changes measure fundamentally different quantities.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Identify Your Known Values and Mathematical Mode",
+        stepDescription:
+          "Determine whether you are finding a portion of a whole, calculating a discount, adding a markup, or measuring relative growth between two periods.",
+      },
+      {
+        stepTitle: "Convert Percentages to Decimals When Calculating",
+        stepDescription:
+          "Divide percentage values by 100 before multiplying. For example, 7.5% becomes 0.075.",
+      },
+      {
+        stepTitle: "Watch for Baseline Value Pitfalls",
+        stepDescription:
+          "When calculating percentage increase or decrease, always divide by the original starting value—never the final value.",
+      },
+      {
+        stepTitle: "Check for Compounding Sequence Effects",
+        stepDescription:
+          "When calculating discounts followed by sales tax, calculate the discount on original price first, then apply sales tax to the discounted net total.",
+      },
+    ],
+    practicalExample: {
+      title: "Calculating a Store Sale Discount and Net Final Price",
+      scenario: "A retail jacket originally priced at $80 is marked 25% off.",
+      inputLabel: "Original Price and Discount Rate",
+      inputSample: "Original: $80, Discount: 25%",
+      outputLabel: "Calculation & Final Price",
+      outputSample: "Discount = $20, Final Price = $60",
+      explanation: "80 × 0.25 = $20 discount. Subtracting $20 from $80 yields an exact net checkout price of $60.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Dividing by the final value instead of the original value in percentage change",
+        whyItHappens: "Confusion over which number represents the baseline.",
+        howToFix: "Always use the formula ((New - Old) / Old) × 100.",
+      },
+      {
+        mistake: "Assuming a 20% increase followed by a 20% decrease returns to the starting value",
+        whyItHappens: "The second percentage is calculated against the newly increased base.",
+        howToFix: "Remember that percentages compound; $100 increased by 20% is $120, but $120 decreased by 20% ($24) leaves $96.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Calculator shows 'Undefined' error",
+        solution: "Division by zero is mathematically impossible. Ensure your denominator or initial baseline value is not 0.",
+      },
+      {
+        symptom: "Result shows unexpected negative sign",
+        solution: "A negative percentage change indicates a decrease from the initial baseline value.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Can percentages be negative?",
+        answer: "Yes. In percentage change calculations, a negative result indicates a decrease from the initial baseline.",
+      },
+      {
+        question: "What is the difference between a percentage and a percentage point?",
+        answer: "A percentage point is the simple arithmetic difference between two percentages (e.g., from 10% to 15% is a 5 percentage point increase, but a 50% relative increase).",
+      },
+      {
+        question: "How do I calculate what percentage of X is Y?",
+        answer: "Use the formula (Y / X) × 100. For example, to find what percentage of 50 is 25, compute (25 / 50) × 100 = 50%.",
+      },
+    ],
+    conclusion: {
+      heading: "Master Real-World Math with Confidence and Speed",
+      paragraphs: [
+        "Understanding percentage calculations allows you to audit invoices, evaluate store promotions, and measure analytical growth accurately.",
+      ],
+      ctaLabel: "Open Percentage Calculator",
+    },
+  },
 ] as const;
 
 export function getArticleBySlug(slug: string): LearnArticle | undefined {
