@@ -25,6 +25,10 @@ export const VALID_TOOL_SLUGS = [
   "image-resizer",
   "base64-encoder-decoder",
   "percentage-calculator",
+  "pdf-to-image",
+  "image-to-pdf",
+  "pdf-organizer",
+  "pdf-watermark",
 ] as const;
 
 export type ValidToolSlug = (typeof VALID_TOOL_SLUGS)[number];

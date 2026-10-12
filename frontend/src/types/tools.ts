@@ -18,7 +18,11 @@ export type ToolIconName =
   | "KeyRound"
   | "Scaling"
   | "Binary"
-  | "Percent";
+  | "Percent"
+  | "FileImage"
+  | "Images"
+  | "Layers"
+  | "Stamp";
 
 export type CategoryIconName =
   | "GraduationCap"

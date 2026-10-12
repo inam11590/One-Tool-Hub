@@ -18,6 +18,10 @@ import {
   Scaling,
   Binary,
   Percent,
+  FileImage,
+  Images,
+  Layers,
+  Stamp,
   type LucideProps,
 } from "lucide-react";
 import type { CategoryIconName, ToolIconName } from "@/types/tools";
@@ -51,6 +55,14 @@ export function ToolIcon({
       return <Binary {...props} />;
     case "Percent":
       return <Percent {...props} />;
+    case "FileImage":
+      return <FileImage {...props} />;
+    case "Images":
+      return <Images {...props} />;
+    case "Layers":
+      return <Layers {...props} />;
+    case "Stamp":
+      return <Stamp {...props} />;
   }
 }
 

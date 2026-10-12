@@ -95,6 +95,25 @@ import {
   formatPercentageNumber,
 } from "./percentage-calculator.ts";
 import {
+  validatePdfForConversion,
+} from "./pdf-to-image.ts";
+import {
+  validateImageForPdf,
+  generatePdfFromImages,
+} from "./image-to-pdf.ts";
+import {
+  reorderPages,
+  rotatePage,
+  rotateAllPages,
+  deletePage,
+  exportOrganizedPdf,
+  type OrganizerPageItem,
+} from "./pdf-organizer.ts";
+import {
+  hexToPdfRgb,
+  applyWatermarkToPdf,
+} from "./pdf-watermark.ts";
+import {
   classifyErrorCategory,
   getErrorMonitoringConfig,
   getFriendlyBoundaryErrorMessage,
@@ -1142,7 +1161,7 @@ test("Step 6 Production SEO: resolves https://one-tool-hub-sooty.vercel.app on V
 // ============================================================================
 test("Step 7 Learning Center Content Integrity: verifies complete tutorials, unique metadata, and 1-to-1 tool coverage", () => {
   assert.equal(LEARN_CATEGORIES.length, 5);
-  assert.equal(LEARN_ARTICLES.length, 12);
+  assert.equal(LEARN_ARTICLES.length, 16);
 
   const slugs = new Set<string>();
   const titles = new Set<string>();
@@ -1197,14 +1216,14 @@ test("Step 7 Learning Center Content Integrity: verifies complete tutorials, uni
     assert.ok(article.relatedArticleSlugs.length >= 2);
   }
 
-  // All 12 tools have a dedicated companion tutorial
-  assert.equal(primaryToolsCovered.size, 12);
+  // All 16 tools have a dedicated companion tutorial
+  assert.equal(primaryToolsCovered.size, 16);
 });
 
 test("Step 7 Search, Category Filtering, Internal Linking & Article JSON-LD: validates directory filters and structured data", () => {
   // Search and category filtering
   const allResults = filterArticles(LEARN_ARTICLES, "", "all");
-  assert.equal(allResults.length, 12);
+  assert.equal(allResults.length, 16);
 
   const devCategoryResults = filterArticles(
     LEARN_ARTICLES,
@@ -1529,9 +1548,9 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
   assert.equal(levenshteinDistance("conpress", "compress"), 1);
   assert.equal(levenshteinDistance("kitten", "sitting"), 3);
 
-  // 2. Empty query returns all tools (12 available tools)
+  // 2. Empty query returns all tools (16 available tools)
   const allResults = searchTools(TOOLS_REGISTRY, "");
-  assert.equal(allResults.length, 12);
+  assert.equal(allResults.length, 16);
 
   // 3. Exact matching by tool name
   const jsonResults = searchTools(TOOLS_REGISTRY, "JSON");
@@ -1569,7 +1588,7 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
   assert.ok(typoResults3.length >= 1);
   assert.equal(typoResults3[0]?.item.slug, "youtube-timestamp-formatter");
 
-  // 7. New Step 11 tools discovery
+  // 7. Step 11 tools discovery
   const passResults = searchTools(TOOLS_REGISTRY, "passwrd");
   assert.ok(passResults.length >= 1);
   assert.equal(passResults[0]?.item.slug, "password-generator");
@@ -1585,6 +1604,23 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
   const percentResults = searchTools(TOOLS_REGISTRY, "percentage");
   assert.ok(percentResults.length >= 1);
   assert.equal(percentResults[0]?.item.slug, "percentage-calculator");
+
+  // 8. Step 12 PDF tools discovery
+  const pdfToImgRes = searchTools(TOOLS_REGISTRY, "pdf to jpg");
+  assert.ok(pdfToImgRes.length >= 1);
+  assert.equal(pdfToImgRes[0]?.item.slug, "pdf-to-image");
+
+  const imgToPdfRes = searchTools(TOOLS_REGISTRY, "image to pdf");
+  assert.ok(imgToPdfRes.length >= 1);
+  assert.equal(imgToPdfRes[0]?.item.slug, "image-to-pdf");
+
+  const orgRes = searchTools(TOOLS_REGISTRY, "organizer");
+  assert.ok(orgRes.length >= 1);
+  assert.equal(orgRes[0]?.item.slug, "pdf-organizer");
+
+  const wmRes = searchTools(TOOLS_REGISTRY, "watermark");
+  assert.ok(wmRes.length >= 1);
+  assert.equal(wmRes[0]?.item.slug, "pdf-watermark");
 });
 
 test("Step 11: Secure Password Generator", () => {
@@ -1755,6 +1791,218 @@ test("Step 11: Percentage Calculator", () => {
   // Helper formatting
   assert.equal(formatPercentageNumber(12.34567, 2), "12.35");
 });
+
+// ============================================================================
+// STEP 12: Advanced PDF & Document Utilities
+// ============================================================================
+
+test("Step 12: PDF to Image Validation & Config", () => {
+  // 1. File type and name validation
+  const validFile = { name: "contract.pdf", size: 1024 * 500, type: "application/pdf" };
+  assert.equal(validatePdfForConversion(validFile).valid, true);
+
+  const invalidExt = { name: "photo.png", size: 1024 * 500, type: "image/png" };
+  assert.equal(validatePdfForConversion(invalidExt).valid, false);
+
+  const emptyFile = { name: "empty.pdf", size: 0, type: "application/pdf" };
+  assert.equal(validatePdfForConversion(emptyFile).valid, false);
+
+  const oversized = { name: "huge.pdf", size: 60 * 1024 * 1024, type: "application/pdf" };
+  assert.equal(validatePdfForConversion(oversized).valid, false);
+
+  // 2. Magic header validation
+  const validBytes = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x35]); // %PDF-1.5
+  assert.equal(validatePdfForConversion(validFile, validBytes).valid, true);
+
+  const corruptedBytes = new Uint8Array([0x00, 0x11, 0x22, 0x33, 0x44]);
+  assert.equal(validatePdfForConversion(validFile, corruptedBytes).valid, false);
+});
+
+test("Step 12: Image to PDF Converter Logic", async () => {
+  // 1. Image validation
+  assert.equal(validateImageForPdf({ name: "scan.jpg", size: 5000, type: "image/jpeg" }).valid, true);
+  assert.equal(validateImageForPdf({ name: "diagram.png", size: 5000, type: "image/png" }).valid, true);
+  assert.equal(validateImageForPdf({ name: "photo.webp", size: 5000, type: "image/webp" }).valid, true);
+  assert.equal(validateImageForPdf({ name: "notes.txt", size: 5000, type: "text/plain" }).valid, false);
+  assert.equal(validateImageForPdf({ name: "empty.jpg", size: 0 }).valid, false);
+  assert.equal(validateImageForPdf({ name: "giant.jpg", size: 35 * 1024 * 1024 }).valid, false);
+
+  // 2. Multi-image PDF creation
+  // Minimal 1x1 transparent PNG byte stream
+  const png1x1 = new Uint8Array([
+    137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0,
+    0, 1, 8, 6, 0, 0, 0, 31, 21, 196, 137, 0, 0, 0, 13, 73, 68, 65, 84, 120, 156,
+    99, 96, 0, 0, 0, 2, 0, 1, 229, 39, 188, 70, 0, 0, 0, 0, 73, 69, 78, 68, 174,
+    66, 96, 130,
+  ]);
+
+  const items = [
+    {
+      id: "img-1",
+      name: "page1.png",
+      size: png1x1.byteLength,
+      type: "image/png",
+      bytes: png1x1,
+      objectUrl: "",
+      width: 1,
+      height: 1,
+    },
+    {
+      id: "img-2",
+      name: "page2.png",
+      size: png1x1.byteLength,
+      type: "image/png",
+      bytes: png1x1,
+      objectUrl: "",
+      width: 1,
+      height: 1,
+    },
+  ];
+
+  const pdfOutput = await generatePdfFromImages(items, {
+    pageSize: "a4",
+    orientation: "portrait",
+    margin: "small",
+    layoutMode: "fit",
+    outputFileName: "combined.pdf",
+  });
+
+  assert.equal(pdfOutput.pageCount, 2);
+  assert.equal(pdfOutput.fileName, "combined.pdf");
+  assert.ok(pdfOutput.bytes.byteLength > 500);
+
+  // Verify resulting document structure with pdf-lib
+  const parsed = await PDFDocument.load(pdfOutput.bytes);
+  assert.equal(parsed.getPageCount(), 2);
+  const p1 = parsed.getPage(0);
+  assert.equal(Math.round(p1.getWidth()), 595); // A4 width
+});
+
+test("Step 12: PDF Page Organizer Logic", async () => {
+  const dummyPages: OrganizerPageItem[] = [
+    { id: "1", originalIndex: 0, displayNumber: 1, rotationDegrees: 0 },
+    { id: "2", originalIndex: 1, displayNumber: 2, rotationDegrees: 0 },
+    { id: "3", originalIndex: 2, displayNumber: 3, rotationDegrees: 0 },
+  ];
+
+  // 1. Reordering
+  const moved = reorderPages(dummyPages, 0, 2);
+  assert.equal(moved[0]?.displayNumber, 2);
+  assert.equal(moved[1]?.displayNumber, 3);
+  assert.equal(moved[2]?.displayNumber, 1);
+
+  // 2. Rotation
+  const rot1 = rotatePage(dummyPages, 0, 90);
+  assert.equal(rot1[0]?.rotationDegrees, 90);
+  const rot2 = rotatePage(rot1, 0, 90);
+  assert.equal(rot2[0]?.rotationDegrees, 180);
+  const rot3 = rotatePage(rot2, 0, -90);
+  assert.equal(rot3[0]?.rotationDegrees, 90);
+
+  const rotAll = rotateAllPages(dummyPages, 90);
+  assert.equal(rotAll[0]?.rotationDegrees, 90);
+  assert.equal(rotAll[1]?.rotationDegrees, 90);
+  assert.equal(rotAll[2]?.rotationDegrees, 90);
+
+  // 3. Deletion with guard
+  const delSuccess = deletePage(dummyPages, 1);
+  assert.equal(delSuccess.deleted, true);
+  assert.equal(delSuccess.pages.length, 2);
+
+  const singlePageList = [dummyPages[0]!];
+  const delBlocked = deletePage(singlePageList, 0);
+  assert.equal(delBlocked.deleted, false);
+  assert.ok(delBlocked.error?.includes("at least one page"));
+
+  // 4. Export Organized PDF
+  const testPdf = await PDFDocument.create();
+  testPdf.addPage([400, 400]);
+  testPdf.addPage([500, 500]);
+  testPdf.addPage([600, 600]);
+  const originalBytes = await testPdf.save();
+
+  const organized = await exportOrganizedPdf(
+    originalBytes,
+    [
+      { id: "p3", originalIndex: 2, displayNumber: 3, rotationDegrees: 90 },
+      { id: "p1", originalIndex: 0, displayNumber: 1, rotationDegrees: 0 },
+    ],
+    "reordered.pdf"
+  );
+
+  assert.equal(organized.pageCount, 2);
+  assert.equal(organized.fileName, "reordered.pdf");
+
+  const verifyDoc = await PDFDocument.load(organized.bytes);
+  assert.equal(verifyDoc.getPageCount(), 2);
+  assert.equal(verifyDoc.getPage(0).getRotation().angle, 90);
+});
+
+test("Step 12: PDF Watermark Tool Logic", async () => {
+  // 1. Color parsing
+  const red = hexToPdfRgb("#ef4444");
+  assert.ok(red.red > 0.8);
+  assert.ok(red.green < 0.4);
+
+  const black = hexToPdfRgb("#000000");
+  assert.equal(black.red, 0);
+  assert.equal(black.green, 0);
+  assert.equal(black.blue, 0);
+
+  const threeDigit = hexToPdfRgb("#fff");
+  assert.equal(threeDigit.red, 1);
+
+  // 2. Watermark Application
+  const testDoc = await PDFDocument.create();
+  testDoc.addPage([600, 800]);
+  testDoc.addPage([600, 800]);
+  const pdfBytes = await testDoc.save();
+
+  // Apply Center Watermark
+  const watermarked = await applyWatermarkToPdf(
+    pdfBytes,
+    {
+      text: "CONFIDENTIAL",
+      fontSize: 48,
+      fontFamily: "HelveticaBold",
+      colorHex: "#ef4444",
+      opacity: 0.3,
+      rotationDegrees: -45,
+      position: "center",
+      pageSelection: "all",
+    },
+    "marked.pdf"
+  );
+
+  assert.equal(watermarked.pageCount, 2);
+  assert.equal(watermarked.fileName, "marked.pdf");
+  assert.ok(watermarked.bytes.byteLength > pdfBytes.byteLength);
+
+  // Verify result is a valid loadable PDF
+  const loaded = await PDFDocument.load(watermarked.bytes);
+  assert.equal(loaded.getPageCount(), 2);
+
+  // Apply Tiled Watermark to single page range
+  const tiled = await applyWatermarkToPdf(
+    pdfBytes,
+    {
+      text: "DRAFT",
+      fontSize: 24,
+      fontFamily: "Helvetica",
+      colorHex: "#6b7280",
+      opacity: 0.2,
+      rotationDegrees: -30,
+      position: "tile",
+      pageSelection: "custom",
+      customPagesString: "1",
+    },
+    "tiled.pdf"
+  );
+  assert.equal(tiled.pageCount, 2);
+  const loadedTiled = await PDFDocument.load(tiled.bytes);
+  assert.equal(loadedTiled.getPageCount(), 2);
+});
+
 
 
 
