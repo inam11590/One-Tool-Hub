@@ -2614,3 +2614,111 @@ test("Step 16: Web Vitals RUM Thresholds & Privacy Safety", async () => {
   assert.equal(rateWebVital("FCP", 1400), "good");
 });
 
+test("Step 17: Internationalization Config, Path Resolution & Translation Dictionaries", async () => {
+  const {
+    LOCALES,
+    DEFAULT_LOCALE,
+    SUPPORTED_LOCALES,
+    getLocaleFromPathname,
+    formatLocalizedPath,
+  } = await import("../i18n/config.ts");
+  const { getDictionary } = await import("../i18n/index.ts");
+  const { UR_TOOLS_MAP } = await import("../i18n/tools-ur.ts");
+
+  // 1. Locale Config Integrity
+  assert.equal(DEFAULT_LOCALE, "en");
+  assert.deepEqual([...SUPPORTED_LOCALES], ["en", "ur"]);
+  assert.equal(LOCALES.en.dir, "ltr");
+  assert.equal(LOCALES.ur.dir, "rtl");
+  assert.equal(LOCALES.ur.nativeName, "اردو");
+
+  // 2. Pathname Resolution
+  assert.equal(getLocaleFromPathname("/"), "en");
+  assert.equal(getLocaleFromPathname("/tools"), "en");
+  assert.equal(getLocaleFromPathname("/tools/json-formatter"), "en");
+  assert.equal(getLocaleFromPathname("/ur"), "ur");
+  assert.equal(getLocaleFromPathname("/ur/tools"), "ur");
+  assert.equal(getLocaleFromPathname("/ur/tools/json-formatter"), "ur");
+
+  // 3. Bidirectional Path Formatting
+  assert.equal(formatLocalizedPath("/", "ur"), "/ur");
+  assert.equal(formatLocalizedPath("/tools", "ur"), "/ur/tools");
+  assert.equal(formatLocalizedPath("/tools/json-formatter", "ur"), "/ur/tools/json-formatter");
+  assert.equal(formatLocalizedPath("/ur/tools/json-formatter", "en"), "/tools/json-formatter");
+  assert.equal(formatLocalizedPath("/ur", "en"), "/");
+
+  // 4. Dictionaries Completeness
+  const enDict = getDictionary("en");
+  const urDict = getDictionary("ur");
+  assert.ok(enDict.common.siteName);
+  assert.ok(urDict.common.siteName);
+  assert.equal(urDict.common.siteName, "ون ٹول ہب");
+  assert.equal(urDict.categories.developer.shortName, "ڈویلپرز");
+  assert.equal(urDict.toolUI.copied, "کاپی ہو گیا!");
+
+  // 5. Complete 24-tool Urdu mapping
+  assert.equal(Object.keys(UR_TOOLS_MAP).length, 24, "All 24 tools must have Urdu translations");
+  for (const slug of Object.keys(UR_TOOLS_MAP)) {
+    const item = UR_TOOLS_MAP[slug];
+    assert.ok(item?.name && item.name.length > 2, `Urdu name exists for ${slug}`);
+    assert.ok(item?.shortDescription && item.shortDescription.length > 10, `Urdu description exists for ${slug}`);
+    assert.ok(item?.keywords && item.keywords.length >= 2, `Urdu keywords exist for ${slug}`);
+  }
+});
+
+test("Step 17: Multilingual Tool Search & Typo Tolerance across English and Urdu", async () => {
+  const { searchTools } = await import("../search.ts");
+
+  // 1. Search in English still works
+  const enRes = searchTools(TOOLS_REGISTRY, "json formatter");
+  assert.ok(enRes.length >= 1);
+  assert.equal(enRes[0]?.tool.slug, "json-formatter");
+
+  // 2. Search in Urdu: Exact Name
+  const urNameRes = searchTools(TOOLS_REGISTRY, "امیج کمپریسر");
+  assert.ok(urNameRes.length >= 1, "Must find Image Compressor via Urdu query 'امیج کمپریسر'");
+  assert.equal(urNameRes[0]?.tool.slug, "image-compressor");
+
+  // 3. Search in Urdu: Keyword match
+  const urKwRes = searchTools(TOOLS_REGISTRY, "پاس ورڈ");
+  assert.ok(urKwRes.length >= 1, "Must find Password Generator via Urdu keyword 'پاس ورڈ'");
+  assert.equal(urKwRes[0]?.tool.slug, "password-generator");
+
+  // 4. Search in Urdu: GPA
+  const urGpaRes = searchTools(TOOLS_REGISTRY, "سی جی پی اے");
+  assert.ok(urGpaRes.length >= 1, "Must find GPA Calculator via Urdu query 'سی جی پی اے'");
+  assert.equal(urGpaRes[0]?.tool.slug, "gpa-calculator");
+});
+
+test("Step 17: Reciprocal Hreflang and Multilingual Metadata", async () => {
+  const { buildPageMetadata } = await import("../seo.ts");
+
+  // English page metadata
+  const enMeta = buildPageMetadata({
+    title: "All Tools",
+    description: "Directory of tools",
+    pathname: "/tools",
+    locale: "en",
+  });
+
+  const enLangs = enMeta.alternates?.languages as Record<string, string>;
+  assert.ok(enLangs);
+  assert.equal(enLangs.en, "/tools");
+  assert.equal(enLangs.ur, "/ur/tools");
+  assert.equal(enLangs["x-default"], "/tools");
+
+  // Urdu page metadata
+  const urMeta = buildPageMetadata({
+    title: "تمام ٹولز",
+    description: "ٹولز کی فہرست",
+    pathname: "/ur/tools",
+    locale: "ur",
+  });
+
+  const urLangs = urMeta.alternates?.languages as Record<string, string>;
+  assert.ok(urLangs);
+  assert.equal(urLangs.en, "/tools");
+  assert.equal(urLangs.ur, "/ur/tools");
+  assert.equal(urLangs["x-default"], "/tools");
+  assert.equal(urMeta.openGraph?.locale, "ur_PK");
+});

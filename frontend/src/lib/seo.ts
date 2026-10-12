@@ -146,11 +146,12 @@ export interface PageMetadataOptions {
   path?: string;
   keywords?: readonly string[];
   noIndex?: boolean;
+  locale?: "en" | "ur";
 }
 
 /**
  * Builds consistent Next.js App Router Metadata with unique title, description,
- * canonical path, Open Graph, and Twitter/X cards.
+ * canonical path, reciprocal hreflang alternate links, Open Graph, and Twitter/X cards.
  */
 export function buildPageMetadata({
   title,
@@ -159,10 +160,22 @@ export function buildPageMetadata({
   path,
   keywords,
   noIndex = false,
+  locale = "en",
 }: PageMetadataOptions): Metadata {
   const rawPath = pathname ?? path ?? "/";
   const canonicalPath = rawPath === "/" ? "/" : rawPath.replace(/\/+$/, "");
   const shouldNoIndex = noIndex || isPreviewDeployment();
+
+  // Calculate reciprocal hreflang URLs
+  let enPath = canonicalPath;
+  let urPath = canonicalPath;
+  if (canonicalPath === "/ur" || canonicalPath.startsWith("/ur/")) {
+    enPath = canonicalPath === "/ur" ? "/" : canonicalPath.slice(3);
+    urPath = canonicalPath;
+  } else {
+    enPath = canonicalPath;
+    urPath = canonicalPath === "/" ? "/ur" : `/ur${canonicalPath}`;
+  }
 
   return {
     title,
@@ -172,13 +185,18 @@ export function buildPageMetadata({
       ? undefined
       : {
           canonical: canonicalPath,
+          languages: {
+            en: enPath,
+            ur: urPath,
+            "x-default": enPath,
+          },
         },
     openGraph: {
       title: `${title} | OneToolHub`,
       description,
       url: canonicalPath,
-      siteName: "OneToolHub",
-      locale: "en_US",
+      siteName: locale === "ur" ? "ون ٹول ہب" : "OneToolHub",
+      locale: locale === "ur" ? "ur_PK" : "en_US",
       type: "website",
     },
     twitter: {

@@ -12,6 +12,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/contact",
     "/privacy",
     "/terms",
+    "/ur",
+    "/ur/tools",
+    "/ur/learn",
   ];
   const availableToolRoutes = TOOLS_REGISTRY.filter(
     (tool) => tool.status === "available" && tool.href

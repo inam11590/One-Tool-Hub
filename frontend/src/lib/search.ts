@@ -6,6 +6,7 @@
  */
 
 import type { ToolItem, ToolCategoryId } from '@/types/tools';
+import { UR_TOOLS_MAP } from './i18n/tools-ur.ts';
 
 export interface SearchResultItem {
   tool: ToolItem;
@@ -98,9 +99,29 @@ export function searchTools(
     const keywordsLower = tool.keywords.map((k) => k.toLowerCase());
     const nameTokens = nameLower.split(/\s+/);
 
+    // Multilingual support: Check Urdu translations if present
+    const urData = UR_TOOLS_MAP[tool.slug];
+    const urName = urData ? urData.name.toLowerCase() : "";
+    const urDesc = urData ? urData.shortDescription.toLowerCase() : "";
+    const urKeywords = urData ? urData.keywords.map((k) => k.toLowerCase()) : [];
+
     let score = 0;
     let matchReason: SearchResultItem['matchReason'] = 'name';
     let matchedTerm: string | undefined;
+
+    // 0. Urdu exact/substring matches
+    if (urName && (urName === cleanQuery || urName.includes(cleanQuery))) {
+      score += 140;
+      matchReason = 'name';
+      matchedTerm = urData?.name;
+    } else if (urKeywords.some((k) => k.includes(cleanQuery))) {
+      score += 90;
+      matchReason = 'keyword';
+      matchedTerm = cleanQuery;
+    } else if (urDesc && urDesc.includes(cleanQuery)) {
+      score += 45;
+      matchReason = 'description';
+    }
 
     // 1. Exact full name match
     if (nameLower === cleanQuery) {

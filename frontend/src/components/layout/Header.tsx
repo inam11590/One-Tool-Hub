@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Layers } from "lucide-react";
 import { Navigation } from "@/components/layout/Navigation";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { Container } from "@/components/ui/Container";
 
 export function Header() {
@@ -19,7 +20,10 @@ export function Header() {
           </span>
         </Link>
 
-        <Navigation />
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+          <Navigation />
+        </div>
       </Container>
     </header>
   );
