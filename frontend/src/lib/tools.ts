@@ -705,10 +705,10 @@ const CURATED_RELATED_TOOL_SLUGS: Record<string, readonly string[]> = {
     "uuid-generator",
   ],
   "word-counter": [
-    "code-diff-checker",
-    "gpa-calculator",
-    "percentage-calculator",
-    "regex-tester",
+    "text-case-converter",
+    "text-cleaner",
+    "text-compare",
+    "lorem-ipsum-generator",
   ],
   "youtube-timestamp-formatter": [
     "image-compressor",

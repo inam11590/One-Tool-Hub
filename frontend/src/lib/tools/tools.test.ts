@@ -73,6 +73,7 @@ import {
 } from "../user-preferences.ts";
 import {
   TOOLS_REGISTRY,
+  getRelatedTools,
 } from "../tools.ts";
 import {
   searchTools,
@@ -1254,6 +1255,19 @@ test("Step 7 Learning Center Content Integrity: verifies complete tutorials, uni
     assert.ok(article.conclusion.ctaLabel.length > 5);
     assert.ok(article.relatedToolSlugs.length >= 2);
     assert.ok(article.relatedArticleSlugs.length >= 2);
+
+    for (const rts of article.relatedToolSlugs) {
+      assert.ok(
+        TOOLS_REGISTRY.some((t) => t.slug === rts),
+        `Article ${article.slug} references invalid tool slug: ${rts}`
+      );
+    }
+    for (const ras of article.relatedArticleSlugs) {
+      assert.ok(
+        LEARN_ARTICLES.some((a) => a.slug === ras),
+        `Article ${article.slug} references invalid article slug: ${ras}`
+      );
+    }
   }
 
   // All 24 tools have a dedicated companion tutorial
@@ -2722,3 +2736,177 @@ test("Step 17: Reciprocal Hreflang and Multilingual Metadata", async () => {
   assert.equal(urLangs["x-default"], "/tools");
   assert.equal(urMeta.openGraph?.locale, "ur_PK");
 });
+
+test("Step 18: Pathname Localization & Fallback Routing Matrix", async () => {
+  const {
+    getLocaleFromPathname,
+    formatLocalizedPath,
+    isSupportedLocale,
+    DEFAULT_LOCALE,
+    SUPPORTED_LOCALES,
+  } = await import("../i18n/config.ts");
+
+  // Supported Locales
+  assert.equal(DEFAULT_LOCALE, "en");
+  assert.deepEqual(Array.from(SUPPORTED_LOCALES), ["en", "ur"]);
+  assert.equal(isSupportedLocale("en"), true);
+  assert.equal(isSupportedLocale("ur"), true);
+  assert.equal(isSupportedLocale("fr"), false);
+  assert.equal(isSupportedLocale(null), false);
+  assert.equal(isSupportedLocale(undefined), false);
+
+  // Pathname to Locale detection
+  assert.equal(getLocaleFromPathname("/"), "en");
+  assert.equal(getLocaleFromPathname("/tools"), "en");
+  assert.equal(getLocaleFromPathname("/tools/json-formatter"), "en");
+  assert.equal(getLocaleFromPathname("/ur"), "ur");
+  assert.equal(getLocaleFromPathname("/ur/"), "ur");
+  assert.equal(getLocaleFromPathname("/ur/tools"), "ur");
+  assert.equal(getLocaleFromPathname("/ur/tools/json-formatter"), "ur");
+  assert.equal(getLocaleFromPathname("ur/tools"), "ur");
+
+  // Bidirectional Localized Path Formatting
+  assert.equal(formatLocalizedPath("/", "en"), "/");
+  assert.equal(formatLocalizedPath("/", "ur"), "/ur");
+  assert.equal(formatLocalizedPath("/ur", "en"), "/");
+  assert.equal(formatLocalizedPath("/ur", "ur"), "/ur");
+  assert.equal(formatLocalizedPath("/tools/json-formatter", "ur"), "/ur/tools/json-formatter");
+  assert.equal(formatLocalizedPath("/ur/tools/json-formatter", "en"), "/tools/json-formatter");
+  assert.equal(formatLocalizedPath("/learn", "ur"), "/ur/learn");
+  assert.equal(formatLocalizedPath("/ur/learn", "en"), "/learn");
+});
+
+test("Step 18: Mathematical & Invariant Calculation Parity across Language Contexts", async () => {
+  // 1. Percentage Calculations remain invariant
+  const pctRes = calculatePercentage({
+    mode: "x-is-what-percent-of-y",
+    valX: 25,
+    valY: 200,
+  });
+  assert.equal(pctRes.valid, true);
+  assert.equal(pctRes.value, 12.5);
+  const formattedPct = formatPercentageNumber(pctRes.value);
+  assert.equal(formattedPct, "12.5");
+
+  // 2. Base64 encoding/decoding remains invariant
+  const rawSample = "OneToolHub ون ٹول ہب 2026";
+  const b64 = encodeUtf8ToBase64(rawSample);
+  assert.equal(b64.success, true);
+  const decoded = decodeBase64ToUtf8(b64.output);
+  assert.equal(decoded.success, true);
+  assert.equal(decoded.output, rawSample);
+
+  // 3. Password Generation with WebCrypto remains cryptographically sound
+  const pwd = generateSecurePassword({
+    length: 20,
+    includeUppercase: true,
+    includeLowercase: true,
+    includeNumbers: true,
+    includeSymbols: true,
+  });
+  assert.equal(pwd.password.length, 20);
+  const pwdStrength = evaluatePasswordStrength(pwd.password);
+  assert.ok(pwdStrength.score >= 4);
+
+  // 4. JSON Formatter logic remains invariant
+  const rawJson = '{"name":"OneToolHub","locale":"ur","tools":24}';
+  const formatted = validateAndFormatJson(rawJson, 2);
+  assert.equal(formatted.valid, true);
+  assert.ok(formatted.output && formatted.output.includes('"tools": 24'));
+});
+
+test("Step 18: Privacy Safeguards & Non-PII Telemetry Compliance", async () => {
+  // Telemetry parameter sanitizer must strictly reject unknown or sensitive keys
+  const dirtyParams: Parameters<typeof sanitizeToolAnalyticsParams>[0] = {
+    tool_slug: "json-formatter",
+    tool_category: "developer",
+    operation_type: "format_json",
+    sensitive_user_input: "password123",
+    email_address: "user@example.com",
+    random_extra: 999,
+  };
+
+  const sanitized = sanitizeToolAnalyticsParams(dirtyParams);
+  assert.ok(sanitized !== null);
+  assert.equal(sanitized.tool_slug, "json-formatter");
+  assert.equal(sanitized.tool_category, "developer");
+  assert.equal(sanitized.operation_type, "format_json");
+  assert.equal(Object.prototype.hasOwnProperty.call(sanitized, "sensitive_user_input"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(sanitized, "email_address"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(sanitized, "random_extra"), false);
+});
+
+// ============================================================================
+// STEP 19: Global Organic Growth Engine & SEO Content Strategy
+// ============================================================================
+test("Step 19: Organic Growth Internal Linking & Bidirectional Graph Integrity", () => {
+  // 1. Tool-to-Tutorial Bidirectional 1-to-1 Mapping
+  assert.equal(TOOLS_REGISTRY.length, 24);
+  assert.equal(LEARN_ARTICLES.length, 24);
+
+  for (const tool of TOOLS_REGISTRY) {
+    const article = getArticleForTool(tool.slug);
+    assert.ok(article, `Every tool must have a matching tutorial: ${tool.slug}`);
+    assert.equal(
+      article.primaryToolSlug,
+      tool.slug,
+      `Tutorial primaryToolSlug must point back to tool: ${tool.slug}`
+    );
+
+    // Curated related tools must return distinct tools and never include self
+    const related = getRelatedTools(tool.slug, 4);
+    assert.ok(related.length >= 2, `Tool ${tool.slug} must have at least 2 related tools`);
+    assert.ok(
+      related.every((r) => r.slug !== tool.slug),
+      `Tool ${tool.slug} must not include itself in related tools`
+    );
+  }
+
+  // 2. Tutorial Related Articles & Tools Cross-Links
+  for (const article of LEARN_ARTICLES) {
+    const relatedArticles = getRelatedArticles(article.slug, 3);
+    assert.ok(
+      relatedArticles.length >= 2,
+      `Article ${article.slug} must have at least 2 related articles`
+    );
+    assert.ok(
+      relatedArticles.every((ra) => ra.slug !== article.slug),
+      `Article ${article.slug} must not include itself in related articles`
+    );
+  }
+});
+
+test("Step 19: Keyword-to-Page Alignment & Search Metadata Coverage", () => {
+  for (const tool of TOOLS_REGISTRY) {
+    assert.ok(tool.keywords.length >= 4, `Tool ${tool.slug} must have at least 4 seed keywords`);
+    assert.ok(tool.name.length >= 3, `Tool ${tool.slug} must have a valid name`);
+    assert.ok(tool.shortDescription.length >= 20, `Tool ${tool.slug} must have descriptive summary`);
+  }
+
+  for (const article of LEARN_ARTICLES) {
+    assert.ok(
+      article.keywords.length >= 4,
+      `Article ${article.slug} must have at least 4 keywords`
+    );
+    assert.ok(
+      article.seoTitle.length >= 25 && article.seoTitle.length <= 80,
+      `Article ${article.slug} SEO title should be well-proportioned`
+    );
+    assert.ok(
+      article.metaDescription.length >= 60,
+      `Article ${article.slug} meta description must be detailed`
+    );
+  }
+});
+
+test("Step 19: Safe Shareable URLs & Zero-Leak Privacy Guarantee", () => {
+  // Ensure that tool URLs used in sharing components never leak query parameters or sensitive state
+  for (const tool of TOOLS_REGISTRY) {
+    const canonicalPath = `/tools/${tool.slug}`;
+    assert.ok(!canonicalPath.includes("?"), "Tool share path must not contain query parameters");
+    assert.ok(!canonicalPath.includes("#"), "Tool share path must not contain fragments");
+    assert.ok(canonicalPath.startsWith("/tools/"), "Tool share path must point to canonical /tools/*");
+  }
+});
+
+

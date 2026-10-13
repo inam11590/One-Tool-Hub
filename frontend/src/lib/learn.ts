@@ -504,13 +504,13 @@ export const LEARN_ARTICLES: readonly LearnArticle[] = [
     featured: false,
     primaryToolSlug: "word-counter",
     relatedToolSlugs: [
-      "gpa-calculator",
-      "youtube-timestamp-formatter",
-      "pdf-merge-split",
+      "text-case-converter",
+      "text-cleaner",
+      "text-compare",
     ],
     relatedArticleSlugs: [
-      "how-to-calculate-college-gpa-credit-hours",
-      "how-to-format-youtube-timestamps-and-chapters",
+      "how-to-convert-text-case-editorial-developer-guide",
+      "how-to-clean-and-format-messy-text",
     ],
     keywords: [
       "how to count words and estimate reading time",
@@ -1566,7 +1566,7 @@ export const LEARN_ARTICLES: readonly LearnArticle[] = [
     featured: true,
     primaryToolSlug: "percentage-calculator",
     relatedToolSlugs: ["gpa-calculator", "invoice-generator", "word-counter"],
-    relatedArticleSlugs: ["how-to-calculate-gpa-weighted-unweighted", "how-to-create-freelance-invoices"],
+    relatedArticleSlugs: ["how-to-calculate-college-gpa-credit-hours", "how-to-create-professional-freelance-invoice"],
     keywords: [
       "how to calculate percentages",
       "percentage increase decrease formula",
@@ -2036,7 +2036,7 @@ export const LEARN_ARTICLES: readonly LearnArticle[] = [
     featured: true,
     primaryToolSlug: "pdf-watermark",
     relatedToolSlugs: ["pdf-organizer", "invoice-generator", "pdf-merge-split", "pdf-to-image"],
-    relatedArticleSlugs: ["how-to-create-freelance-invoices", "how-to-reorder-rotate-and-delete-pdf-pages"],
+    relatedArticleSlugs: ["how-to-create-professional-freelance-invoice", "how-to-reorder-rotate-and-delete-pdf-pages"],
     keywords: [
       "how to add watermark to pdf",
       "stamp pdf confidential draft online",
@@ -2279,7 +2279,7 @@ export const LEARN_ARTICLES: readonly LearnArticle[] = [
     relatedArticleSlugs: [
       "how-to-format-and-validate-json",
       "how-to-test-regular-expressions-online",
-      "how-to-count-words-and-reading-time",
+      "how-to-count-words-and-estimate-reading-time",
     ],
     keywords: [
       "how to compare code differences online",
@@ -2401,7 +2401,7 @@ export const LEARN_ARTICLES: readonly LearnArticle[] = [
     relatedToolSlugs: ["image-resizer", "image-compressor", "qr-code-generator"],
     relatedArticleSlugs: [
       "how-to-compress-images-for-web",
-      "how-to-resize-images-online",
+      "how-to-resize-images-without-unnecessary-quality-loss",
       "how-to-format-and-validate-json",
     ],
     keywords: [
@@ -2645,7 +2645,7 @@ export const LEARN_ARTICLES: readonly LearnArticle[] = [
     featured: true,
     primaryToolSlug: "text-case-converter",
     relatedToolSlugs: ["word-counter", "text-cleaner", "text-compare"],
-    relatedArticleSlugs: ["how-to-count-words-characters-reading-time", "how-to-compare-two-texts-find-differences"],
+    relatedArticleSlugs: ["how-to-count-words-and-estimate-reading-time", "how-to-compare-two-texts-find-differences"],
     keywords: [
       "how to convert text case",
       "title case rules ap chicago style",
@@ -2764,7 +2764,7 @@ export const LEARN_ARTICLES: readonly LearnArticle[] = [
     featured: true,
     primaryToolSlug: "text-compare",
     relatedToolSlugs: ["code-diff-checker", "text-case-converter", "word-counter"],
-    relatedArticleSlugs: ["how-to-compare-code-diffs-side-by-side", "how-to-convert-text-case-editorial-developer-guide"],
+    relatedArticleSlugs: ["how-to-compare-code-and-find-differences", "how-to-convert-text-case-editorial-developer-guide"],
     keywords: [
       "how to compare two texts",
       "text difference checker guide",
@@ -3002,7 +3002,7 @@ export const LEARN_ARTICLES: readonly LearnArticle[] = [
     featured: true,
     primaryToolSlug: "lorem-ipsum-generator",
     relatedToolSlugs: ["color-picker", "uuid-generator", "word-counter"],
-    relatedArticleSlugs: ["how-to-pick-and-convert-colors-accessible-palettes", "how-to-generate-and-validate-cryptographic-uuids"],
+    relatedArticleSlugs: ["how-to-convert-hex-rgb-hsl-colors", "how-to-generate-and-validate-uuids"],
     keywords: [
       "how to use lorem ipsum",
       "lorem ipsum placeholder text guide",
