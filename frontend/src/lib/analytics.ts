@@ -37,6 +37,14 @@ export const VALID_TOOL_SLUGS = [
   "text-compare",
   "text-cleaner",
   "lorem-ipsum-generator",
+  "pdf-text-extractor",
+  "pdf-page-rotator",
+  "pdf-metadata-editor",
+  "pdf-password-protector",
+  "image-format-converter",
+  "image-cropper",
+  "image-to-base64",
+  "image-color-palette",
 ] as const;
 
 export type ValidToolSlug = (typeof VALID_TOOL_SLUGS)[number];
@@ -59,6 +67,11 @@ export const ANALYTICS_EVENT_NAMES = [
   "tool_search",
   "favorite_add",
   "favorite_remove",
+  "tool_finder_search",
+  "tool_finder_select",
+  "collection_view",
+  "workflow_view",
+  "workspace_reset",
 ] as const;
 
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
@@ -451,4 +464,48 @@ export function trackToolEvent(
   gtagFn("event", eventName, safePayload);
 
   return { sent: true, payload: safePayload };
+}
+
+export interface SafeRetentionEventParams {
+  event_category: "discovery" | "collection" | "workflow" | "workspace";
+  item_slug?: string;
+  count?: number;
+}
+
+/**
+ * Tracks a privacy-preserving discovery or retention event (tool finder, collections, workflows, workspace resets).
+ * Strictly guarantees that user task inputs, queries, or PII are NEVER forwarded.
+ */
+export function trackRetentionEvent(
+  eventName: "tool_finder_search" | "tool_finder_select" | "collection_view" | "workflow_view" | "workspace_reset",
+  params: SafeRetentionEventParams,
+  options?: {
+    gtagFn?: (...args: unknown[]) => void;
+  }
+): boolean {
+  if (!canSendAnalyticsEvents()) {
+    return false;
+  }
+  const gtagFn =
+    options?.gtagFn ??
+    (typeof window !== "undefined" ? window.gtag : undefined);
+
+  if (typeof gtagFn !== "function") {
+    return false;
+  }
+
+  const safePayload: Record<string, unknown> = {
+    event_category: params.event_category,
+  };
+
+  if (typeof params.item_slug === "string" && SAFE_TOKEN_REGEX.test(params.item_slug)) {
+    safePayload.item_slug = params.item_slug;
+  }
+
+  if (typeof params.count === "number" && Number.isFinite(params.count)) {
+    safePayload.count = Math.max(0, Math.floor(params.count));
+  }
+
+  gtagFn("event", eventName, safePayload);
+  return true;
 }

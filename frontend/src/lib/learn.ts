@@ -3104,6 +3104,868 @@ export const LEARN_ARTICLES: readonly LearnArticle[] = [
       ctaLabel: "Open Lorem Ipsum Generator",
     },
   },
+  {
+    slug: "how-to-extract-text-from-pdf",
+    title: "How to Extract Text from PDF Documents Online",
+    seoTitle: "How to Extract Text from PDF Documents Online — Fast & Private",
+    metaDescription:
+      "Step-by-step guide to extract clean, selectable text from PDF documents and multi-page reports. Includes tips for handling scanned PDFs, columns, and TXT export.",
+    excerpt:
+      "Learn how to extract readable text streams from multi-page PDFs directly in your browser. Understand native font streams vs. scanned images, word count analysis, and instant TXT exports.",
+    categoryId: "image-pdf-guides",
+    categoryLabel: "Image & PDF Guides",
+    icon: "FileSearch",
+    readingTimeMinutes: 5,
+    publishedAt: "2026-10-13",
+    updatedAt: "2026-10-13",
+    featured: true,
+    primaryToolSlug: "pdf-text-extractor",
+    relatedToolSlugs: [
+      "pdf-text-extractor",
+      "word-counter",
+      "text-cleaner",
+      "pdf-organizer",
+    ],
+    relatedArticleSlugs: [
+      "how-to-merge-and-split-pdf-files-online",
+      "how-to-convert-pdf-pages-to-jpg-or-png",
+      "how-to-count-words-and-estimate-reading-time",
+    ],
+    keywords: [
+      "extract text from pdf",
+      "pdf text extractor",
+      "copy text from pdf",
+      "pdf to txt online",
+      "scanned pdf ocr",
+      "extract multi-page pdf",
+    ],
+    introduction: [
+      "PDFs are the gold standard for preserving visual layout across operating systems, but copying text out of them can be notoriously frustrating. Many viewers insert awkward line breaks in the middle of sentences or scramble multi-column layouts.",
+      "With modern browser-based web workers, you can extract clean, continuous text from your documents without installing heavy desktop software or sending confidential business records to cloud servers.",
+    ],
+    problemSolved: {
+      heading: "Overcoming Layout Frustrations and Privacy Concerns in PDF Text Extraction",
+      paragraphs: [
+        "Traditional text copying from PDF viewers often introduces artificial carriage returns after every line of text, making quotes and excerpts unusable without extensive manual cleanup.",
+        "Furthermore, many free online PDF converters upload your files to remote servers where they may be cached or indexed. Browser-local parsing guarantees that your documents remain strictly confidential on your computer.",
+      ],
+      keyTakeaways: [
+        "Native PDF text extraction runs 100% locally in your browser memory.",
+        "Custom page ranges let you target specific chapters, executive summaries, or citations.",
+        "Scanned image-only PDFs lack font glyphs and require OCR.",
+        "Export directly to .txt format or copy to clipboard for immediate note-taking.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Upload Your PDF File",
+        stepDescription:
+          "Drag and drop your PDF into the tool or browse your local storage. The file loads directly into your browser's private memory.",
+        proTip: "Files up to 50 MB are supported without any network lag.",
+      },
+      {
+        stepTitle: "Specify Page Range",
+        stepDescription:
+          "Select 'All Pages' for full document extraction or choose 'Custom Range' to enter specific pages (e.g., '1-5, 8').",
+        proTip: "Targeting specific pages saves processing time on lengthy multi-chapter reports.",
+      },
+      {
+        stepTitle: "Extract Text and Review Live Statistics",
+        stepDescription:
+          "Click 'Extract Text'. Live word and character counters update in real time as each page is parsed.",
+        proTip: "If no text is detected, the document consists of raster scans and requires an OCR tool.",
+      },
+      {
+        stepTitle: "Copy or Download As TXT",
+        stepDescription:
+          "Review the text preview, click 'Copy to Clipboard' for quick pasting, or click 'Download .txt File' to save the text document.",
+        proTip: "Use the Text Cleaner tool if you want to normalize line breaks or strip trailing spaces.",
+      },
+    ],
+    practicalExample: {
+      title: "Extracting Citations and Abstract from an Academic Journal",
+      scenario: "A graduate student needs to extract the abstract and references section from an 18-page downloaded paper.",
+      inputLabel: "Extraction Settings",
+      inputSample: "File: journal-article.pdf, Range: Custom (1, 17-18)",
+      outputLabel: "Extracted Content",
+      outputSample: "Abstract: Recent advancements in browser-based cryptographic sandboxing... [1,240 words extracted]",
+      explanation: "Clean text extracted with no missing headers and saved as a plain text file for citation management.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Assuming all PDF files contain extractable text",
+        whyItHappens: "Scanned paper documents are stored as flat pictures (raster images) inside a PDF container without character codes.",
+        howToFix: "If the tool alerts that no selectable text was found, run the document through an OCR tool before extracting.",
+      },
+      {
+        mistake: "Extracting entire 500-page textbooks in a single pass",
+        whyItHappens: "Attempting to allocate hundreds of pages of text in browser DOM simultaneously can cause momentary memory spikes.",
+        howToFix: "Extract in batches of 50 to 100 pages using the custom range selector.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Extracted text contains question marks or unreadable symbols",
+        solution: "The original document likely used non-standard embedded fonts or custom glyph encodings without a ToUnicode CMap table.",
+      },
+      {
+        symptom: "The extraction button is disabled",
+        solution: "Verify that a valid PDF file is selected and that any custom page range numbers are within the total page count.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Is my document uploaded to a server to extract text?",
+        answer: "No. All font parsing and text reconstruction happen 100% locally in your browser using PDF.js. Your document never leaves your device.",
+      },
+      {
+        question: "Can I extract text from password-protected PDFs?",
+        answer: "Encrypted PDFs must be unlocked before uploading, as client-side decryption without credentials is restricted for security.",
+      },
+      {
+        question: "Does text extraction preserve bold or italic formatting?",
+        answer: "Extracted output is plain UTF-8 text. Rich formatting and font stylings are stripped to provide clean, unencumbered text.",
+      },
+    ],
+    conclusion: {
+      heading: "Fast, Private PDF Text Extraction for Any Workflow",
+      paragraphs: [
+        "Extracting selectable text from reports, papers, and legal agreements doesn't require cloud uploads or expensive PDF suites. Use OneToolHub's client-side extractor for immediate, private text processing.",
+      ],
+      ctaLabel: "Open PDF Text Extractor",
+    },
+  },
+  {
+    slug: "how-to-rotate-pdf-pages",
+    title: "How to Rotate PDF Pages and Save Permanently",
+    seoTitle: "How to Rotate PDF Pages Online (90°, 180°, 270°) — Free & Lossless",
+    metaDescription:
+      "Learn how to rotate individual PDF pages or entire documents clockwise (+90°), counter-clockwise (-90°), or upside down (180°) without losing document resolution.",
+    excerpt:
+      "Fix upside-down scans and mixed-orientation pages in your browser. Discover how lossless PDF viewport rotation works without degrading vectors, fonts, or images.",
+    categoryId: "image-pdf-guides",
+    categoryLabel: "Image & PDF Guides",
+    icon: "RotateCw",
+    readingTimeMinutes: 5,
+    publishedAt: "2026-10-13",
+    updatedAt: "2026-10-13",
+    featured: true,
+    primaryToolSlug: "pdf-page-rotator",
+    relatedToolSlugs: [
+      "pdf-page-rotator",
+      "pdf-organizer",
+      "pdf-merge-split",
+      "pdf-watermark",
+    ],
+    relatedArticleSlugs: [
+      "how-to-reorder-rotate-and-delete-pdf-pages",
+      "how-to-merge-and-split-pdf-files-online",
+      "how-to-add-a-watermark-to-a-pdf",
+    ],
+    keywords: [
+      "rotate pdf pages",
+      "pdf page rotator",
+      "rotate pdf 90 degrees",
+      "turn pdf sideways",
+      "fix upside down pdf scan",
+      "lossless pdf rotation",
+    ],
+    introduction: [
+      "Scanner feeds, mobile scanner apps, and landscape diagrams often produce PDFs with pages facing in different directions. Reading a contract with upside-down pages or sideways tables is frustrating and unprofessional.",
+      "Fortunately, permanent PDF rotation is fast and completely lossless when handled properly. Discover how to rotate individual sheets or entire documents and save the changes permanently.",
+    ],
+    problemSolved: {
+      heading: "Permanent Lossless Rotation vs. Temporary Viewer Zoom Rotation",
+      paragraphs: [
+        "Many users rely on the 'Rotate' button in their browser's built-in PDF viewer, only to discover that closing the tab resets all pages back to their crooked orientation.",
+        "Other web tools rasterize pages into images to rotate them, which destroys crisp vector fonts and explodes file size. True PDF rotation modifies the page's internal orientation matrix, ensuring zero loss in quality and permanent orientation fixes.",
+      ],
+      keyTakeaways: [
+        "Permanent rotation updates the internal PDF dictionary so the orientation persists in every viewer.",
+        "Lossless rotation leaves fonts, vector graphics, and embedded images completely uncompressed.",
+        "Rotate single pages or bulk rotate the entire document in 90° increments.",
+        "Zero server uploads: all rotation operations occur in client-side memory via pdf-lib.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Upload Your PDF Document",
+        stepDescription:
+          "Drop your PDF into the upload area or select it from your device. Page thumbnails render instantly in your browser.",
+        proTip: "Check that the page count matches your document.",
+      },
+      {
+        stepTitle: "Select Pages to Rotate",
+        stepDescription:
+          "Click on individual page cards to toggle them, or use 'Select All' if the entire document was scanned backwards.",
+        proTip: "Page cards display their current rotation angle so you can easily track changes.",
+      },
+      {
+        stepTitle: "Choose Your Rotation Angle",
+        stepDescription:
+          "Click '+90° (Clockwise)' to turn landscape pages, '-90° (Counter-clockwise)' for counter-rotations, or '180°' for upside-down scans.",
+        proTip: "You can click multiple times to rotate through 90°, 180°, and 270° degrees.",
+      },
+      {
+        stepTitle: "Download Your Rotated PDF",
+        stepDescription:
+          "Click 'Download Rotated PDF' to save your updated document. The rotation is now baked permanently into the file.",
+        proTip: "Test opening the downloaded file in your default viewer to confirm the orientation.",
+      },
+    ],
+    practicalExample: {
+      title: "Fixing an Inverted Invoice Scan",
+      scenario: "An office manager scans a batch of paper vendor bills into a single PDF, but pages 2 and 4 were fed upside down.",
+      inputLabel: "Initial Document State",
+      inputSample: "Pages 1 & 3: 0° (Normal) | Pages 2 & 4: 180° (Inverted)",
+      outputLabel: "Correction Applied",
+      outputSample: "Selected Pages 2 & 4 → Rotated by 180° → All pages standardized to 0°",
+      explanation: "A clean, perfectly oriented document ready to submit to accounting without re-scanning.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Using browser viewer rotation and expecting it to save automatically",
+        whyItHappens: "Default browser PDF viewer rotation controls only change the temporary display view, not the underlying PDF file.",
+        howToFix: "Use a dedicated PDF page rotator that rewrites the document catalog and exports a new PDF file.",
+      },
+      {
+        mistake: "Converting pages to JPG images just to rotate them",
+        whyItHappens: "Users often screenshot or rasterize pages, which destroys vector sharpness and inflates file size.",
+        howToFix: "Rotate the native PDF directly to preserve full resolution and selectable text.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Page rotation appears correct in the tool but not when printed",
+        solution: "Ensure your printer driver is set to 'Auto-rotate and center pages' rather than forcing a fixed paper orientation.",
+      },
+      {
+        symptom: "The rotate buttons do not change the angle of a page",
+        solution: "Confirm that the page's checkbox is checked before clicking the rotation buttons.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Does rotating PDF pages reduce the quality of text or pictures?",
+        answer: "No. PDF rotation changes only the viewport transformation matrix. The underlying images, vectors, and text streams remain 100% untouched.",
+      },
+      {
+        question: "Can I rotate pages in 45-degree increments?",
+        answer: "No. The official ISO PDF specification only permits standard orthogonal rotations: 0°, 90°, 180°, and 270° degrees.",
+      },
+      {
+        question: "Are my confidential files stored on any remote servers?",
+        answer: "Never. All page rotation is computed directly inside your browser tab using pdf-lib. No document data is ever sent to the cloud.",
+      },
+    ],
+    conclusion: {
+      heading: "Permanently Straighten and Standardize Your Documents",
+      paragraphs: [
+        "Eliminate crooked scans and sideways reports in seconds with OneToolHub's client-side PDF Page Rotator. Quick, lossless, and 100% private.",
+      ],
+      ctaLabel: "Open PDF Page Rotator",
+    },
+  },
+  {
+    slug: "how-to-view-and-edit-pdf-metadata",
+    title: "How to View, Edit, and Wipe PDF Metadata for Privacy",
+    seoTitle: "How to View and Edit PDF Metadata Online — Privacy Sanitization Guide",
+    metaDescription:
+      "Understand hidden metadata stored inside PDF files. Learn how to inspect, edit Title and Author properties, and wipe personal identifying metadata before sharing.",
+    excerpt:
+      "Discover what hidden information PDFs store about your computer and identity. Learn how to inspect Title, Author, and Subject fields, and completely strip metadata for privacy.",
+    categoryId: "image-pdf-guides",
+    categoryLabel: "Image & PDF Guides",
+    icon: "Tag",
+    readingTimeMinutes: 6,
+    publishedAt: "2026-10-13",
+    updatedAt: "2026-10-13",
+    featured: true,
+    primaryToolSlug: "pdf-metadata-editor",
+    relatedToolSlugs: [
+      "pdf-metadata-editor",
+      "pdf-watermark",
+      "pdf-page-rotator",
+      "invoice-generator",
+    ],
+    relatedArticleSlugs: [
+      "how-to-add-a-watermark-to-a-pdf",
+      "how-to-reorder-rotate-and-delete-pdf-pages",
+      "how-to-merge-and-split-pdf-files-online",
+    ],
+    keywords: [
+      "pdf metadata editor",
+      "view pdf metadata",
+      "edit pdf author",
+      "remove pdf metadata",
+      "clean pdf metadata",
+      "strip hidden pdf properties",
+      "sanitize pdf",
+    ],
+    introduction: [
+      "When you export a document to PDF from Microsoft Word, Google Docs, or Adobe InDesign, the software writes a hidden /Info dictionary into the file header. This metadata often includes your real name, computer username, software version, and exact file save timestamps.",
+      "Whether you are submitting blind peer reviews, sharing competitive proposals, or publishing public reports, auditing and sanitizing PDF metadata is a critical digital privacy habit.",
+    ],
+    problemSolved: {
+      heading: "Protecting Privacy and Ensuring Document Compliance Through Metadata Management",
+      paragraphs: [
+        "Hidden document metadata is one of the most common causes of accidental data leakage. Academic researchers have disqualified peer-review submissions because author names were left in the PDF summary properties.",
+        "Similarly, business proposals often leak internal draft versions and team member identities. The OneToolHub PDF Metadata Editor lets you inspect, update, or wipe all standard metadata fields directly in your browser with zero server exposure.",
+      ],
+      keyTakeaways: [
+        "PDF metadata includes Title, Author, Subject, Keywords, Creator, Producer, and Timestamps.",
+        "Clearing metadata protects your personal identity before distributing documents publicly.",
+        "Updating Title and Keywords improves document cataloging and digital archive discovery.",
+        "All inspections and edits occur 100% locally in browser memory via pdf-lib.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Upload Your PDF Document",
+        stepDescription:
+          "Select or drop your PDF into the metadata editor. The tool parses the document's internal /Info dictionary immediately.",
+        proTip: "No files are transmitted across the internet; parsing is 100% local.",
+      },
+      {
+        stepTitle: "Inspect Existing Properties",
+        stepDescription:
+          "Review current values in the form fields: Title, Author, Subject, Keywords, Creator (application), and Producer.",
+        proTip: "Check the Creation and Modification timestamps to see when the file was originally compiled.",
+      },
+      {
+        stepTitle: "Update Fields or Click 'Clear All Metadata'",
+        stepDescription:
+          "Type updated metadata to improve searchability, or click 'Clear All Metadata' to completely blank all personal identifier fields.",
+        proTip: "For maximum privacy when sharing with third parties, wiping all fields is recommended.",
+      },
+      {
+        stepTitle: "Save and Download Sanitized PDF",
+        stepDescription:
+          "Click 'Save & Download PDF'. A freshly sanitized copy of your document downloads immediately.",
+        proTip: "Re-open the downloaded file in the editor to verify that all metadata fields are empty.",
+      },
+    ],
+    practicalExample: {
+      title: "Sanitizing a Proposal Before Submitting to an RFP",
+      scenario: "A freelance consultant exports a sales deck to PDF. The metadata contains their private home MacBook username and draft revision timestamps.",
+      inputLabel: "Original Metadata Detected",
+      inputSample: "Author: john_macbook_air, Creator: Microsoft Word 16.89, Producer: macOS Quartz",
+      outputLabel: "Sanitized Output",
+      outputSample: "Author: [Empty], Creator: [Empty], Producer: [Empty], Title: 'Enterprise Architecture Proposal'",
+      explanation: "Personal and hardware footprints removed, while adding a professional public title for the client.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Assuming renaming the PDF filename erases internal metadata",
+        whyItHappens: "Changing 'report_draft_john.pdf' to 'report.pdf' changes the filename on disk, but does not alter internal /Info dictionary tags.",
+        howToFix: "Use a metadata editor to inspect and wipe the internal metadata dictionary inside the PDF itself.",
+      },
+      {
+        mistake: "Confusing metadata sanitization with redacting body text",
+        whyItHappens: "Wiping metadata clears the document properties header, but does not redact blacked-out text on the actual visible pages.",
+        howToFix: "Use metadata wiping for document catalog properties and specialized redaction tools for visual body text.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Dates cannot be edited manually in the form",
+        solution: "PDF modification dates are automatically updated by the specification upon saving, or wiped when clearing all metadata.",
+      },
+      {
+        symptom: "Some custom XMP metadata streams remain in specialized Adobe files",
+        solution: "Standard PDF Info dictionary entries are fully wiped; if your document contains specialized Adobe Illustrator XMP streams, flatten the PDF first.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Does clearing metadata affect the text or images in the document?",
+        answer: "No. Metadata exists in a separate header block. All text, fonts, vector artwork, and photos remain completely unaffected.",
+      },
+      {
+        question: "Why should I update Title and Keywords instead of wiping them?",
+        answer: "For public whitepapers, ebooks, and journals, descriptive Titles and Keywords help search engines and document management systems index the file properly.",
+      },
+      {
+        question: "Are my files uploaded to your servers to edit metadata?",
+        answer: "Never. All reading and writing of PDF metadata happen purely within your browser RAM using pdf-lib. Your privacy is 100% protected.",
+      },
+    ],
+    conclusion: {
+      heading: "Take Control of Your Digital Footprint in PDF Documents",
+      paragraphs: [
+        "Audit what your documents reveal about you before sharing. Use OneToolHub's client-side PDF Metadata Editor to verify, customize, or wipe document properties with complete confidence.",
+      ],
+      ctaLabel: "Open PDF Metadata Editor",
+    },
+  },
+  {
+    slug: "how-to-convert-images-between-jpg-png-webp",
+    title: "How to Convert Images Between JPG, PNG, and WebP",
+    seoTitle: "How to Convert Images Between JPG, PNG, and WebP — Complete Guide",
+    metaDescription:
+      "Learn how to convert images across JPG, PNG, and WebP formats in your browser. Master transparency handling, compression quality, and file size optimization.",
+    excerpt:
+      "Understand the technical differences between JPG, PNG, and WebP. Learn how to convert formats in your browser without uploading files or losing visual fidelity.",
+    categoryId: "image-pdf-guides",
+    categoryLabel: "Image & PDF Guides",
+    icon: "RefreshCw",
+    readingTimeMinutes: 6,
+    publishedAt: "2026-10-13",
+    updatedAt: "2026-10-13",
+    featured: true,
+    primaryToolSlug: "image-format-converter",
+    relatedToolSlugs: ["image-compressor", "image-resizer", "image-cropper"],
+    relatedArticleSlugs: ["how-to-compress-images-for-web", "how-to-resize-images-without-unnecessary-quality-loss"],
+    keywords: [
+      "how to convert images to webp",
+      "convert png to jpg online",
+      "jpg to png transparency",
+      "in-browser image converter",
+      "webp image optimization",
+    ],
+    introduction: [
+      "Image formats serve distinct engineering purposes across the modern web. JPEG excels at continuous-tone photography with lossy compression, PNG provides lossless rendering with full alpha-channel transparency, and WebP combines the best of both with superior compression algorithms.",
+      "Selecting the wrong format can inflate web page payload by megabytes or introduce unsightly black backgrounds where transparency was expected. Converting between these formats directly in your browser using HTML5 Canvas allows instant optimization without sending private photos to cloud servers.",
+    ],
+    problemSolved: {
+      heading: "Why Choosing the Right Image Format Determines Web Performance",
+      paragraphs: [
+        "Serving raw PNG screenshots on websites often causes severe Core Web Vitals penalties due to massive file weights. Conversely, saving logos as JPEG can introduce blocky compression artifacts and erase transparent backgrounds.",
+        "A client-side image format converter allows developers, creators, and professionals to switch between formats seamlessly, calibrate lossy compression quality, and ensure background transparency is cleanly handled.",
+      ],
+      keyTakeaways: [
+        "WebP delivers 25%–35% smaller file sizes than comparable JPEG images at identical visual quality.",
+        "JPEG lacks an alpha channel; converting transparent PNGs to JPEG requires filling the background with a solid color.",
+        "PNG is lossless and ideal for graphics, text screenshots, and logos requiring pixel-perfect transparency.",
+        "In-browser canvas conversion guarantees zero server uploads and complete privacy.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Upload Your Source Graphic or Photo",
+        stepDescription:
+          "Drag and drop any valid JPEG, PNG, or WebP image up to 25 MB into the in-browser converter.",
+      },
+      {
+        stepTitle: "Select Target Output Format",
+        stepDescription:
+          "Choose WebP for website optimization, PNG for transparent graphics, or JPEG for universal legacy compatibility.",
+      },
+      {
+        stepTitle: "Calibrate Compression Quality and Background Fill",
+        stepDescription:
+          "For lossy formats (JPEG and WebP), adjust the quality slider between 10% and 100%. If converting a transparent image to JPEG, pick a solid background color (such as white #FFFFFF) to prevent black artifacts.",
+      },
+      {
+        stepTitle: "Convert and Download the Result",
+        stepDescription:
+          "Inspect the converted preview and file size difference, then download the freshly encoded image directly to your device.",
+      },
+    ],
+    practicalExample: {
+      title: "Converting Desktop PNG Screenshot to WebP",
+      scenario: "A web developer needs to optimize a 3.5 MB uncompressed PNG desktop screenshot for a fast-loading landing page hero banner.",
+      inputLabel: "Original Graphic",
+      inputSample: "hero-desktop.png (3.5 MB, 1920×1080 px, 24-bit PNG)",
+      outputLabel: "Converted Asset",
+      outputSample: "hero-desktop-converted.webp (280 KB, 85% Quality, 92% size reduction)",
+      explanation: "Converting from PNG to WebP preserved crisp UI text while reducing payload by 3.22 MB, directly improving Largest Contentful Paint (LCP).",
+    },
+    commonMistakes: [
+      {
+        mistake: "Converting transparent PNG logos to JPEG without setting background color",
+        whyItHappens: "Because JPEG does not support alpha channels, transparent pixels default to black in unhandled conversions.",
+        howToFix: "Use a converter that explicitly flattens alpha channels against a clean white or theme-matching background.",
+      },
+      {
+        mistake: "Converting already compressed JPEGs to PNG expecting quality improvement",
+        whyItHappens: "PNG is lossless, but it cannot restore photographic details that were already discarded during initial JPEG compression.",
+        howToFix: "Only convert JPEG to PNG if you need to composite the image into design tools or avoid further re-compression loss.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Converted image appears slightly larger than original",
+        solution: "Converting a high-compression JPEG to lossless PNG will increase file size because PNG stores pixels losslessly. Choose WebP or adjust JPEG quality.",
+      },
+      {
+        symptom: "Browser crashes or freezes on very large images",
+        solution: "Ensure source images do not exceed 40 megapixels to remain within safe browser Canvas RAM limits.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Is WebP supported across all modern web browsers?",
+        answer: "Yes. WebP is supported by Google Chrome, Apple Safari (iOS & macOS), Mozilla Firefox, Microsoft Edge, and Opera, covering over 97% of global internet users.",
+      },
+      {
+        question: "Does converting between formats reduce image resolution?",
+        answer: "No. The pixel dimensions (width and height) remain identical unless you explicitly resize the image.",
+      },
+      {
+        question: "Are my converted images saved on your servers?",
+        answer: "Never. All encoding happens in browser memory via HTML5 Canvas. Your images are never stored or transmitted anywhere.",
+      },
+    ],
+    conclusion: {
+      heading: "Optimize Visual Assets with the Right Image Format",
+      paragraphs: [
+        "Choosing the ideal image format balances visual sharpness with lightning-fast download speeds. Convert your graphics with OneToolHub's free in-browser converter with zero server uploads.",
+      ],
+      ctaLabel: "Open Image Format Converter",
+    },
+  },
+  {
+    slug: "how-to-crop-images-for-websites-and-social-media",
+    title: "How to Crop Images for Websites and Social Media",
+    seoTitle: "How to Crop Images for Websites and Social Media — Aspect Ratio Guide",
+    metaDescription:
+      "Learn how to crop photos and graphics for Instagram (1:1), YouTube (16:9), TikTok (9:16), and websites. Master composition, pixel boundaries, and in-browser cropping.",
+    excerpt:
+      "Master image cropping for digital platforms. Understand aspect ratio standards, composition framing, and how to crop photos in your browser without quality loss.",
+    categoryId: "youtube-creator-guides",
+    categoryLabel: "YouTube Creator Guides",
+    icon: "Crop",
+    readingTimeMinutes: 5,
+    publishedAt: "2026-10-13",
+    updatedAt: "2026-10-13",
+    featured: true,
+    primaryToolSlug: "image-cropper",
+    relatedToolSlugs: ["image-resizer", "image-format-converter", "image-compressor"],
+    relatedArticleSlugs: ["how-to-resize-images-without-unnecessary-quality-loss", "how-to-convert-images-between-jpg-png-webp"],
+    keywords: [
+      "how to crop images for social media",
+      "crop photo to 16 9 ratio",
+      "square crop 1 1 instagram",
+      "crop image online free",
+      "in browser image cropper",
+    ],
+    introduction: [
+      "Every major digital platform enforces strict aspect ratio requirements. Instagram feeds favor 1:1 square or 4:5 vertical frames, YouTube thumbnails require 16:9 widescreen proportions, and TikTok or Instagram Reels demand 9:16 full-screen vertical framing.",
+      "Uploading an uncropped image often results in awkward automated letterboxing or harsh center-cropping that cuts off vital faces, text, or products. Cropping your photos beforehand ensures complete control over composition.",
+    ],
+    problemSolved: {
+      heading: "Why Pre-Cropping Images Prevents Unwanted Social Media Cuts",
+      paragraphs: [
+        "Social media platforms automatically crop and resize uploaded photos to fit their layout grids. If an image has important details near the edges, algorithmic cropping will frequently clip them out.",
+        "Using a client-side cropper with pre-calibrated aspect ratio presets allows creators and marketers to frame subjects precisely, verify boundary coordinates, and export high-resolution assets locally.",
+      ],
+      keyTakeaways: [
+        "1:1 aspect ratio is the gold standard for profile avatars and square Instagram posts.",
+        "16:9 ratio is mandatory for YouTube video thumbnails and horizontal website headers.",
+        "9:16 ratio matches modern mobile smartphone screens for Stories and Reels.",
+        "Cropping extracts pixels natively without downscaling, preserving the sharpness of the cropped region.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Upload Photo to the In-Browser Cropper",
+        stepDescription:
+          "Drop your image into the cropper. The tool decodes dimensions locally without uploading.",
+      },
+      {
+        stepTitle: "Choose an Aspect Ratio Preset",
+        stepDescription:
+          "Select '1:1' for square posts, '16:9' for YouTube, '9:16' for vertical video stills, or 'Freeform' for custom framing.",
+      },
+      {
+        stepTitle: "Position the Crop Box and Adjust Offsets",
+        stepDescription:
+          "Adjust the width, height, and X/Y coordinates to frame your subject according to the rule of thirds.",
+      },
+      {
+        stepTitle: "Export and Download the Cropped Graphic",
+        stepDescription:
+          "Select your preferred output format (PNG for lossless transparency, JPG for compact photos) and download the file.",
+      },
+    ],
+    practicalExample: {
+      title: "Framing a 1:1 Avatar for Social Media",
+      scenario: "A digital creator needs to turn a horizontal 4000×3000 DSLR camera photo into a clean 1:1 square avatar for their YouTube channel.",
+      inputLabel: "Raw DSLR Photograph",
+      inputSample: "creator-portrait.jpg (4000 × 3000 px, 4:3 Ratio)",
+      outputLabel: "Cropped Channel Avatar",
+      outputSample: "creator-portrait-cropped.png (2600 × 2600 px, 1:1 Square Ratio)",
+      explanation: "The creator selected the 1:1 preset, centered their face in the frame, and exported a high-resolution lossless PNG avatar.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Cropping too tightly around text or facial boundaries",
+        whyItHappens: "When platforms display avatars in circular masks, sharp corners and tight borders get clipped.",
+        howToFix: "Leave generous margin around subjects when preparing square avatars to account for circular circular framing.",
+      },
+      {
+        mistake: "Resizing an image instead of cropping it to change aspect ratio",
+        whyItHappens: "Forcing a 16:9 image into a 1:1 box with resizing will squash or stretch the visual contents.",
+        howToFix: "Always crop to change aspect ratio without distortion; use resizing only to scale resolution up or down.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Crop box cannot be moved beyond image edges",
+        solution: "The cropper enforces boundary safety checks so the output never contains unrendered empty pixels.",
+      },
+      {
+        symptom: "Exported cropped file size is large",
+        solution: "If you exported as PNG, switch to JPG or WebP with 85% quality to significantly reduce file size.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Does cropping an image reduce its sharpness?",
+        answer: "No. The cropped area retains its exact original native pixels. It only trims away the unwanted outer regions.",
+      },
+      {
+        question: "Can I enter exact pixel dimensions instead of using presets?",
+        answer: "Yes. You can type specific pixel widths, heights, and offsets directly into the manual numeric fields.",
+      },
+      {
+        question: "Are my photos uploaded to any server?",
+        answer: "Never. The cropping occurs in your browser canvas using local memory. Your images remain private.",
+      },
+    ],
+    conclusion: {
+      heading: "Master Social Media Framing with Effortless Cropping",
+      paragraphs: [
+        "Present your graphics with professional composition. Crop photos accurately for any platform using OneToolHub's client-side Image Cropper.",
+      ],
+      ctaLabel: "Open Image Cropper Tool",
+    },
+  },
+  {
+    slug: "how-to-convert-image-to-base64",
+    title: "How to Convert an Image to Base64 and Data URLs",
+    seoTitle: "How to Convert an Image to Base64 and Data URLs — Developer Guide",
+    metaDescription:
+      "Learn how to convert images to Base64 strings and RFC 2397 Data URLs. Understand byte overhead (~33%), HTML/CSS inlining, and client-side encoding.",
+    excerpt:
+      "Master image to Base64 encoding. Understand RFC 2397 Data URLs, calculate byte overhead, and learn when inlining images is best for web performance.",
+    categoryId: "developer-tutorials",
+    categoryLabel: "Developer Tutorials",
+    icon: "FileCode",
+    readingTimeMinutes: 6,
+    publishedAt: "2026-10-13",
+    updatedAt: "2026-10-13",
+    featured: true,
+    primaryToolSlug: "image-to-base64",
+    relatedToolSlugs: ["base64-encoder-decoder", "image-format-converter", "json-formatter"],
+    relatedArticleSlugs: ["how-base64-encoding-and-decoding-works", "how-to-format-and-validate-json"],
+    keywords: [
+      "how to convert image to base64",
+      "image to data url converter",
+      "inline image in html css",
+      "base64 size overhead explained",
+      "client side image encoder",
+    ],
+    introduction: [
+      "Modern web development often requires embedding small icons, favicons, email signatures, or JSON payload assets without triggering separate HTTP roundtrips. Base64 encoding translates binary image files into printable ASCII strings that can be placed directly inside HTML tags, CSS stylesheets, and API requests.",
+      "While Base64 provides convenience and eliminates network latency for tiny assets, it also increases file payload size by approximately 33%. Understanding how Data URLs work enables you to make informed engineering trade-offs between HTTP overhead and payload weight.",
+    ],
+    problemSolved: {
+      heading: "Eliminating HTTP Roundtrips vs. Managing Base64 Payload Overhead",
+      paragraphs: [
+        "In performance-critical scenarios such as critical rendering path CSS, fetching external images introduces DNS resolution and TCP handshake delays. Inlining critical icons directly into CSS via Data URLs guarantees they render instantaneously.",
+        "However, converting large multi-megabyte photos to Base64 inflates bundle sizes and prevents browser image caching. A dedicated converter provides both the raw string and Data URL while calculating exact overhead metrics.",
+      ],
+      keyTakeaways: [
+        "Data URLs follow RFC 2397 syntax: `data:[mime-type];base64,[payload]`.",
+        "Base64 converts 3 bytes of binary data into 4 ASCII text characters, causing an unavoidable ~33% size increase.",
+        "Ideal for tiny icons (< 10 KB), CSS background patterns, email signatures, and mock API payloads.",
+        "Not recommended for large photos or hero images, which benefit from browser HTTP caching and progressive loading.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Upload Image File to the Encoder",
+        stepDescription:
+          "Drop any JPEG, PNG, or WebP image up to 15 MB into the in-browser converter.",
+      },
+      {
+        stepTitle: "Review Dimensions and Overhead Analytics",
+        stepDescription:
+          "Inspect original binary byte weight vs Base64 character length and review the exact percentage increase.",
+      },
+      {
+        stepTitle: "Choose Between Data URL and Raw Base64",
+        stepDescription:
+          "Select 'Complete Data URL' for direct use in HTML `<img src='...'>` or CSS `background-image: url(...)`, or select 'Raw Base64' for JSON API endpoints.",
+      },
+      {
+        stepTitle: "Copy or Download as Text File",
+        stepDescription:
+          "Click 'Copy to Clipboard' for instant code editor pasting, or 'Save as .txt' to avoid browser memory buffer limitations.",
+      },
+    ],
+    practicalExample: {
+      title: "Inlining a Vector Icon in HTML Email Template",
+      scenario: "A front-end developer needs to inline a 4 KB SVG-converted PNG icon directly into an offline email newsletter HTML template.",
+      inputLabel: "Binary Image Input",
+      inputSample: "mail-icon.png (4,096 bytes binary)",
+      outputLabel: "Data URL Output",
+      outputSample: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA... (5,464 characters, +33.4% overhead)",
+      explanation: "Inlining the Data URL into `<img src='data:image/png;base64,...'>` prevented email client privacy blockers from hiding the icon.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Converting large multi-megabyte photos into Base64 for website galleries",
+        whyItHappens: "Developers assume inlining always speeds up pages, but huge Base64 strings bloat the initial HTML and delay First Contentful Paint.",
+        howToFix: "Reserve Base64 for small assets under 10–15 KB. Serve larger photos as standard binary WebP or JPEG files.",
+      },
+      {
+        mistake: "Pasting raw Base64 strings into HTML src attributes without the Data URL prefix",
+        whyItHappens: "Omitting `data:image/png;base64,` causes browsers to treat the text as an invalid relative URL.",
+        howToFix: "Always use the complete Data URL format when embedding directly in HTML or CSS.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Browser crashes when copying very large Base64 strings",
+        solution: "Strings over several million characters can exceed clipboard limits. Use the 'Save as .txt' button to download the text file directly.",
+      },
+      {
+        symptom: "Image does not render in older email clients",
+        solution: "Certain legacy desktop email clients restrict Data URLs for security. Test on modern web clients or host external fallbacks.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Can Base64 data URLs be cached by web browsers?",
+        answer: "If inlined directly in HTML, no. If embedded inside an external CSS stylesheet, the image data is cached whenever the CSS file is cached.",
+      },
+      {
+        question: "Is Base64 a form of encryption?",
+        answer: "No. Base64 is an encoding format designed for safe data transport across text channels. It provides zero cryptographic security.",
+      },
+      {
+        question: "Are my files uploaded to a remote server?",
+        answer: "No. Conversion uses the browser's native FileReader API entirely in client RAM. Your files never leave your device.",
+      },
+    ],
+    conclusion: {
+      heading: "Harness the Power of Inlined Data URLs Responsibly",
+      paragraphs: [
+        "Inlining small visual assets simplifies asset distribution and prevents HTTP roundtrips. Generate clean, safe Base64 strings with OneToolHub's in-browser converter.",
+      ],
+      ctaLabel: "Open Image to Base64 Tool",
+    },
+  },
+  {
+    slug: "how-to-extract-color-palette-from-image",
+    title: "How to Extract a Color Palette from an Image",
+    seoTitle: "How to Extract a Harmonious Color Palette from an Image — Designer Guide",
+    metaDescription:
+      "Learn how to extract dominant colors and harmonious color palettes from any image or logo. Get HEX/RGB codes, verify WCAG contrast, and export to CSS.",
+    excerpt:
+      "Extract beautiful color palettes from photographs and graphics. Learn pixel quantization, WCAG contrast verification, and how to export palettes to CSS and JSON.",
+    categoryId: "image-pdf-guides",
+    categoryLabel: "Image & PDF Guides",
+    icon: "Pipette",
+    readingTimeMinutes: 5,
+    publishedAt: "2026-10-13",
+    updatedAt: "2026-10-13",
+    featured: true,
+    primaryToolSlug: "image-color-palette",
+    relatedToolSlugs: ["color-picker", "image-cropper", "image-format-converter"],
+    relatedArticleSlugs: ["how-to-convert-hex-rgb-hsl-colors", "how-to-convert-images-between-jpg-png-webp"],
+    keywords: [
+      "how to extract color palette from image",
+      "dominant colors in photo generator",
+      "image color picker hex codes",
+      "extract brand colors from logo",
+      "client side palette extractor",
+    ],
+    introduction: [
+      "Great design often begins with real-world visual inspiration. Whether building a corporate brand identity, designing a website theme, or creating marketing graphics, extracting dominant colors from reference photography or logos guarantees a natural, cohesive aesthetic.",
+      "Traditional manual color picking with an eye dropper is slow and prone to subjective bias. Automated color quantization scans millions of pixels deterministically, grouping colors into frequency clusters and isolating distinct harmonious swatches.",
+    ],
+    problemSolved: {
+      heading: "From Raw Photography to Cohesive Digital Design Tokens",
+      paragraphs: [
+        "Photographs contain thousands of subtle hue variations and lighting shifts. Manually pinpointing the exact primary, secondary, and accent colors requires trial and error.",
+        "An algorithmic palette extractor downsamples image pixels, filters out transparent areas, and deduplicates near-identical shades using Euclidean distance thresholds, delivering ready-to-use HEX, RGB, and CSS variables.",
+      ],
+      keyTakeaways: [
+        "Downsampling pixels allows instant, deterministic color clustering in milliseconds without browser lag.",
+        "Filtering out alpha transparency prevents transparent PNG canvas edges from skewing the palette.",
+        "Euclidean distance calculations ensure output swatches remain distinct rather than repeating slight tint variations.",
+        "Exporting to CSS custom properties (`:root { --color-1: ... }`) bridges the gap between design inspiration and web implementation.",
+      ],
+    },
+    steps: [
+      {
+        stepTitle: "Upload Inspiration Image or Brand Logo",
+        stepDescription:
+          "Drop your photo or graphic into the in-browser extractor. The tool analyzes pixel data locally.",
+      },
+      {
+        stepTitle: "Select Palette Swatch Count",
+        stepDescription:
+          "Choose between 4, 6, 8, 10, or 12 swatches based on whether you need a minimalist or comprehensive design system.",
+      },
+      {
+        stepTitle: "Inspect Dominant Colors and Percentages",
+        stepDescription:
+          "Review the continuous palette strip, HEX codes, RGB components, and estimated visual share percentages.",
+      },
+      {
+        stepTitle: "Copy Codes or Export Design Tokens",
+        stepDescription:
+          "Click any swatch to copy its individual HEX code, or export the full palette as JSON, Plain Text, or CSS Custom Properties.",
+      },
+    ],
+    practicalExample: {
+      title: "Extracting Natural Palette for Web Brand Identity",
+      scenario: "A UI designer needs to create a modern earthy theme for an eco-friendly brand based on a landscape photograph of a redwood forest.",
+      inputLabel: "Inspiration Image",
+      inputSample: "redwood-forest.jpg (Scenic nature photography)",
+      outputLabel: "Extracted 6-Color Palette",
+      outputSample: "#1B3B2B (Deep Forest Green, 32%), #5C4033 (Rich Bark Brown, 24%), #8FBC8F (Sage Green, 18%), #D2B48C (Warm Tan, 12%), #F5F5DC (Soft Cream, 8%), #2F4F4F (Slate Shadow, 6%)",
+      explanation: "The extractor delivered a cohesive, balanced natural palette ready to be implemented directly as website CSS theme variables.",
+    },
+    commonMistakes: [
+      {
+        mistake: "Extracting palettes from low-contrast or over-filtered photos",
+        whyItHappens: "Heavy social media filters compress the color spectrum, resulting in monochromatic or muddy palette swatches.",
+        howToFix: "Use natural, well-lit photographs or clean vector graphics with distinct lighting and contrast.",
+      },
+      {
+        mistake: "Using extracted colors for text without checking contrast ratios",
+        whyItHappens: "Extracted colors are visually dominant, but they may not meet WCAG AA standards (4.5:1) for readable typography.",
+        howToFix: "Cross-check extracted background and text pairings in a contrast checker before publishing live web pages.",
+      },
+    ],
+    troubleshooting: [
+      {
+        symptom: "Palette contains mostly black or white colors",
+        solution: "Images with heavy letterboxing or solid borders can skew frequency bins. Crop out borders before palette extraction.",
+      },
+      {
+        symptom: "Transparent PNG logo yields unintended background colors",
+        solution: "Our tool automatically ignores transparent pixels (alpha < 128); ensure the graphic actually has true transparency rather than a solid background.",
+      },
+    ],
+    faqs: [
+      {
+        question: "How does the algorithm choose which colors to extract?",
+        answer: "The tool downsamples the image, groups colors into 5-bit color bins, sorts them by pixel frequency, and applies Euclidean distance checks to filter out redundant near-identical shades.",
+      },
+      {
+        question: "Can I export the colors directly into my stylesheet?",
+        answer: "Yes. Click 'CSS' to download a ready-to-paste `:root` custom properties block with all extracted color variables.",
+      },
+      {
+        question: "Are my artwork or logos uploaded to a server?",
+        answer: "Never. All pixel analysis occurs inside your browser memory using the HTML5 Canvas API. No images leave your computer.",
+      },
+    ],
+    conclusion: {
+      heading: "Turn Visual Inspiration into Dynamic Color Systems",
+      paragraphs: [
+        "Uncover the authentic color harmony in your favorite images. Extract, customize, and export professional palettes with OneToolHub's client-side Palette Extractor.",
+      ],
+      ctaLabel: "Open Image Color Palette Extractor",
+    },
+  },
 ] as const;
 
 export function getArticleBySlug(slug: string): LearnArticle | undefined {

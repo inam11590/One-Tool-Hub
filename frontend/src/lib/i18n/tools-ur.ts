@@ -150,4 +150,52 @@ export const UR_TOOLS_MAP: Record<string, LocalizedToolMetadata> = {
     shortDescription: "ڈیزائن، ویب سائٹس اور لے آؤٹس کے لیے پیراگراف اور فرضی متن بنائیں۔",
     keywords: ["lorem ipsum جنریٹر", "ڈمی ٹیکسٹ", "فرضی تحریر جنریٹر"],
   },
+  "pdf-text-extractor": {
+    slug: "pdf-text-extractor",
+    name: "PDF ٹیکسٹ ایکسٹریکٹر",
+    shortDescription: "پی ڈی ایف دستاویزات سے متن نکالیں، الفاظ گنیں اور TXT فائل ڈاؤن لوڈ کریں۔",
+    keywords: ["پی ڈی ایف ٹیکسٹ نکالیں", "pdf سے ٹیکسٹ", "pdf to txt اردو", "دستاویز ٹیکسٹ ایکسٹریکٹ"],
+  },
+  "pdf-page-rotator": {
+    slug: "pdf-page-rotator",
+    name: "PDF پیج روٹیٹر",
+    shortDescription: "پی ڈی ایف صفحات کو 90، 180 یا 270 ڈگری گھمائیں اور درست سمت میں محفوظ کریں۔",
+    keywords: ["پی ڈی ایف پیج گھمائیں", "pdf روٹیٹ کریں", "الٹا پی ڈی ایف درست کریں", "pdf پیج سیدھا کریں"],
+  },
+  "pdf-metadata-editor": {
+    slug: "pdf-metadata-editor",
+    name: "PDF میٹا ڈیٹا ویوور اور ایڈیٹر",
+    shortDescription: "پی ڈی ایف ٹائٹل، مصنف اور پوشیدہ معلومات دیکھیں، تبدیل کریں یا مکمل صاف کریں۔",
+    keywords: ["پی ڈی ایف میٹا ڈیٹا", "pdf معلومات تبدیل کریں", "pdf مصنف صاف کریں", "دستاویز پرائیویسی"],
+  },
+  "pdf-password-protector": {
+    slug: "pdf-password-protector",
+    name: "PDF پاس ورڈ پروٹیکٹر (سیکیورٹی جائزہ)",
+    shortDescription: "پی ڈی ایف دستاویزات کے لیے کلائنٹ سائیڈ پاس ورڈ سیکیورٹی اور کریپٹوگرافک جائزہ۔",
+    keywords: ["پی ڈی ایف پاس ورڈ", "pdf محفوظ کریں", "pdf لاک کریں", "سیکیورٹی ایڈوائزری"],
+  },
+  "image-format-converter": {
+    slug: "image-format-converter",
+    name: "امیج فارمیٹ کنورٹر",
+    shortDescription: "تصاویر کو JPG، PNG اور WebP کے درمیان تبدیل کریں، کوالٹی سیٹ کریں اور فوری ڈاؤن لوڈ کریں۔",
+    keywords: ["امیج فارمیٹ کنورٹر", "تصویر فارمیٹ تبدیل کریں", "png to jpg اردو", "webp کنورٹر"],
+  },
+  "image-cropper": {
+    slug: "image-cropper",
+    name: "امیج کروپر (تصویر تراشیں)",
+    shortDescription: "سوشل میڈیا اور ویب سائٹس کے لیے تصاویر کو 1:1، 16:9، 9:16 یا مرضی کے سائز میں تراشیں۔",
+    keywords: ["تصویر کروپ کریں", "امیج کروپر", "پروفائل تصویر تراشیں", "یوٹیوب تھمب نیل کروپ"],
+  },
+  "image-to-base64": {
+    slug: "image-to-base64",
+    name: "امیج ٹو Base64 کنورٹر",
+    shortDescription: "تصویر کو Base64 سٹرنگ اور Data URL میں تبدیل کریں اور کوڈ میں باآسانی استعمال کریں۔",
+    keywords: ["امیج ٹو base64", "تصویر base64 کوڈ", "ڈیٹا یو آر ایل جنریٹر", "base64 سٹرنگ"],
+  },
+  "image-color-palette": {
+    slug: "image-color-palette",
+    name: "امیج کلر پیلیٹ ایکسٹریکٹر",
+    shortDescription: "تصویر سے نمایاں رنگ نکالیں، HEX اور RGB کوڈز دیکھیں اور مکمل پیلیٹ کاپی کریں۔",
+    keywords: ["تصویر سے رنگ نکالیں", "کلر پیلیٹ جنریٹر", "امیج کلر کوڈز", "ڈیزائن پیلیٹ اردو"],
+  },
 };

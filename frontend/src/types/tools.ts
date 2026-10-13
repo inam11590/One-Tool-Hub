@@ -30,7 +30,13 @@ export type ToolIconName =
   | "Type"
   | "FileSearch"
   | "Eraser"
-  | "Pilcrow";
+  | "Pilcrow"
+  | "RotateCw"
+  | "Tag"
+  | "Crop"
+  | "RefreshCw"
+  | "FileCode"
+  | "Pipette";
 
 export type CategoryIconName =
   | "GraduationCap"

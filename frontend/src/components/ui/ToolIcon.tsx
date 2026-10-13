@@ -30,6 +30,12 @@ import {
   FileSearch,
   Eraser,
   Pilcrow,
+  RotateCw,
+  Tag,
+  Crop,
+  RefreshCw,
+  FileCode,
+  Pipette,
   type LucideProps,
 } from "lucide-react";
 import type { CategoryIconName, ToolIconName } from "@/types/tools";
@@ -87,6 +93,18 @@ export function ToolIcon({
       return <Eraser {...props} />;
     case "Pilcrow":
       return <Pilcrow {...props} />;
+    case "RotateCw":
+      return <RotateCw {...props} />;
+    case "Tag":
+      return <Tag {...props} />;
+    case "Crop":
+      return <Crop {...props} />;
+    case "RefreshCw":
+      return <RefreshCw {...props} />;
+    case "FileCode":
+      return <FileCode {...props} />;
+    case "Pipette":
+      return <Pipette {...props} />;
   }
 }
 

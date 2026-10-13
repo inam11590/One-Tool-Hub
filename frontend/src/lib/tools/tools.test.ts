@@ -1202,7 +1202,7 @@ test("Step 6 Production SEO: resolves https://one-tool-hub-sooty.vercel.app on V
 // ============================================================================
 test("Step 7 Learning Center Content Integrity: verifies complete tutorials, unique metadata, and 1-to-1 tool coverage", () => {
   assert.equal(LEARN_CATEGORIES.length, 5);
-  assert.equal(LEARN_ARTICLES.length, 24);
+  assert.equal(LEARN_ARTICLES.length, 31);
 
   const slugs = new Set<string>();
   const titles = new Set<string>();
@@ -1270,21 +1270,21 @@ test("Step 7 Learning Center Content Integrity: verifies complete tutorials, uni
     }
   }
 
-  // All 24 tools have a dedicated companion tutorial
-  assert.equal(primaryToolsCovered.size, 24);
+  // All 31 functional tools have a dedicated companion tutorial
+  assert.equal(primaryToolsCovered.size, 31);
 });
 
 test("Step 7 Search, Category Filtering, Internal Linking & Article JSON-LD: validates directory filters and structured data", () => {
   // Search and category filtering
   const allResults = filterArticles(LEARN_ARTICLES, "", "all");
-  assert.equal(allResults.length, 24);
+  assert.equal(allResults.length, 31);
 
   const devCategoryResults = filterArticles(
     LEARN_ARTICLES,
     "",
     "developer-tutorials"
   );
-  assert.equal(devCategoryResults.length, 9);
+  assert.equal(devCategoryResults.length, 10);
 
   const gpaSearchResults = filterArticles(LEARN_ARTICLES, "credit hours", "all");
   assert.ok(
@@ -1602,9 +1602,9 @@ test("Smart Tool Search & Typo Tolerance (Step 10)", () => {
   assert.equal(levenshteinDistance("conpress", "compress"), 1);
   assert.equal(levenshteinDistance("kitten", "sitting"), 3);
 
-  // 2. Empty query returns all tools (24 available tools)
+  // 2. Empty query returns all tools
   const allResults = searchTools(TOOLS_REGISTRY, "");
-  assert.equal(allResults.length, 24);
+  assert.equal(allResults.length, TOOLS_REGISTRY.length);
 
   // 3. Exact matching by tool name
   const jsonResults = searchTools(TOOLS_REGISTRY, "JSON");
@@ -2504,8 +2504,8 @@ test("Step 14: Lorem Ipsum & Placeholder Text Generator Logic", () => {
 test("Step 15: Technical SEO Sitemap Dynamic Timestamps & Coverage", () => {
   // Test dynamic sitemap entries
   const availableTools = TOOLS_REGISTRY.filter((t) => t.status === "available" && t.href);
-  assert.equal(availableTools.length, 24, "All 24 tools must be in available status");
-  assert.equal(LEARN_ARTICLES.length, 24, "All 24 tutorials must be registered");
+  assert.equal(availableTools.length, 31, "All 31 functional tools must be in available status");
+  assert.equal(LEARN_ARTICLES.length, 31, "All 31 tutorials must be registered");
 
   // Every tool must have a matching tutorial
   for (const tool of availableTools) {
@@ -2534,7 +2534,7 @@ test("Step 15: All 24 Tools Route Registry & Client-Side Integrity", () => {
     assert.ok(tool.keywords && tool.keywords.length >= 3, `Tool has at least 3 searchable keywords: ${tool.slug}`);
   }
 
-  assert.equal(seenSlugs.size, 24, "Total registered tools must exactly equal 24");
+  assert.equal(seenSlugs.size, 32, "Total registered tools must exactly equal 32");
 });
 
 test("Step 16: Error Classification, Standard Error Classes & Safe Serialization", async () => {
@@ -2670,8 +2670,8 @@ test("Step 17: Internationalization Config, Path Resolution & Translation Dictio
   assert.equal(urDict.categories.developer.shortName, "ڈویلپرز");
   assert.equal(urDict.toolUI.copied, "کاپی ہو گیا!");
 
-  // 5. Complete 24-tool Urdu mapping
-  assert.equal(Object.keys(UR_TOOLS_MAP).length, 24, "All 24 tools must have Urdu translations");
+  // 5. Complete 32-tool Urdu mapping
+  assert.equal(Object.keys(UR_TOOLS_MAP).length, 32, "All 32 tools must have Urdu translations");
   for (const slug of Object.keys(UR_TOOLS_MAP)) {
     const item = UR_TOOLS_MAP[slug];
     assert.ok(item?.name && item.name.length > 2, `Urdu name exists for ${slug}`);
@@ -2841,10 +2841,10 @@ test("Step 18: Privacy Safeguards & Non-PII Telemetry Compliance", async () => {
 // ============================================================================
 test("Step 19: Organic Growth Internal Linking & Bidirectional Graph Integrity", () => {
   // 1. Tool-to-Tutorial Bidirectional 1-to-1 Mapping
-  assert.equal(TOOLS_REGISTRY.length, 24);
-  assert.equal(LEARN_ARTICLES.length, 24);
+  assert.equal(TOOLS_REGISTRY.length, 32);
+  assert.equal(LEARN_ARTICLES.length, 31);
 
-  for (const tool of TOOLS_REGISTRY) {
+  for (const tool of TOOLS_REGISTRY.filter((t) => t.status === "available")) {
     const article = getArticleForTool(tool.slug);
     assert.ok(article, `Every tool must have a matching tutorial: ${tool.slug}`);
     assert.equal(
@@ -2852,6 +2852,9 @@ test("Step 19: Organic Growth Internal Linking & Bidirectional Graph Integrity",
       tool.slug,
       `Tutorial primaryToolSlug must point back to tool: ${tool.slug}`
     );
+  }
+
+  for (const tool of TOOLS_REGISTRY) {
 
     // Curated related tools must return distinct tools and never include self
     const related = getRelatedTools(tool.slug, 4);
@@ -2909,4 +2912,641 @@ test("Step 19: Safe Shareable URLs & Zero-Leak Privacy Guarantee", () => {
   }
 });
 
+test("Step 20: Smart Tool Finder Task Intent Matching", async () => {
+  const { findToolsForTask, TASK_SUGGESTIONS } = await import("../tool-finder.ts");
 
+  // 1. Task suggestions catalog integrity
+  assert.ok(TASK_SUGGESTIONS.length >= 8, "Must provide at least 8 starter suggestions");
+  for (const s of TASK_SUGGESTIONS) {
+    assert.ok(s.id, "Suggestion must have an id");
+    assert.ok(s.query.length >= 10, "Suggestion must have descriptive English query");
+    assert.ok(s.queryUr.length >= 10, "Suggestion must have descriptive Urdu query");
+    assert.ok(s.targetToolSlug, "Suggestion must have a targetToolSlug");
+  }
+
+  // 2. Natural language query resolution
+  const imageMatch = findToolsForTask("I need to compress my photos for my website");
+  assert.ok(imageMatch.matches.length > 0, "Image compression query must find tools");
+  assert.equal(imageMatch.matches[0]?.tool.slug, "image-compressor");
+  assert.ok(imageMatch.matches[0]?.score >= 40, "Should have high intent score");
+
+  const pdfMatch = findToolsForTask("combine and merge two pdf reports together");
+  assert.ok(pdfMatch.matches.length > 0, "PDF merge query must find tools");
+  assert.equal(pdfMatch.matches[0]?.tool.slug, "pdf-merge-split");
+
+  const jsonMatch = findToolsForTask("prettify and validate minified json data");
+  assert.ok(jsonMatch.matches.length > 0, "JSON format query must find tools");
+  assert.equal(jsonMatch.matches[0]?.tool.slug, "json-formatter");
+
+  const gpaMatch = findToolsForTask("calculate my college semester grades gpa");
+  assert.ok(gpaMatch.matches.length > 0, "GPA query must find tools");
+  assert.equal(gpaMatch.matches[0]?.tool.slug, "gpa-calculator");
+
+  // 3. Urdu task matching
+  const urduImageMatch = findToolsForTask("تصویر کا سائز کم کریں", { locale: "ur" });
+  assert.ok(urduImageMatch.matches.length > 0, "Urdu image compression query must match");
+  assert.equal(urduImageMatch.matches[0]?.tool.slug, "image-compressor");
+
+  // 4. Empty query safety
+  const emptyRes = findToolsForTask("   ");
+  assert.equal(emptyRes.emptyQuery, true);
+  assert.equal(emptyRes.matches.length, 0);
+  assert.ok(emptyRes.suggestedRelatedTools.length >= 4, "Should offer fallback starter tools");
+});
+
+test("Step 20: Tool Collections Registry & Role-Based Bundles", async () => {
+  const { getCollections, getCollectionBySlug, getToolsForCollection } = await import("../collections.ts");
+
+  const collections = getCollections();
+  assert.equal(collections.length, 6, "Must provide exactly 6 curated tool collections");
+
+  const expectedSlugs = [
+    "student-toolkit",
+    "developer-toolkit",
+    "content-creator-toolkit",
+    "pdf-productivity-toolkit",
+    "writing-toolkit",
+    "image-design-toolkit",
+  ];
+
+  for (const slug of expectedSlugs) {
+    const col = getCollectionBySlug(slug);
+    assert.ok(col, `Collection ${slug} must be registered`);
+    assert.ok(col.title.length >= 5, `Collection ${slug} must have valid title`);
+    assert.ok(col.titleUr.length >= 5, `Collection ${slug} must have valid Urdu title`);
+    assert.ok(col.description.length >= 20, `Collection ${slug} must have description`);
+    assert.ok(col.toolSlugs.length >= 3, `Collection ${slug} must contain at least 3 tools`);
+
+    // Verify all toolSlugs point to available tools
+    const tools = getToolsForCollection(col);
+    assert.equal(tools.length, col.toolSlugs.length, `All tool slugs in ${slug} must resolve`);
+    for (const tool of tools) {
+      assert.equal(tool.status, "available", `Tool ${tool.slug} must be available`);
+    }
+  }
+});
+
+test("Step 20: Productivity Workflows Pipeline Integrity", async () => {
+  const { getWorkflows, getWorkflowBySlug, getToolsForWorkflow } = await import("../workflows.ts");
+
+  const workflows = getWorkflows();
+  assert.equal(workflows.length, 7, "Must provide exactly 7 guided productivity recipes");
+
+  const expectedSlugs = [
+    "prepare-images-website",
+    "prepare-pdf-document",
+    "developer-data-prep",
+    "prepare-youtube-description",
+    "extract-pdf-report-data",
+    "prepare-social-media-image",
+    "create-brand-color-palette",
+  ];
+
+  for (const slug of expectedSlugs) {
+    const wf = getWorkflowBySlug(slug);
+    assert.ok(wf, `Workflow ${slug} must be registered`);
+    assert.ok(wf.title.length >= 10, `Workflow ${slug} must have title`);
+    assert.ok(wf.titleUr.length >= 10, `Workflow ${slug} must have Urdu title`);
+    assert.ok(wf.estimatedMinutes > 0, `Workflow ${slug} must have time estimate`);
+    assert.ok(wf.steps.length >= 2, `Workflow ${slug} must have at least 2 steps`);
+
+    // Validate each step in the recipe
+    for (const step of wf.steps) {
+      assert.ok(step.stepNumber >= 1, "Step must have positive number");
+      assert.ok(step.title.length >= 5, "Step must have title");
+      assert.ok(step.toolSlug, "Step must specify toolSlug");
+      assert.ok(step.actionLabel.length >= 5, "Step must have action label");
+      assert.ok(step.tip.length >= 10, "Step must have pro tip");
+    }
+
+    const tools = getToolsForWorkflow(wf);
+    assert.ok(tools.length >= 2, `Workflow ${slug} must connect at least 2 tools`);
+  }
+});
+
+test("Step 20: Enhanced Personalization, Frequency & Recommendations", async () => {
+  const {
+    getFavoriteTools,
+    toggleFavoriteTool,
+    getRecentlyUsedTools,
+    recordRecentlyUsedTool,
+    recordToolUsage,
+    getFrequentlyUsedTools,
+    getRecommendedTools,
+    resetAllPreferences,
+  } = await import("../user-preferences.ts");
+
+  // Verify non-DOM fallback behavior doesn't throw
+  assert.deepEqual(getFavoriteTools(), []);
+  assert.deepEqual(getRecentlyUsedTools(), []);
+  assert.deepEqual(getFrequentlyUsedTools(), []);
+  assert.equal(typeof toggleFavoriteTool, "function");
+  assert.equal(typeof recordRecentlyUsedTool, "function");
+  assert.equal(typeof recordToolUsage, "function");
+  assert.equal(typeof resetAllPreferences, "function");
+
+  // Test recommended tools logic with known registry
+  const mockRegistry = [
+    { slug: "json-formatter", categoryId: "developer", status: "available" },
+    { slug: "regex-tester", categoryId: "developer", status: "available" },
+    { slug: "uuid-generator", categoryId: "developer", status: "available" },
+    { slug: "gpa-calculator", categoryId: "student", status: "available" },
+    { slug: "word-counter", categoryId: "student", status: "available" },
+  ];
+
+  const recommendations = getRecommendedTools(mockRegistry, 3);
+  assert.ok(Array.isArray(recommendations), "Recommendations must be an array");
+  assert.ok(recommendations.length <= 3, "Recommendations must respect limit");
+});
+
+test("Step 20: Privacy-Safe Retention Telemetry Compliance", async () => {
+  const { trackRetentionEvent } = await import("../analytics.ts");
+
+  // Verify function handles calls without throwing when analytics is disabled in test
+  const sent = trackRetentionEvent("tool_finder_search", {
+    event_category: "discovery",
+    count: 1,
+  });
+  // In test environment, consent is undecided/disabled so it cleanly returns false without leaking
+  assert.equal(typeof sent, "boolean");
+
+  const sentReset = trackRetentionEvent("workspace_reset", {
+    event_category: "workspace",
+  });
+  assert.equal(typeof sentReset, "boolean");
+});
+
+// ============================================================================
+// STEP 21: Advanced PDF & Document Productivity Expansion Tests
+// ============================================================================
+test("Step 21: PDF Text Extractor Logic & Range Parsing", async () => {
+  const { countWords, validatePdfForTextExtraction } = await import(
+    "./pdf-text-extractor.ts"
+  );
+  const { parsePageRanges } = await import("./pdf-merge-split.ts");
+
+  // 1. Word counting accuracy
+  assert.equal(countWords("Hello world\nThis is OneToolHub."), 5);
+  assert.equal(countWords("   \n\t  "), 0);
+  assert.equal(countWords("Word"), 1);
+
+  // 2. Validation
+  const emptyBytes = new Uint8Array(0);
+  assert.equal(validatePdfForTextExtraction(emptyBytes, "empty.pdf").valid, false);
+
+  const invalidHeaderBytes = new Uint8Array([1, 2, 3, 4]);
+  assert.equal(validatePdfForTextExtraction(invalidHeaderBytes, "bad.pdf").valid, false);
+
+  const validHeaderBytes = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d]); // %PDF-
+  assert.equal(validatePdfForTextExtraction(validHeaderBytes, "valid.pdf").valid, true);
+
+  // 3. Page range parsing
+  const range1 = parsePageRanges("1-3, 5", 6);
+  assert.equal(range1.valid, true);
+  assert.deepEqual(range1.uniqueSortedPages, [1, 2, 3, 5]);
+
+  const range2 = parsePageRanges("4, 2, 1", 5);
+  assert.equal(range2.valid, true);
+  assert.deepEqual(range2.uniqueSortedPages, [1, 2, 4]); // Sorted and deduped
+
+  // Invalid ranges
+  assert.equal(parsePageRanges("", 5).valid, false);
+  assert.equal(parsePageRanges("0-2", 5).valid, false);
+  assert.equal(parsePageRanges("1-10", 5).valid, false);
+});
+
+test("Step 21: PDF Page Rotator Lossless Normalization & Multi-Page Modification", async () => {
+  const {
+    normalizeAngle,
+    applyRotationDelta,
+    resetRotations,
+    exportRotatedPdf,
+    inspectPdfForRotation,
+  } = await import("./pdf-page-rotator.ts");
+
+  // 1. Angle normalization
+  assert.equal(normalizeAngle(0), 0);
+  assert.equal(normalizeAngle(90), 90);
+  assert.equal(normalizeAngle(180), 180);
+  assert.equal(normalizeAngle(270), 270);
+  assert.equal(normalizeAngle(360), 0);
+  assert.equal(normalizeAngle(450), 90);
+  assert.equal(normalizeAngle(-90), 270);
+  assert.equal(normalizeAngle(-180), 180);
+
+  // 2. Rotation delta manipulation
+  const initialPages = [
+    { pageNumber: 1, originalRotation: 0, rotationDelta: 0, finalRotation: 0 },
+    { pageNumber: 2, originalRotation: 90, rotationDelta: 0, finalRotation: 90 },
+  ];
+
+  const rotatedPages = applyRotationDelta(initialPages, 90, [1]);
+  assert.equal(rotatedPages[0]?.finalRotation, 90);
+  assert.equal(rotatedPages[1]?.finalRotation, 90); // untouched
+
+  const resetResult = resetRotations(rotatedPages);
+  assert.equal(resetResult[0]?.finalRotation, 0);
+  assert.equal(resetResult[1]?.finalRotation, 90);
+
+  // 3. PDF Creation, Inspection, and Export
+  const doc = await PDFDocument.create();
+  doc.addPage([200, 200]);
+  doc.addPage([300, 300]);
+  const initialPdfBytes = await doc.save();
+
+  const inspection = await inspectPdfForRotation(initialPdfBytes, "test.pdf");
+  assert.equal(inspection.valid, true);
+  assert.equal(inspection.pageCount, 2);
+
+  const modifiedPages = applyRotationDelta(inspection.pages, 90, [1]);
+  const exportResult = await exportRotatedPdf(initialPdfBytes, modifiedPages);
+  assert.ok(exportResult.bytes.length > 0);
+  assert.ok(exportResult.sizeBytes > 0);
+
+  // Verify internal rotation in exported PDF
+  const verifiedDoc = await PDFDocument.load(exportResult.bytes);
+  assert.equal(verifiedDoc.getPage(0).getRotation().angle, 90);
+  assert.equal(verifiedDoc.getPage(1).getRotation().angle, 0);
+});
+
+test("Step 21: PDF Metadata Editor Extraction, Modification & Privacy Wipe", async () => {
+  const {
+    readPdfMetadata,
+    updatePdfMetadata,
+    clearAllPdfMetadata,
+  } = await import("./pdf-metadata-editor.ts");
+
+  // 1. Create a PDF with known metadata
+  const doc = await PDFDocument.create();
+  doc.setTitle("Confidential Strategy Proposal");
+  doc.setAuthor("Alice Smith");
+  doc.setSubject("Financial Architecture");
+  doc.setKeywords(["strategy", "finance", "q4"]);
+  doc.setCreator("Test Suite Word Processor");
+  doc.setProducer("OneToolHub PDF Generator");
+  doc.addPage([400, 400]);
+  const initialBytes = await doc.save();
+
+  // 2. Read metadata
+  const inspection = await readPdfMetadata(initialBytes, "proposal.pdf");
+  assert.equal(inspection.valid, true);
+  assert.equal(inspection.metadata.title, "Confidential Strategy Proposal");
+  assert.equal(inspection.metadata.author, "Alice Smith");
+  assert.equal(inspection.metadata.subject, "Financial Architecture");
+  assert.ok(inspection.metadata.keywords.includes("strategy"));
+  assert.ok(inspection.metadata.keywords.includes("finance"));
+  assert.equal(inspection.metadata.creator, "Test Suite Word Processor");
+  assert.ok(inspection.metadata.producer.includes("pdf-lib"));
+
+  // 3. Update metadata fields
+  const updatedResult = await updatePdfMetadata(initialBytes, {
+    title: "Public Whitepaper",
+    author: "OneToolHub Team",
+    subject: "Web Tools",
+    keywords: "tools, browser",
+  });
+  assert.ok(updatedResult.bytes.length > 0);
+
+  const updatedInspection = await readPdfMetadata(
+    updatedResult.bytes,
+    "updated.pdf"
+  );
+  assert.equal(updatedInspection.metadata.title, "Public Whitepaper");
+  assert.equal(updatedInspection.metadata.author, "OneToolHub Team");
+  assert.equal(updatedInspection.metadata.subject, "Web Tools");
+
+  // 4. One-click Clear All Metadata (Privacy Wipe)
+  const wipedResult = await clearAllPdfMetadata(initialBytes);
+  assert.ok(wipedResult.bytes.length > 0);
+
+  const wipedInspection = await readPdfMetadata(wipedResult.bytes, "wiped.pdf");
+  assert.equal(wipedInspection.metadata.title, "");
+  assert.equal(wipedInspection.metadata.author, "");
+  assert.equal(wipedInspection.metadata.subject, "");
+  assert.equal(wipedInspection.metadata.keywords, "");
+  assert.equal(wipedInspection.metadata.creator, "");
+  assert.ok(
+    wipedInspection.metadata.producer === "" ||
+      wipedInspection.metadata.producer.includes("pdf-lib")
+  );
+});
+
+test("Step 21: PDF Password Protector Feasibility Gate & Ethical Security Stance", async () => {
+  const { getToolBySlug } = await import("../tools.ts");
+
+  // 1. Verify pdf-lib prototype does NOT support PDF encryption
+  const pdfDocProto = PDFDocument.prototype as unknown as Record<string, unknown>;
+  assert.equal(
+    typeof pdfDocProto["encrypt"],
+    "undefined",
+    "pdf-lib must not have a native encrypt method"
+  );
+
+  // 2. Verify tool registry entry is marked coming-soon with security advisory role
+  const protectorTool = getToolBySlug("pdf-password-protector");
+  assert.ok(protectorTool, "pdf-password-protector must be in registry");
+  assert.equal(
+    protectorTool.status,
+    "coming-soon",
+    "pdf-password-protector must be marked coming-soon"
+  );
+  assert.equal(protectorTool.featured, false);
+
+  // 3. Verify that 31 functional tools are available
+  const availableTools = TOOLS_REGISTRY.filter((t) => t.status === "available");
+  assert.equal(
+    availableTools.length,
+    31,
+    "Must have 31 available tools in registry"
+  );
+
+  // 4. Verify that each Step 21 available tool is properly registered in UR_TOOLS_MAP
+  const step21Slugs = [
+    "pdf-text-extractor",
+    "pdf-page-rotator",
+    "pdf-metadata-editor",
+    "pdf-password-protector",
+  ];
+  const { UR_TOOLS_MAP } = await import("../i18n/tools-ur.ts");
+  for (const slug of step21Slugs) {
+    assert.ok(UR_TOOLS_MAP[slug], `Urdu mapping must exist for ${slug}`);
+    assert.ok(UR_TOOLS_MAP[slug].name.length > 2);
+  }
+
+  // 5. Verify Tool Finder intent mappings cover new tools
+  const { findToolsForTask } = await import("../tool-finder.ts");
+  const textExtractSearch = findToolsForTask("extract text from pdf");
+  assert.ok(
+    textExtractSearch.matches.some((m) => m.tool.slug === "pdf-text-extractor"),
+    "Tool finder must match pdf-text-extractor"
+  );
+
+  const rotatorSearch = findToolsForTask("rotate pdf upside down");
+  assert.ok(
+    rotatorSearch.matches.some((m) => m.tool.slug === "pdf-page-rotator"),
+    "Tool finder must match pdf-page-rotator"
+  );
+
+  const metadataSearch = findToolsForTask("edit pdf metadata and author");
+  assert.ok(
+    metadataSearch.matches.some((m) => m.tool.slug === "pdf-metadata-editor"),
+    "Tool finder must match pdf-metadata-editor"
+  );
+});
+
+// ============================================================================
+// STEP 22: Professional Image & Design Tools Expansion
+// ============================================================================
+test("Step 22: Image Format Converter Logic & Filename Generation", async () => {
+  const {
+    validateConversionRequest,
+    buildConvertedFileName,
+  } = await import("./image-format-converter.ts");
+
+  // 1. Validation checks
+  const validFile = { name: "banner.png", type: "image/png", size: 1024 * 500 };
+  assert.equal(validateConversionRequest(validFile, "image/webp").valid, true);
+  assert.equal(validateConversionRequest(validFile, "image/jpeg").valid, true);
+  assert.equal(validateConversionRequest(validFile, "image/png").valid, true);
+
+  // Unsupported format rejection
+  const invalidTarget = validateConversionRequest(validFile, "image/gif");
+  assert.equal(invalidTarget.valid, false);
+  assert.ok(invalidTarget.error?.includes("Unsupported target format"));
+
+  // Empty file rejection
+  const emptyFile = { name: "empty.png", type: "image/png", size: 0 };
+  const emptyCheck = validateConversionRequest(emptyFile, "image/webp");
+  assert.equal(emptyCheck.valid, false);
+
+  // Oversized file rejection (> 25 MB)
+  const hugeFile = { name: "huge.png", type: "image/png", size: 30 * 1024 * 1024 };
+  const hugeCheck = validateConversionRequest(hugeFile, "image/webp");
+  assert.equal(hugeCheck.valid, false);
+
+  // 2. Safe Filename Generation
+  assert.equal(
+    buildConvertedFileName("photo.png", "image/webp"),
+    "photo-converted.webp"
+  );
+  assert.equal(
+    buildConvertedFileName("my screenshot.jpg", "image/png"),
+    "my-screenshot-converted.png"
+  );
+  assert.equal(
+    buildConvertedFileName("avatar!@#$%.webp", "image/jpeg"),
+    "avatar------converted.jpg"
+  );
+});
+
+test("Step 22: Image Cropper Aspect Presets & Boundary Validation", async () => {
+  const {
+    validateCropRect,
+    calculateDefaultCropRect,
+    buildCroppedFileName,
+  } = await import("./image-cropper.ts");
+
+  // 1. Boundary validation
+  const validCrop = { x: 50, y: 50, width: 400, height: 300 };
+  assert.equal(validateCropRect(validCrop, 800, 600).valid, true);
+
+  // Negative origin
+  const negCrop = { x: -10, y: 0, width: 200, height: 200 };
+  assert.equal(validateCropRect(negCrop, 800, 600).valid, false);
+
+  // Overflowing width
+  const overflowX = { x: 500, y: 0, width: 400, height: 300 };
+  assert.equal(validateCropRect(overflowX, 800, 600).valid, false);
+
+  // Zero dimension
+  const zeroCrop = { x: 0, y: 0, width: 0, height: 200 };
+  assert.equal(validateCropRect(zeroCrop, 800, 600).valid, false);
+
+  // 2. Aspect Ratio Presets
+  const imgW = 1920;
+  const imgH = 1080;
+
+  // 1:1 Square
+  const squareCrop = calculateDefaultCropRect("1:1", imgW, imgH);
+  assert.equal(squareCrop.width, squareCrop.height);
+  assert.ok(squareCrop.width <= imgH);
+  assert.ok(squareCrop.x >= 0 && squareCrop.y >= 0);
+
+  // 16:9 Landscape
+  const landscapeCrop = calculateDefaultCropRect("16:9", imgW, imgH);
+  const ratio16_9 = landscapeCrop.width / landscapeCrop.height;
+  assert.ok(Math.abs(ratio16_9 - 16 / 9) < 0.05);
+
+  // 4:3 Standard Photo
+  const photoCrop = calculateDefaultCropRect("4:3", imgW, imgH);
+  const ratio4_3 = photoCrop.width / photoCrop.height;
+  assert.ok(Math.abs(ratio4_3 - 4 / 3) < 0.05);
+
+  // Freeform defaults to centered box
+  const freeformCrop = calculateDefaultCropRect("freeform", imgW, imgH);
+  assert.ok(freeformCrop.width > 0 && freeformCrop.height > 0);
+
+  // 3. Filename generator
+  assert.equal(
+    buildCroppedFileName("profile.jpg", "image/png"),
+    "profile-cropped.png"
+  );
+});
+
+test("Step 22: Image to Base64 Calculation & Overhead Analytics", async () => {
+  const {
+    calculateBase64Overhead,
+    MAX_IMAGE_BASE64_FILE_SIZE_BYTES,
+  } = await import("./image-to-base64.ts");
+
+  // 1. Safe size limit is 15 MB
+  assert.equal(MAX_IMAGE_BASE64_FILE_SIZE_BYTES, 15 * 1024 * 1024);
+
+  // 2. Overhead math: 3 bytes binary -> 4 chars base64 (4/3 = 1.3333, +33.3%)
+  const originalBytes = 3000;
+  const base64Length = 4000;
+  const stats = calculateBase64Overhead(originalBytes, base64Length);
+
+  assert.equal(stats.overheadBytes, 1000);
+  assert.equal(stats.overheadPercentage, 33.3);
+
+  // Edge cases
+  assert.equal(calculateBase64Overhead(0, 0).overheadPercentage, 0);
+  assert.equal(calculateBase64Overhead(100, 100).overheadBytes, 0);
+});
+
+test("Step 22: Image Color Palette Extractor Quantization, Distance & Export", async () => {
+  const {
+    calculateColorDistance,
+    isPerceptuallyDark,
+    extractPaletteFromPixelArray,
+    exportPaletteAsJson,
+    exportPaletteAsText,
+    exportPaletteAsCss,
+  } = await import("./image-color-palette.ts");
+
+  // 1. Color Distance
+  const red = { r: 255, g: 0, b: 0 };
+  const black = { r: 0, g: 0, b: 0 };
+  const white = { r: 255, g: 255, b: 255 };
+
+  assert.equal(calculateColorDistance(red, red), 0);
+  assert.equal(calculateColorDistance(black, white), Math.sqrt(255 ** 2 * 3));
+
+  // 2. Luminance & Text Contrast
+  assert.equal(isPerceptuallyDark(black), true);
+  assert.equal(isPerceptuallyDark({ r: 20, g: 30, b: 40 }), true);
+  assert.equal(isPerceptuallyDark(white), false);
+  assert.equal(isPerceptuallyDark({ r: 240, g: 245, b: 250 }), false);
+
+  // 3. Deterministic quantization from mock pixel buffer
+  // Create 100 pixels: 60 Red, 30 Green, 10 Transparent
+  const pixelCount = 100;
+  const buffer = new Uint8ClampedArray(pixelCount * 4);
+
+  // 60 Red pixels
+  for (let i = 0; i < 60; i++) {
+    const idx = i * 4;
+    buffer[idx] = 255;
+    buffer[idx + 1] = 0;
+    buffer[idx + 2] = 0;
+    buffer[idx + 3] = 255; // Alpha 255
+  }
+  // 30 Blue pixels
+  for (let i = 60; i < 90; i++) {
+    const idx = i * 4;
+    buffer[idx] = 0;
+    buffer[idx + 1] = 0;
+    buffer[idx + 2] = 255;
+    buffer[idx + 3] = 255;
+  }
+  // 10 Transparent pixels (should be ignored)
+  for (let i = 90; i < 100; i++) {
+    const idx = i * 4;
+    buffer[idx] = 255;
+    buffer[idx + 1] = 255;
+    buffer[idx + 2] = 0;
+    buffer[idx + 3] = 0; // Alpha 0
+  }
+
+  const palette = extractPaletteFromPixelArray(buffer, 4, 20);
+  assert.ok(palette.length >= 2);
+  // Dominant color must be Red
+  assert.equal(palette[0]!.hex, "#ff0000");
+  assert.ok(palette[0]!.percentage > 50);
+
+  // Second dominant color must be Blue
+  assert.equal(palette[1]!.hex, "#0000ff");
+  assert.ok(palette[1]!.percentage > 25);
+
+  // 4. Export functions
+  const jsonExport = exportPaletteAsJson(palette);
+  assert.ok(jsonExport.includes('"hex": "#ff0000"'));
+
+  const textExport = exportPaletteAsText(palette);
+  assert.ok(textExport.includes("#FF0000"));
+
+  const cssExport = exportPaletteAsCss(palette);
+  assert.ok(cssExport.includes(":root {"));
+  assert.ok(cssExport.includes("--color-1: #ff0000;"));
+});
+
+test("Step 22: Platform Ecosystem & All Tools Integration Regression Suite", async () => {
+  // 1. Tool count verification
+  const availableTools = TOOLS_REGISTRY.filter((t) => t.status === "available");
+  assert.equal(availableTools.length, 31, "Must have 31 available tools");
+  assert.equal(TOOLS_REGISTRY.length, 32, "Must have 32 total registered tools");
+
+  // 2. Tutorials 1-to-1 match
+  assert.equal(LEARN_ARTICLES.length, 31, "Must have 31 tutorials");
+  for (const tool of availableTools) {
+    const tutorial = getArticleForTool(tool.slug);
+    assert.ok(tutorial, `Tutorial must exist for available tool: ${tool.slug}`);
+    assert.equal(tutorial.primaryToolSlug, tool.slug);
+  }
+
+  // 3. Urdu parity
+  const { UR_TOOLS_MAP } = await import("../i18n/tools-ur.ts");
+  const step22Slugs = [
+    "image-format-converter",
+    "image-cropper",
+    "image-to-base64",
+    "image-color-palette",
+  ];
+  for (const slug of step22Slugs) {
+    assert.ok(UR_TOOLS_MAP[slug], `Urdu translation must exist for ${slug}`);
+    assert.ok(UR_TOOLS_MAP[slug].name.length > 2);
+    assert.ok(UR_TOOLS_MAP[slug].shortDescription.length > 5);
+  }
+
+  // 4. Collections integration
+  const { getCollectionBySlug } = await import("../collections.ts");
+  const imageCollection = getCollectionBySlug("image-design-toolkit");
+  assert.ok(imageCollection, "Image & Design Toolkit collection must exist");
+  assert.equal(imageCollection.toolSlugs.length, 6);
+  assert.ok(imageCollection.toolSlugs.includes("image-format-converter"));
+  assert.ok(imageCollection.toolSlugs.includes("image-cropper"));
+  assert.ok(imageCollection.toolSlugs.includes("image-to-base64"));
+  assert.ok(imageCollection.toolSlugs.includes("image-color-palette"));
+
+  // 5. Workflows integration
+  const { getWorkflowBySlug } = await import("../workflows.ts");
+  const socialWorkflow = getWorkflowBySlug("prepare-social-media-image");
+  assert.ok(socialWorkflow, "Social media image workflow must exist");
+  assert.equal(socialWorkflow.steps.length, 4);
+
+  const brandWorkflow = getWorkflowBySlug("create-brand-color-palette");
+  assert.ok(brandWorkflow, "Brand color palette workflow must exist");
+  assert.equal(brandWorkflow.steps.length, 2);
+
+  // 6. Tool Finder intent resolution
+  const { findToolsForTask } = await import("../tool-finder.ts");
+  const cropMatch = findToolsForTask("crop image to 16:9 square");
+  assert.ok(cropMatch.matches.some((m) => m.tool.slug === "image-cropper"));
+
+  const convertMatch = findToolsForTask("convert png to webp format");
+  assert.ok(convertMatch.matches.some((m) => m.tool.slug === "image-format-converter"));
+
+  const paletteMatch = findToolsForTask("extract color palette hex from photo");
+  assert.ok(paletteMatch.matches.some((m) => m.tool.slug === "image-color-palette"));
+});

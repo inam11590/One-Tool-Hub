@@ -167,8 +167,43 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         {/* Results List or Suggestions */}
         <div className="max-h-80 overflow-y-auto p-2">
           {!query.trim() && (
-            <div className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-              {quickTools.length > 0 ? 'Your Quick Access & Starred Tools' : 'Suggested Utilities'}
+            <div className="mb-2 px-1">
+              <div className="flex items-center gap-1.5 pb-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    router.push('/tool-finder');
+                  }}
+                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-indigo-100 bg-indigo-50/60 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors"
+                >
+                  <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
+                  <span>Tool Finder</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    router.push('/collections');
+                  }}
+                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+                >
+                  <span>Collections</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    router.push('/workflows');
+                  }}
+                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+                >
+                  <span>Workflows</span>
+                </button>
+              </div>
+              <div className="px-2 pt-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                {quickTools.length > 0 ? 'Your Quick Access & Starred Tools' : 'Suggested Utilities'}
+              </div>
             </div>
           )}
 

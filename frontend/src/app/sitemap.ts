@@ -7,6 +7,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
     "/",
     "/tools",
+    "/tool-finder",
+    "/collections",
+    "/workflows",
     "/learn",
     "/about",
     "/contact",
@@ -14,6 +17,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/terms",
     "/ur",
     "/ur/tools",
+    "/ur/tool-finder",
+    "/ur/collections",
+    "/ur/workflows",
     "/ur/learn",
   ];
   const availableToolRoutes = TOOLS_REGISTRY.filter(
